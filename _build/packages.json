@@ -8,9 +8,63 @@
       "root-path": "D:\\CodeWorkspace\\forMoonbit\\pinyin",
       "root": "pinyin/pinyin",
       "rel": "",
-      "files": {},
+      "files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        }
+      },
       "wbtest-files": {},
-      "test-files": {},
+      "test-files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        }
+      },
       "mbt-md-files": {
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\README.mbt.md": {
           "backend": [
@@ -57,6 +111,8 @@
         "check",
         "-error-format",
         "json",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt",
         "-o",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\pinyin.mi",
         "-pkg",
@@ -84,6 +140,12 @@
         "-error-format",
         "json",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\README.mbt.md",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error_test.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format_test.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt",
         "-include-doctests",
         "-o",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\pinyin.blackbox_test.mi",

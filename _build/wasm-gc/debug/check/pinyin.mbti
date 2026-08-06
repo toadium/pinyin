@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "pinyin/pinyin"
+
+// Values
+
+// Errors
+pub(all) suberror PinyinError {
+  PinyinError(String)
+}
+
+// Types and methods
+pub(all) enum PinyinFormat {
+  WithToneMark
+  WithoutTone
+  WithToneNumber
+  FirstLetter
+}
+pub fn PinyinFormat::name(Self) -> String
+
+// Type aliases
+
+// Traits
+

@@ -429,6 +429,58 @@ fn moonbit_test_driver_internal_catch_error(
 // =========================================================
 // -=================== END JS SPECIFIC ====================
 // =========================================================
+// This file is introduced when tests without args is needed
+
+///|
+let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMap[
+  () -> Unit raise,
+] = {
+  "pinyin_format_test.mbt": {
+    0: (__test_70696e79696e5f666f726d61745f746573742e6d6274_0, ["with_tone_mark_name_returns_WITH_TONE_MARK"]),
+    1: (__test_70696e79696e5f666f726d61745f746573742e6d6274_1, ["without_tone_name_returns_WITHOUT_TONE"]),
+    2: (__test_70696e79696e5f666f726d61745f746573742e6d6274_2, ["with_tone_number_name_returns_WITH_TONE_NUMBER"]),
+    3: (__test_70696e79696e5f666f726d61745f746573742e6d6274_3, ["first_letter_name_returns_FIRST_LETTER"]),
+    4: (__test_70696e79696e5f666f726d61745f746573742e6d6274_4, ["name_returns_distinct_strings_for_all_variants"]),
+  },
+  "pinyin_error_test.mbt": {
+    0: (__test_70696e79696e5f6572726f725f746573742e6d6274_0, ["pinyin_error_carries_message"]),
+    1: (__test_70696e79696e5f6572726f725f746573742e6d6274_1, ["pinyin_error_with_empty_message"]),
+    2: (__test_70696e79696e5f6572726f725f746573742e6d6274_2, ["pinyin_error_preserves_distinct_messages"]),
+  },
+}
+
+
+///|
+impl MoonBit_Test_Driver for MoonBit_Test_Driver_Internal_No_Args with fn run_test(
+  _,
+  filename,
+  index,
+  handle_start,
+  handle_result,
+  error_to_string,
+) {
+  if moonbit_test_driver_internal_no_args_tests.0.get(filename)
+    is Some(index_map) &&
+    index_map.get(index) is Some((f, attrs)) {
+    let name = if attrs is [name, ..] { name } else { "" }
+    if MOONBIT_TEST_DRIVER_INTERNAL_IS_NATIVE {
+      for attr in attrs {
+        if attr is [.. "panic", ..] {
+          raise MoonBitTestDriverInternalSkipTest(name~)
+        }
+      }
+    }
+    handle_start()
+    moonbit_test_driver_internal_catch_error(
+      f,
+      on_ok=() => handle_result(name, "", false),
+      on_err=err => handle_result(name, error_to_string(err), false),
+    )
+    true
+  } else {
+    false
+  }
+}
 ///|
 #cfg(any(target="native", target="llvm"))
 #test_entry
