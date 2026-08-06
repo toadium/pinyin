@@ -1,0 +1,3 @@
+import {
+  "pinyin/pinyin/data",
+}
