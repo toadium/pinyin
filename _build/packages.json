@@ -38,6 +38,45 @@
       },
       "wbtest-files": {},
       "test-files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_dict_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\mutil_pinyin_dict_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dict_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error_test.mbt": {
           "backend": [
             "Wasm",
@@ -52,6 +91,19 @@
           ]
         },
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tongyong_pinyin_dict_test.mbt": {
           "backend": [
             "Wasm",
             "WasmGC",
@@ -140,8 +192,12 @@
         "-error-format",
         "json",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\README.mbt.md",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_dict_test.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\mutil_pinyin_dict_test.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dict_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format_test.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tongyong_pinyin_dict_test.mbt",
         "-doctest-only",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
         "-doctest-only",
@@ -185,7 +241,60 @@
       "root-path": "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data",
       "root": "pinyin/pinyin",
       "rel": "data",
-      "files": {},
+      "files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\chinese_dict.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\mutil_pinyin_dict.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\pinyin_dict.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\tongyong_pinyin_dict.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        }
+      },
       "wbtest-files": {},
       "test-files": {},
       "mbt-md-files": {},
@@ -215,6 +324,10 @@
         "check",
         "-error-format",
         "json",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\chinese_dict.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\mutil_pinyin_dict.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\pinyin_dict.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\tongyong_pinyin_dict.mbt",
         "-o",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\data\\data.mi",
         "-pkg",
@@ -239,6 +352,14 @@
         "check",
         "-error-format",
         "json",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\chinese_dict.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\mutil_pinyin_dict.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\pinyin_dict.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\data\\tongyong_pinyin_dict.mbt",
         "-include-doctests",
         "-o",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\data\\data.blackbox_test.mi",

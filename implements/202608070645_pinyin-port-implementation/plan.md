@@ -43,3 +43,42 @@
 - 命名映射：WITH_TONE_MARK→WithToneMark / WITHOUT_TONE→WithoutTone / WITH_TONE_NUMBER→WithToneNumber / FIRST_LETTER→FirstLetter / getName→name
 - R1 已建立模块骨架（moon.mod / moon.pkg / data/moon.pkg / README.mbt.md），`moon check` 通过
 - 本任务不引用数据子包（`@data.xxx`），`unused_package` 警告将持续至后续字典加载任务
+
+---
+
+## R2 PASSED 基础类型定义（PinyinFormat + PinyinError）
+
+结果：主包根目录新增 `pinyin_format.mbt`（`pub(all) enum PinyinFormat` 4 变体 + `PinyinFormat::name` 方法）与 `pinyin_error.mbt`（`pub(all) suberror PinyinError` 单变体 `PinyinError(String)`）。未修改 R1 产出，未引用数据子包。
+测试：`pinyin_format_test.mbt`（5 用例）+ `pinyin_error_test.mbt`（3 用例）。`moon check` exit code 0，1 warnings（`unused_package` 预期），0 errors。`moon test` Total 8, passed 8, failed 0。
+
+---
+
+## R3 NEW 字典数据子包字面量生成（含生成脚本）
+
+任务：创建 Python 3 生成脚本 `scripts/gen_pinyin_dict.py`，从源库 `D:\CodeWorkspace\forCangjie\pinyin4cj` 的 `src/chinese.dict.cj` / `src/mutil_pinyin.dict.cj` / `src/tongyong_pinyin_dict.cj` / `resource/pinyin.dict.txt` 转写为 MoonBit 字面量，生成 4 个数据子包源文件：`data/chinese_dict.mbt`（`let chinese_dict : Map[Int, Int]`，约 2556 条，16 进制码点）、`data/mutil_pinyin_dict.mbt`（`let mutil_pinyin_dict : Map[String, String]`，约 856 条）、`data/tongyong_pinyin_dict.mbt`（`let tongyong_pinyin_dict : Map[String, String]`，83 条）、`data/pinyin_dict.mbt`（`let pinyin_dict : Map[String, String]`，20903 条）。运行脚本生成产物，验证 `moon check` 通过（数据子包零依赖，主包仍不引用 `@data.xxx`，`unused_package` 警告持续至 R4 字典视图任务）。预期文件路径：`scripts/gen_pinyin_dict.py`、`data/chinese_dict.mbt`、`data/mutil_pinyin_dict.mbt`、`data/tongyong_pinyin_dict.mbt`、`data/pinyin_dict.mbt`。
+
+选择理由：四张字典是全部算法实现（`pinyin_dicts.mbt` 字典视图 / `tone_conversion.mbt` 声调转换 / `pinyin_helper.mbt` 拼音转换 / `chinese_helper.mbt` 繁简互转）的底层数据依赖。按"底层优先"原则，在算法实现之前先建立字典数据子包。四张字典均为纯数据字面量（非复杂行为类型），紧密相关，合并为一个任务符合粒度约定。生成脚本入版本控制，产物亦入版本控制（便于 `moon check` 离线验证，落实技术方案 §5.1）。
+
+上下文：
+- 技术方案 §4.1 字典数据结构选型（CHINESE_MAP: Map[Int, Int] / PINYIN_TABLE: Map[String, String] / MUTIL_PINYIN_TABLE: Map[String, String] / TONGYONG_PINYIN_TABLE: Map[String, String]）、§4.2 存储策略（构建期内嵌为 MoonBit 字面量）、§5.1 生成脚本路径与输入输出、§5.2 转写规则（4 子节）、§十一 T6/T7/T8 决策
+- 源库 `src/chinese.dict.cj`（2556 行）：`HashMap<Rune, Rune>([(r'臺', r'台'), ...])`，约 2556 条繁→简映射
+- 源库 `src/mutil_pinyin.dict.cj`（858 行）：`HashMap<String, String>([("阿訇", "ā,hōng"), ...])`，约 856 条词组拼音
+- 源库 `src/tongyong_pinyin_dict.cj`（92 行）：`HashMap<String, String>([("chi", "chih"), ...])`，83 条通用拼音
+- 源库 `resource/pinyin.dict.txt`（41806 行 / 20903 组）：两行一组（汉字 / 拼音读音），单字拼音字典
+- 转写规则：`chinese_dict.mbt` 用 16 进制码点字面量（`0x81FA: 0x53F0`）；其余三张直接转写键值字符串；`pinyin_dict.mbt` 条目数必须 = 20903（脚本含断言校验）
+- R1 已建立数据子包骨架（`data/moon.pkg` 纯数据包零依赖），R2 已建立基础类型（本任务不依赖 R2 产出）
+- 本任务不修改主包源文件，不引用 `@data.xxx`，`unused_package` 警告将持续至 R4 字典视图任务
+
+---
+
+## R3 RETRY 字典数据子包字面量生成（含生成脚本）— 审议修订 r1
+
+原因：v3 任务分配被计划审查驳回（plan_review_v3_r1.md），4 项问题（1 严重 / 2 一般 / 1 轻微）。
+
+修订要点（详见 task_v3.md §修订说明 v3 r1）：
+1. **[严重] 可见性修饰符**：删除 `pub(self) let` 错误备选，明确要求数据子包常量使用 `pub let`（已查阅 wiki `language/packages.md:79-80` 确认跨包 `@data` 引用正确性）
+2. **[一般] UTF-8 编码**：补充脚本所有文件读写显式指定 `encoding="utf-8"` 的强制要求
+3. **[一般] 确定性输出顺序**：补充脚本按 key 排序输出的强制要求（`chinese_dict` 按 Int key 升序，其余按 String key 字典序）
+4. **[轻微] 完整性校验**：四张字典均改为精确条目数断言（严格相等，不使用约等于容差）
+
+修正方向：覆写 task_v3.md，保留前序内容 + 追加修订说明，不创建新版本号文件。继续 R3 任务。
