@@ -9,6 +9,19 @@
       "root": "pinyin/pinyin",
       "rel": "",
       "files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt": {
           "backend": [
             "Wasm",
@@ -65,6 +78,19 @@
           ]
         },
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dict_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts_test.mbt": {
           "backend": [
             "Wasm",
             "WasmGC",
@@ -163,6 +189,7 @@
         "check",
         "-error-format",
         "json",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt",
         "-o",
@@ -195,9 +222,12 @@
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_dict_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\mutil_pinyin_dict_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dict_test.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tongyong_pinyin_dict_test.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt",
         "-doctest-only",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
         "-doctest-only",

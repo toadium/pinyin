@@ -107,3 +107,26 @@
 - 失败根因详见 test_v3.md §moon test 实际结果/失败用例原因分析 与 §建议处置
 - 涉及文件：`scripts/gen_pinyin_dict.py`、`data/chinese_dict.mbt`、`data/mutil_pinyin_dict.mbt`、`data/tongyong_pinyin_dict.mbt`、`data/pinyin_dict.mbt`、`chinese_dict_test.mbt`、`mutil_pinyin_dict_test.mbt`
 - `text_segment_excceed` 警告（`pinyin_dict.mbt` 超 16384 行软限制）不阻断验收（exit code 0），消除需拆分 `pinyin_dict` 为多常量（设计变更），本任务不强制处理，留待 R4 或设计修订评估
+
+---
+
+## R3 PASSED 字典数据子包字面量生成（含生成脚本）
+
+结果：v4 修正生成脚本 `scripts/gen_pinyin_dict.py` 增加 `dedup_by_key` 去重函数（保留末次 value）与 `format_repr` 格式化函数，更新 `EXPECTED_COUNTS` 为去重后条目数（chinese 2533 / mutil 843 / tongyong 82 / pinyin 20903），`main` 流程调整为"解析→去重→断言→写入"。重新生成 4 个 `.mbt` 数据文件（`data/chinese_dict.mbt` 2533 条 / `data/mutil_pinyin_dict.mbt` 843 条 / `data/tongyong_pinyin_dict.mbt` 82 条 / `data/pinyin_dict.mbt` 20903 条），同步更新 2 个测试文件断言（2543→2533 / 845→843）。
+测试：`chinese_dict_test.mbt` / `mutil_pinyin_dict_test.mbt` / `tongyong_pinyin_dict_test.mbt` / `pinyin_dict_test.mbt` 共 26 用例。`moon check` exit code 0，2 warnings（`unused_package` 预期 + `text_segment_excceed` 设计遗漏），0 errors。`moon test` Total 26, passed 26, failed 0。脚本运行审计日志：`chinese_dict` 10 行 `[DEDUP]` / `mutil_pinyin_dict` 2 行 / 其余 0 行。
+
+---
+
+## R4 NEW 字典视图构造（pinyin_dicts.mbt）
+
+任务：在主包根目录创建 `pinyin_dicts.mbt`，从 `@data` 子包读取四个字典字面量并绑定为运行时 `Map` 视图常量：`pub(self) let chinese_map : Map[Int, Int] = @data.chinese_dict`、`pub(self) let pinyin_table : Map[String, String] = @data.pinyin_dict`、`pub(self) let mutil_pinyin_table : Map[String, String] = @data.mutil_pinyin_dict`、`pub(self) let tongyong_pinyin_table : Map[String, String] = @data.tongyong_pinyin_dict`。预期文件路径：`pinyin_dicts.mbt`。验证 `moon check` 通过，`unused_package` 警告消除（主包非 test 源文件引用 `@data.xxx`），`text_segment_excceed` 警告持续（设计变更，本任务不处理）。
+
+选择理由：四张字典视图是全部算法实现（`tone_conversion.mbt` 声调转换 / `pinyin_helper.mbt` 拼音转换 / `chinese_helper.mbt` 繁简互转）的运行时数据入口。R3 已生成 `@data` 子包字面量，本任务在主包建立 `pub(self)` 视图层，消除 `unused_package` 警告并为后续算法任务提供包内可访问的字典引用。四个常量紧密相关（均为字典视图），合并为一个任务符合粒度约定。
+
+上下文：
+- 技术方案 §4.2 存储策略（全局 `let` 常量集合，`pub(self)` 可见性仅包内可访问）、§5.3 字典视图构造（`pinyin_dicts.mbt` 从 `@data` 读取字面量构造运行时 `Map` 视图）、§10.1 移植映射表（`pinyin_resource.cj` → `pinyin_dicts.mbt`）、§十一 T16 决策
+- 源库 `pinyin_helper.cj:10-12`（`let PINYIN_TABLE = PinyinResource.getPinyinResource()` 等）+ `chinese_helper.cj:9`（`let CHINESE_MAP = PinyinResource.getChineseResource()`）：资源加载改为构建期内嵌，运行时直接引用 `@data` 字面量
+- 命名映射：`CHINESE_MAP`→`chinese_map` / `PINYIN_TABLE`→`pinyin_table` / `MUTIL_PINYIN_TABLE`→`mutil_pinyin_table` / `TONGYONG_PINYIN_TABLE`→`tongyong_pinyin_table`
+- R1 已建立主包 `moon.pkg`（import `pinyin/pinyin/data`，别名 `@data`），R3 v4 已生成 `data/*.mbt` 4 个 `pub let` 字面量文件
+- 本任务引用 `@data.xxx` 后，`unused_package` 警告自动消除
+- `text_segment_excceed` 警告（`pinyin_dict.mbt` 超 16384 行）持续存在，消除需拆分 `pinyin_dict` 为多常量（设计变更），本任务不处理
