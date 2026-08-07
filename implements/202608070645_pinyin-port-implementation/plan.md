@@ -82,3 +82,28 @@
 4. **[轻微] 完整性校验**：四张字典均改为精确条目数断言（严格相等，不使用约等于容差）
 
 修正方向：覆写 task_v3.md，保留前序内容 + 追加修订说明，不创建新版本号文件。继续 R3 任务。
+
+---
+
+## R3 FAILED 字典数据子包字面量生成（含生成脚本）
+
+结果：v3 实现完成脚本与 4 个 .mbt 文件生成，`moon check` exit code 0（2 warnings：`unused_package` 预期 + `text_segment_excceed` 设计遗漏），但 `moon test` 26 tests, passed 24, failed 2。
+失败用例：
+- `chinese_dict_has_2543_entries`：实际 2533 ≠ 预期 2543（差 10）
+- `mutil_pinyin_dict_has_845_entries`：实际 843 ≠ 预期 845（差 2）
+根因：源库 `chinese.dict.cj` / `mutil_pinyin.dict.cj` 含重复 key（10 / 2 组），生成脚本 `parse_*` 按行正则匹配收集所有条目并原样写入，MoonBit Map 字面量对重复 key 静默去重（取末次 value），导致运行时 `Map.length()` < 写入条目数。
+测试：4 个测试文件 26 用例（test_v3.md r2），24 passed / 2 failed。失败用例为完整性断言，未放宽断言以暴露缺陷。
+
+---
+
+## R3 RETRY 字典数据子包字面量生成（含生成脚本）— 重复 key 去重修复
+
+任务：修正 `scripts/gen_pinyin_dict.py` 在解析后按 key 去重（保留末次 value，与 MoonBit Map 字面量语义及源库 Cangjie HashMap 语义一致），更新 `EXPECTED_COUNTS` 为去重后条目数（`chinese_dict` 2533 / `mutil_pinyin_dict` 843，`tongyong` 82 / `pinyin` 20903 不变），重新生成 4 个 .mbt 文件，同步更新测试文件断言（`chinese_dict_test.mbt` 2543→2533 / `mutil_pinyin_dict_test.mbt` 845→843），验证 `moon check` + `moon test` 全通过。
+
+选择理由：R3 v3 失败于重复 key 去重缺陷，需修正生成脚本与测试断言后重验。源库 Cangjie `HashMap([...])` 与 MoonBit Map 字面量对重复 key 均取末次 value，去重保留末次是语义保真的正确处置，非容差放宽。
+
+上下文：
+- 上一轮产出：detail_v3.md / code_v3.md / test_v3.md / verify_v3.md
+- 失败根因详见 test_v3.md §moon test 实际结果/失败用例原因分析 与 §建议处置
+- 涉及文件：`scripts/gen_pinyin_dict.py`、`data/chinese_dict.mbt`、`data/mutil_pinyin_dict.mbt`、`data/tongyong_pinyin_dict.mbt`、`data/pinyin_dict.mbt`、`chinese_dict_test.mbt`、`mutil_pinyin_dict_test.mbt`
+- `text_segment_excceed` 警告（`pinyin_dict.mbt` 超 16384 行软限制）不阻断验收（exit code 0），消除需拆分 `pinyin_dict` 为多常量（设计变更），本任务不强制处理，留待 R4 或设计修订评估

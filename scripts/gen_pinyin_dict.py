@@ -9,13 +9,20 @@
   - data/tongyong_pinyin_dict.mbt : Map[String, String] 通用拼音
   - data/pinyin_dict.mbt        : Map[String, String] 单字拼音
 
-所有文件读写显式指定 UTF-8 编码。四张字典按 key 排序输出，多次运行产生
-字节级一致产物。条目数严格断言，不符则 sys.exit(1)。
+所有文件读写显式指定 UTF-8 编码。解析后按 key 去重（保留末次 value，与 MoonBit Map
+字面量及源库 Cangjie HashMap([...]) 构造语义一致），对被丢弃的重复 key 打印审计日志。
+去重后条目数严格断言，不符则 sys.exit(1)。四张字典按 key 排序输出，多次运行产生
+字节级一致产物。
 """
 
 import re
 import sys
 from pathlib import Path
+from typing import TypeVar
+
+# 泛型类型变量（用于 dedup_by_key / format_repr 签名）
+K = TypeVar('K')
+V = TypeVar('V')
 
 # 源库根目录
 SOURCE_ROOT: str = r"D:\CodeWorkspace\forCangjie\pinyin4cj"
@@ -34,12 +41,12 @@ MUTIL_PINYIN_DICT_OUT: str = OUTPUT_DIR + r"\mutil_pinyin_dict.mbt"
 TONGYONG_PINYIN_DICT_OUT: str = OUTPUT_DIR + r"\tongyong_pinyin_dict.mbt"
 PINYIN_DICT_OUT: str = OUTPUT_DIR + r"\pinyin_dict.mbt"
 
-# 预期条目数（设计阶段实际核对值）
+# 预期条目数（v4 去重后值，见设计 §概述/实际条目数核对）
 EXPECTED_COUNTS: dict[str, int] = {
-    "chinese_dict": 2543,
-    "mutil_pinyin_dict": 845,
-    "tongyong_pinyin_dict": 82,
-    "pinyin_dict": 20903,
+    "chinese_dict": 2533,         # v3: 2543 → v4: 2533（去重 10 条）
+    "mutil_pinyin_dict": 843,     # v3: 845 → v4: 843（去重 2 条）
+    "tongyong_pinyin_dict": 82,   # 不变
+    "pinyin_dict": 20903,         # 不变
 }
 
 # chinese.dict.cj 单字符 Rune 条目正则：(r'X', r'Y')
@@ -50,7 +57,7 @@ _RE_STRING = re.compile(r'\("(.+?)"\s*,\s*"(.+?)"\)')
 
 def parse_chinese_dict(src_path: str) -> list[tuple[int, int]]:
     """解析 chinese.dict.cj，提取 (r'X', r'Y') 条目，
-    返回 [(ord(X), ord(Y)), ...] 的码点对列表。"""
+    返回 [(ord(X), ord(Y)), ...] 的码点对列表（含重复 key）。"""
     items: list[tuple[int, int]] = []
     with open(src_path, "r", encoding="utf-8") as fh:
         for line in fh:
@@ -64,7 +71,7 @@ def parse_chinese_dict(src_path: str) -> list[tuple[int, int]]:
 
 def parse_string_dict(src_path: str) -> list[tuple[str, str]]:
     """解析 mutil_pinyin.dict.cj 或 tongyong_pinyin_dict.cj，
-    提取 ("key", "value") 条目，返回 [(key, value), ...] 列表。"""
+    提取 ("key", "value") 条目，返回 [(key, value), ...] 列表（含重复 key）。"""
     items: list[tuple[str, str]] = []
     with open(src_path, "r", encoding="utf-8") as fh:
         for line in fh:
@@ -76,7 +83,7 @@ def parse_string_dict(src_path: str) -> list[tuple[str, str]]:
 
 def parse_pinyin_dict(src_path: str) -> list[tuple[str, str]]:
     """解析 pinyin.dict.txt（两行一组：汉字 / 拼音读音），
-    返回 [(汉字, 拼音), ...] 列表。"""
+    返回 [(汉字, 拼音), ...] 列表（含重复 key，若有）。"""
     items: list[tuple[str, str]] = []
     with open(src_path, "r", encoding="utf-8") as fh:
         lines = [ln.rstrip("\n").rstrip("\r") for ln in fh]
@@ -94,6 +101,36 @@ def parse_pinyin_dict(src_path: str) -> list[tuple[str, str]]:
     return items
 
 
+def format_repr(v: K) -> str:
+    """自定义格式化函数（非 repr()），用于审计日志中 key/value 的可读表示：
+    - Int：f"{v} (0x{v:X})"（十进制+十六进制，如 33266 → "33266 (0x81FA)"）
+    - str：repr(v)（原始字符，如 '臺' → "'臺'"）
+    - 其他类型：repr(v) 兜底"""
+    if isinstance(v, int):
+        return f"{v} (0x{v:X})"
+    return repr(v)
+
+
+def dedup_by_key(items: list[tuple[K, V]], name: str) -> list[tuple[K, V]]:
+    """按 key 去重，保留末次 value（与 MoonBit Map 字面量及源库 Cangjie HashMap 语义一致）。
+    对每个被丢弃的重复 key，打印审计日志：
+      [DEDUP] {name}: key={key_repr}, kept_value={kept_repr}, dropped_value={dropped_repr}
+    返回去重后的条目列表（保持原列表中首次出现的 key 顺序，后续 write_* 会按 key 排序，
+    故顺序不影响输出确定性）。
+
+    实现说明：正向遍历用 dict 累积，后出现的 key 覆盖先出现的，故保留末次 value。
+    注意：dict(reversed(items)) 是错误等价实现——它保留首次 value 而非末次，禁止使用。
+    """
+    seen: dict[K, V] = {}
+    for k, v in items:
+        if k in seen:
+            # 重复 key：当前 v 为 kept（末次），seen[k] 为被覆盖的 dropped
+            print(f"[DEDUP] {name}: key={format_repr(k)}, "
+                  f"kept_value={format_repr(v)}, dropped_value={format_repr(seen[k])}")
+        seen[k] = v
+    return list(seen.items())
+
+
 def write_chinese_dict(items: list[tuple[int, int]], out_path: str) -> None:
     """将码点对列表按 Int key 升序排序后，
     写入 chinese_dict.mbt 为 `pub let chinese_dict : Map[Int, Int] = { 0xXXXX: 0xYYYY, ... }`。"""
@@ -101,6 +138,7 @@ def write_chinese_dict(items: list[tuple[int, int]], out_path: str) -> None:
     lines: list[str] = []
     lines.append("/// 繁体→简体汉字码点映射，由 scripts/gen_pinyin_dict.py 从源库 chinese.dict.cj 生成。")
     lines.append(f"/// 共 {len(sorted_items)} 条，key 为繁体码点（Int），value 为简体码点（Int），16 进制字面量。")
+    lines.append("/// 源库含 10 组重复繁体 key，已按末次 value 去重（与 MoonBit Map 字面量语义一致）。")
     lines.append("pub let chinese_dict : Map[Int, Int] = {")
     for k, v in sorted_items:
         # 大写 16 进制码点，如 0x81FA
@@ -134,26 +172,33 @@ def assert_count(name: str, actual: int, expected: int) -> None:
 
 
 def main() -> None:
-    """主函数：解析四张字典 → 断言条目数 → 排序 → 写入 4 个 .mbt 文件 → 打印生成摘要。"""
-    # 1. 解析四张字典
+    """主函数：解析四张字典 → 按 key 去重 → 断言去重后条目数 → 排序 → 写入 4 个 .mbt 文件 → 打印生成摘要。"""
+    # 1. 解析四张字典（含重复 key）
     chinese_items = parse_chinese_dict(CHINESE_DICT_SRC)
     mutil_items = parse_string_dict(MUTIL_PINYIN_DICT_SRC)
     tongyong_items = parse_string_dict(TONGYONG_PINYIN_DICT_SRC)
     pinyin_items = parse_pinyin_dict(PINYIN_DICT_SRC)
 
-    # 2. 断言条目数
+    # 2. 按 key 去重，保留末次 value（与 MoonBit Map 字面量及源库 Cangjie HashMap 语义一致）
+    chinese_items = dedup_by_key(chinese_items, "chinese_dict")
+    mutil_items = dedup_by_key(mutil_items, "mutil_pinyin_dict")
+    tongyong_items = dedup_by_key(tongyong_items, "tongyong_pinyin_dict")
+    pinyin_items = dedup_by_key(pinyin_items, "pinyin_dict")
+
+    # 3. 断言去重后条目数（= 写入条目数 = 运行时 Map.length()）
     assert_count("chinese_dict", len(chinese_items), EXPECTED_COUNTS["chinese_dict"])
     assert_count("mutil_pinyin_dict", len(mutil_items), EXPECTED_COUNTS["mutil_pinyin_dict"])
     assert_count("tongyong_pinyin_dict", len(tongyong_items), EXPECTED_COUNTS["tongyong_pinyin_dict"])
     assert_count("pinyin_dict", len(pinyin_items), EXPECTED_COUNTS["pinyin_dict"])
 
-    # 3. 写入 4 个 .mbt 文件（排序在 write_* 内部完成）
+    # 4. 写入 4 个 .mbt 文件（排序在 write_* 内部完成）
     write_chinese_dict(chinese_items, CHINESE_DICT_OUT)
     write_string_dict(
         "mutil_pinyin_dict", mutil_items, MUTIL_PINYIN_DICT_OUT,
         [
             "/// 词组拼音映射，由 scripts/gen_pinyin_dict.py 从源库 mutil_pinyin.dict.cj 生成。",
             f"/// 共 {len(mutil_items)} 条，key 为词组（String），value 为逗号分隔拼音（含带调元音）。",
+            "/// 源库含 2 组重复词组 key，已按末次 value 去重（与 MoonBit Map 字面量语义一致）。",
         ],
     )
     write_string_dict(
@@ -171,7 +216,7 @@ def main() -> None:
         ],
     )
 
-    # 4. 打印生成摘要
+    # 5. 打印生成摘要
     print(f"[OK] chinese_dict       : {len(chinese_items)} entries -> {CHINESE_DICT_OUT}")
     print(f"[OK] mutil_pinyin_dict  : {len(mutil_items)} entries -> {MUTIL_PINYIN_DICT_OUT}")
     print(f"[OK] tongyong_pinyin_dict: {len(tongyong_items)} entries -> {TONGYONG_PINYIN_DICT_OUT}")

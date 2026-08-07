@@ -1,8 +1,8 @@
 ///|
-/// 验证 mutil_pinyin_dict 条目数为 845，对齐设计 §概述/实际条目数核对
-/// （源库 mutil_pinyin.dict.cj 858 行，条目第 13-857 行共 845 条）。
-test "mutil_pinyin_dict_has_845_entries" {
-  inspect(@data.mutil_pinyin_dict.length(), content="845")
+/// 验证 mutil_pinyin_dict 条目数为 843，对齐设计 §概述/实际条目数核对
+/// （源库条目第 13-857 行共 845 条（含 2 组重复 key），去重后 843 条）。
+test "mutil_pinyin_dict_has_843_entries" {
+  inspect(@data.mutil_pinyin_dict.length(), content="843")
 }
 
 ///|

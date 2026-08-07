@@ -461,13 +461,13 @@ let moonbit_test_driver_internal_no_args_tests : MoonBitTestDriverInternalTestMa
     4: (__test_70696e79696e5f646963745f746573742e6d6274_4, ["pinyin_dict_returns_none_for_absent_key"]),
   },
   "mutil_pinyin_dict_test.mbt": {
-    0: (__test_6d7574696c5f70696e79696e5f646963745f746573742e6d6274_0, ["mutil_pinyin_dict_has_845_entries"]),
+    0: (__test_6d7574696c5f70696e79696e5f646963745f746573742e6d6274_0, ["mutil_pinyin_dict_has_843_entries"]),
     1: (__test_6d7574696c5f70696e79696e5f646963745f746573742e6d6274_1, ["mutil_pinyin_dict_maps_a_hong_to_a_hong_pinyin"]),
     2: (__test_6d7574696c5f70696e79696e5f646963745f746573742e6d6274_2, ["mutil_pinyin_dict_maps_yi_qiu_zhi_he"]),
     3: (__test_6d7574696c5f70696e79696e5f646963745f746573742e6d6274_3, ["mutil_pinyin_dict_returns_none_for_absent_key"]),
   },
   "chinese_dict_test.mbt": {
-    0: (__test_6368696e6573655f646963745f746573742e6d6274_0, ["chinese_dict_has_2543_entries"]),
+    0: (__test_6368696e6573655f646963745f746573742e6d6274_0, ["chinese_dict_has_2533_entries"]),
     1: (__test_6368696e6573655f646963745f746573742e6d6274_1, ["chinese_dict_maps_0x81FA_to_0x53F0"]),
     2: (__test_6368696e6573655f646963745f746573742e6d6274_2, ["chinese_dict_maps_0x842C_to_0x4E07"]),
     3: (__test_6368696e6573655f646963745f746573742e6d6274_3, ["chinese_dict_returns_none_for_absent_key"]),

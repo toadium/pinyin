@@ -1,8 +1,8 @@
 ///|
-/// 验证 chinese_dict 条目数为 2543，对齐设计 §概述/实际条目数核对
-/// （源库 chinese.dict.cj 2556 行，条目第 13-2555 行共 2543 条）。
-test "chinese_dict_has_2543_entries" {
-  inspect(@data.chinese_dict.length(), content="2543")
+/// 验证 chinese_dict 条目数为 2533，对齐设计 §概述/实际条目数核对
+/// （源库条目第 13-2555 行共 2543 条（含 10 组重复 key），去重后 2533 条）。
+test "chinese_dict_has_2533_entries" {
+  inspect(@data.chinese_dict.length(), content="2533")
 }
 
 ///|

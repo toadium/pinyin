@@ -1,5 +1,6 @@
 /// 词组拼音映射，由 scripts/gen_pinyin_dict.py 从源库 mutil_pinyin.dict.cj 生成。
-/// 共 845 条，key 为词组（String），value 为逗号分隔拼音（含带调元音）。
+/// 共 843 条，key 为词组（String），value 为逗号分隔拼音（含带调元音）。
+/// 源库含 2 组重复词组 key，已按末次 value 去重（与 MoonBit Map 字面量语义一致）。
 pub let mutil_pinyin_dict : Map[String, String] = {
   "一丘之貉": "yī,qiū,zhī,hé",
   "一唱一和": "yī,chàng,yī,hè",
@@ -738,7 +739,6 @@ pub let mutil_pinyin_dict : Map[String, String] = {
   "躯壳": "qū,qiào",
   "轧辊": "zhá,gǔn",
   "轧钢": "zhá,gāng",
-  "轧钢": "zhá,gāng",
   "转动": "zhuàn,dòng",
   "转身": "zhuǎn,shēn",
   "转载": "zhuǎn,zǎi",
@@ -769,7 +769,6 @@ pub let mutil_pinyin_dict : Map[String, String] = {
   "重庆": "chóng,qìng",
   "重新": "chóng,xīn",
   "重来": "chóng,lái",
-  "重沓": "chóng,tà",
   "重沓": "chóng,tà",
   "重洋": "chóng,yáng",
   "重申": "chóng,shēn",
