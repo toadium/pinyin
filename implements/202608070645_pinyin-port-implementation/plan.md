@@ -130,3 +130,45 @@
 - R1 已建立主包 `moon.pkg`（import `pinyin/pinyin/data`，别名 `@data`），R3 v4 已生成 `data/*.mbt` 4 个 `pub let` 字面量文件
 - 本任务引用 `@data.xxx` 后，`unused_package` 警告自动消除
 - `text_segment_excceed` 警告（`pinyin_dict.mbt` 超 16384 行）持续存在，消除需拆分 `pinyin_dict` 为多常量（设计变更），本任务不处理
+
+---
+
+## R4 PASSED 字典视图构造（pinyin_dicts.mbt）
+
+结果：v5 在主包根目录新建 `pinyin_dicts.mbt`，从 `@data` 子包读取 R3 v4 已生成的四个 `pub let` 字典字面量，绑定为 `pub let` 运行时 `Map` 视图常量 `chinese_map` / `pinyin_table` / `mutil_pinyin_table` / `tongyong_pinyin_table`。可见性决策：`pub(self) let` 语法不合法（Error [3005]），选用 `pub let` 作为公共只读常量暴露（技术方案 §4.2 妥协）。未修改任何已有文件。
+测试：新增 `pinyin_dicts_test.mbt`（16 用例：4 条目数断言 + 4 共享引用验证 + 4 正向映射 + 4 边界 None）。`moon check` exit code 0，1 warning（`text_segment_excceed` 预期持续），0 errors。`moon test` Total 42, passed 42, failed 0。`unused_package` 警告消除。
+
+---
+
+## R5 NEW 声调转换内部逻辑（tone_conversion.mbt）
+
+任务：在主包根目录创建 `tone_conversion.mbt`，实现声调格式转换内部逻辑：辅助常量 `pinyin_separator`（`pub let`，跨文件共享）、`all_unmarked_vowel_array` / `all_marked_vowel_array`（`let`，文件内私有），5 个 `pub(self) fn` 内部函数——`find_array_key_by_value`（带调元音索引查找）、`convert_with_tone_number`（带调→数字调）、`convert_without_tone`（带调→无调）、`format_pinyin`（格式分发，match 模式匹配）、`convert_to_pinyin_arrays`（单字转拼音数组，查 `pinyin_table`）。新增 `tone_conversion_test.mbt` 覆盖 5 函数行为。预期文件路径：`tone_conversion.mbt`、`tone_conversion_test.mbt`。验证 `moon check` + `moon test` 通过，`text_segment_excceed` 警告持续。
+
+选择理由：声调转换是拼音转换主流程（R6 `pinyin_helper.mbt`）的核心子逻辑——`format_pinyin` / `convert_to_pinyin_arrays` 被 `pinyin_helper.mbt` 的 `convert_to_pinyin_string` / `convert_to_pinyin_array` 等公开方法调用。按"底层优先"原则，在 R6 之前先实现声调转换内部函数。5 个函数紧密相关（均围绕带调元音处理与格式分发），合并为一个任务符合粒度约定。
+
+上下文：
+- 技术方案 §4.3 辅助常量（PINYIN_SEPARATOR / ALL_UNMARKED_VOWEL_ARRAY / ALL_MARKED_VOWEL_ARRAY）、§6.3 声调格式转换算法（4 子节）、§10.3 内部方法映射（5 函数归属 tone_conversion.mbt）、§十一 T17/T18 决策
+- 源库 `pinyin_helper.cj:15-16`（ALL_*_VOWEL_ARRAY 定义）、`:29-55`（convertWithToneNumber）、`:63-73`（convertWithoutTone）、`:82-93`（formatPinyin）、`:117-123`（convertToPinyinArrays）、`:279-289`（findArrayKeyByValue）
+- 命名映射：convertWithToneNumber→convert_with_tone_number / convertWithoutTone→convert_without_tone / formatPinyin→format_pinyin / convertToPinyinArrays→convert_to_pinyin_arrays / findArrayKeyByValue→find_array_key_by_value / PINYIN_SEPARATOR→pinyin_separator / ALL_*_VOWEL_ARRAY→all_*_vowel_array
+- R2 已定义 `PinyinFormat`（format_pinyin 参数类型），R4 已定义 `pinyin_table`（convert_to_pinyin_arrays 查字典）
+- 可见性：`pinyin_separator` 用 `pub let`（跨文件共享，R6 pinyin_helper.mbt 也要用，`pub(self) let` 不合法）；`all_*_vowel_array` 用 `let`（仅本文件用）；5 函数用 `pub(self) fn`（包内跨文件可见，R6 调用），若 `pub(self) fn` 不支持则退用 `pub fn`
+- `text_segment_excceed` 警告持续（`data/pinyin_dict.mbt` 超 16384 行，本任务不处理）
+
+---
+
+## R5 RETRY 声调转换内部逻辑（tone_conversion.mbt）— 审议修订 r1
+
+原因：v6 任务分配被计划审查驳回（plan_review_v6_r1.md），7 项问题（4 严重 / 1 一般 / 2 轻微），均涉及 MoonBit 标准库 API 签名/语义错误。
+
+修订要点（详见 task_v6.md §修订说明 v6 r1）：
+1. **[严重] `String::from_char_array` 不存在**：改为 `String::from_array(arr[:])`，用 `[:]` 全切片将 `Array[Char]` 转 `ArrayView[Char]`
+2. **[严重] `String::split` 返回 `Iter[StringView]` 非 `Array[String]`**：所有 `split` 调用补充 `.map(fn(x) { x.to_owned() }).to_array()` 转换链，`String` 参数用 `sep[:]` 适配 `StringView`
+3. **[严重] `String::replace` 只替换首个 + 签名错误**：改用 `String::replace_all(old=~, new=~)` 对齐源库替换所有匹配语义
+4. **[严重] `Iter::position` 不存在**：`find_array_key_by_value` 改用显式循环对齐源库 `:279-289`
+5. **[一般] `Char` 比较运算符未确认**：验证 `pub impl Compare for Char`，确认支持 `<` / `>`，保留原写法
+6. **[轻微] `inspect` 格式未说明**：实测确认 `Array[String]` 输出为 `[a, b, c]`（元素无引号），修正所有测试预期值
+7. **[轻微] `has_marked_char` 初始化/循环范围未明确**：行为描述补充每音节 `has_marked_char = false` 初始化与 `0..<length()` 循环范围
+
+所有 API 均用 `moon ide doc`（moon 0.1.20260713）重新验证，并编写临时探针测试实测编译与 `inspect` 格式后删除。
+
+修正方向：覆写 task_v6.md，保留前序内容 + 追加修订说明，不创建新版本号文件。继续 R5 任务。
