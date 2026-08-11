@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
 """gen_pinyin_dict.py — pinyin4cj → MoonBit 字典字面量生成脚本.
 
-从源库 D:\\CodeWorkspace\\forCangjie\\pinyin4cj 转写四张字典为 MoonBit 数据子包
+从源库 pinyin4cj 转写四张字典为 MoonBit 数据子包
 (pinyin/pinyin/data) 的 `pub let` 字面量文件：
 
-  - data/chinese_dict.mbt       : Map[Int, Int]      繁→简码点映射
-  - data/mutil_pinyin_dict.mbt  : Map[String, String] 词组拼音
-  - data/tongyong_pinyin_dict.mbt : Map[String, String] 通用拼音
-  - data/pinyin_dict.mbt        : Map[String, String] 单字拼音
+  - src/data/chinese_dict.mbt       : Map[Int, Int]      繁→简码点映射
+  - src/data/mutil_pinyin_dict.mbt  : Map[String, String] 词组拼音
+  - src/data/tongyong_pinyin_dict.mbt : Map[String, String] 通用拼音
+  - src/data/pinyin_dict.mbt        : Map[String, String] 单字拼音
 
 所有文件读写显式指定 UTF-8 编码。解析后按 key 去重（保留末次 value，与 MoonBit Map
 字面量及源库 Cangjie HashMap([...]) 构造语义一致），对被丢弃的重复 key 打印审计日志。
 去重后条目数严格断言，不符则 sys.exit(1)。四张字典按 key 排序输出，多次运行产生
 字节级一致产物。
+
+环境变量：
+  PINYIN4CJ_ROOT  源库 pinyin4cj 根目录（默认 D:\\CodeWorkspace\\forCangjie\\pinyin4cj）
+
+输出目录固定为脚本所在项目根目录下的 src/data/ 子目录。
 """
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -24,10 +30,17 @@ from typing import TypeVar
 K = TypeVar('K')
 V = TypeVar('V')
 
-# 源库根目录
-SOURCE_ROOT: str = r"D:\CodeWorkspace\forCangjie\pinyin4cj"
-# 输出目录（数据子包）
-OUTPUT_DIR: str = r"D:\CodeWorkspace\forMoonbit\pinyin\data"
+# 脚本所在目录（scripts/），项目根目录为其父目录
+_SCRIPT_DIR: Path = Path(__file__).resolve().parent
+_PROJECT_ROOT: Path = _SCRIPT_DIR.parent
+
+# 源库根目录：优先从环境变量 PINYIN4CJ_ROOT 读取，未设置时回退到历史默认路径
+SOURCE_ROOT: str = os.environ.get(
+    "PINYIN4CJ_ROOT",
+    r"D:\CodeWorkspace\forCangjie\pinyin4cj",
+)
+# 输出目录（数据子包）：项目根目录下的 src/data/
+OUTPUT_DIR: str = str(_PROJECT_ROOT / "src" / "data")
 
 # 源库字典文件路径
 CHINESE_DICT_SRC: str = SOURCE_ROOT + r"\src\chinese.dict.cj"
@@ -136,6 +149,7 @@ def write_chinese_dict(items: list[tuple[int, int]], out_path: str) -> None:
     写入 chinese_dict.mbt 为 `pub let chinese_dict : Map[Int, Int] = { 0xXXXX: 0xYYYY, ... }`。"""
     sorted_items = sorted(items, key=lambda kv: kv[0])
     lines: list[str] = []
+    lines.append("///|")
     lines.append("/// 繁体→简体汉字码点映射，由 scripts/gen_pinyin_dict.py 从源库 chinese.dict.cj 生成。")
     lines.append(f"/// 共 {len(sorted_items)} 条，key 为繁体码点（Int），value 为简体码点（Int），16 进制字面量。")
     lines.append("/// 源库含 10 组重复繁体 key，已按末次 value 去重（与 MoonBit Map 字面量语义一致）。")
@@ -154,6 +168,7 @@ def write_string_dict(var_name: str, items: list[tuple[str, str]], out_path: str
     写入 .mbt 为 `pub let {var_name} : Map[String, String] = { "k": "v", ... }`。"""
     sorted_items = sorted(items, key=lambda kv: kv[0])
     lines: list[str] = []
+    lines.append("///|")
     for dl in doc_lines:
         lines.append(dl)
     lines.append(f"pub let {var_name} : Map[String, String] = {{")

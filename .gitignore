@@ -1,0 +1,36 @@
+# MoonBit build artifacts
+_build/
+
+# CodeArts agent workspace
+.codeartsdoer/
+
+# Source library copy (pinyin4cj)
+pinyin4cj/
+
+# Design / requirements / deliberation records (non-library)
+deliberations/
+designs-oo/
+designs-tech/
+implements/
+requirements/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

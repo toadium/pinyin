@@ -1,0 +1,62 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "pinyin/pinyin"
+
+// Values
+pub let chinese_map : Map[Int, Int]
+
+pub fn convert_to_pinyin_arrays(Char, PinyinFormat) -> Array[String]
+
+pub fn convert_with_tone_number(String) -> Array[String]
+
+pub fn convert_without_tone(String) -> Array[String]
+
+pub fn find_array_key_by_value(Char) -> Int
+
+pub fn format_pinyin(String, PinyinFormat) -> Array[String]
+
+pub let mutil_pinyin_table : Map[String, String]
+
+pub let pinyin_separator : String
+
+pub let pinyin_table : Map[String, String]
+
+pub let tongyong_pinyin_table : Map[String, String]
+
+// Errors
+pub(all) suberror PinyinError {
+  PinyinError(String)
+}
+
+// Types and methods
+pub struct ChineseHelper {
+}
+pub fn ChineseHelper::add_chinese_dict_resource(Map[Int, Int]) -> Unit
+pub fn ChineseHelper::contains_chinese(String) -> Bool
+pub fn ChineseHelper::convert_to_simplified_chinese(String) -> String
+pub fn ChineseHelper::convert_to_traditional_chinese(String) -> String
+pub fn ChineseHelper::is_chinese(Char) -> Bool
+pub fn ChineseHelper::is_traditional_chinese(Char) -> Bool
+
+pub(all) enum PinyinFormat {
+  WithToneMark
+  WithoutTone
+  WithToneNumber
+  FirstLetter
+}
+pub fn PinyinFormat::name(Self) -> String
+
+pub struct PinyinHelper {
+}
+pub fn PinyinHelper::add_mutil_pinyin_dict_resource(Map[String, String]) -> Unit
+pub fn PinyinHelper::add_pinyin_dict_resource(Map[String, String]) -> Unit
+pub fn PinyinHelper::convert_to_pinyin_array(Char, format? : PinyinFormat) -> Array[String]
+pub fn PinyinHelper::convert_to_pinyin_string(String, String, format? : PinyinFormat) -> String raise PinyinError
+pub fn PinyinHelper::convert_to_pinyin_string_traditional(String, String, format? : PinyinFormat) -> String raise PinyinError
+pub fn PinyinHelper::get_short_pinyin(String) -> String raise PinyinError
+pub fn PinyinHelper::has_multi_pinyin(Char) -> Bool raise PinyinError
+pub fn PinyinHelper::to_tongyong_pinyin_string_array(Char) -> Array[String]
+
+// Type aliases
+
+// Traits
+
