@@ -41,6 +41,11 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 │   │   ├── mutil_pinyin_dict.mbt      # 词组拼音（843 条）
 │   │   ├── pinyin_dict.mbt            # 单字拼音（20903 条）
 │   │   └── tongyong_pinyin_dict.mbt  # 通用拼音（82 条）
+│   ├── examples                      # 功能示例
+│   │   ├── chinese_helper_example.mbt
+│   │   ├── pinyin_helper_example.mbt
+│   │   ├── pinyin_array_example.mbt
+│   │   └── custom_dict_example.mbt
 │   ├── chinese_helper.mbt             # ChineseHelper：繁简转换、汉字判断
 │   ├── pinyin_dicts.mbt              # 四张字典视图常量
 │   ├── pinyin_error.mbt              # PinyinError 错误类型
@@ -58,6 +63,7 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 ```
 
 - `src/data` 存放字典字面量（由生成脚本从源库转写）
+- `src/examples` 存放功能示例（对应 README 中的 10 个示例）
 - `src` 是库源码目录
 - `doc` 存放库的特性文档
 - `scripts` 存放字典生成脚本
