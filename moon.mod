@@ -1,4 +1,4 @@
-name = "pinyin/pinyin"
+name = "walkzzz/pinyin"
 
 version = "0.1.0"
 
