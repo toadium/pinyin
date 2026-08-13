@@ -6,7 +6,7 @@ source = "src"
 
 readme = "src/README.mbt.md"
 
-repository = ""
+repository = "https://github.com/toadium/pinyin.git"
 
 license = "MIT"
 

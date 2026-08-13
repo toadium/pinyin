@@ -214,6 +214,20 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
+## 移植说明
+
+本项目移植自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)。
+
+| 项 | 内容 |
+|---|---|
+| 原项目名称 | pinyin4cj |
+| 原项目链接 | https://gitcode.com/pinyin4cj/pinyin4cj |
+| 原项目语言 | Cangjie（仓颉） |
+| 原项目许可证 | MIT |
+| 移植范围 | pinyin_helper + chinese_helper 全部 API，完整移植 |
+| 修改适配 | camelCase→snake_case、异常改用 raise、字典内嵌为字面量、src/ 布局 |
+| 未支持功能 | 无（完整移植） |
+
 ## 开源协议
 
 本项目基于 [MIT License](./LICENSE)，请自由的享受和参与开源。
