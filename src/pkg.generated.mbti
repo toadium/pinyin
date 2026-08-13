@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "pinyin/pinyin"
+package "walkzzz/pinyin"
 
 // Values
 pub let chinese_map : Map[Int, Int]

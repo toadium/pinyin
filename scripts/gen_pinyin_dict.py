@@ -2,7 +2,7 @@
 """gen_pinyin_dict.py — pinyin4cj → MoonBit 字典字面量生成脚本.
 
 从源库 pinyin4cj 转写四张字典为 MoonBit 数据子包
-(pinyin/pinyin/data) 的 `pub let` 字面量文件：
+(walkzzz/pinyin/data) 的 `pub let` 字面量文件：
 
   - src/data/chinese_dict.mbt       : Map[Int, Int]      繁→简码点映射
   - src/data/mutil_pinyin_dict.mbt  : Map[String, String] 词组拼音

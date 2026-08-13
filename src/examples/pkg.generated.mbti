@@ -1,14 +1,7 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "pinyin/pinyin/examples"
+package "walkzzz/pinyin/examples"
 
 // Values
-pub let chinese_dict : Map[Int, Int]
-
-pub let mutil_pinyin_dict : Map[String, String]
-
-pub let pinyin_dict : Map[String, String]
-
-pub let tongyong_pinyin_dict : Map[String, String]
 
 // Errors
 
