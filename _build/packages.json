@@ -9,6 +9,19 @@
       "root": "pinyin/pinyin",
       "rel": "",
       "files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_helper.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt": {
           "backend": [
             "Wasm",
@@ -47,9 +60,62 @@
             "Release",
             "Debug"
           ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_helper.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tone_conversion.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
         }
       },
-      "wbtest-files": {},
+      "wbtest-files": {
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_helper_wbtest.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tone_conversion_wbtest.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        }
+      },
       "test-files": {
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_dict_test.mbt": {
           "backend": [
@@ -129,6 +195,19 @@
             "Debug"
           ]
         },
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_test.mbt": {
+          "backend": [
+            "Wasm",
+            "WasmGC",
+            "Js",
+            "Native",
+            "LLVM"
+          ],
+          "optlevel": [
+            "Release",
+            "Debug"
+          ]
+        },
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tongyong_pinyin_dict_test.mbt": {
           "backend": [
             "Wasm",
@@ -189,9 +268,12 @@
         "check",
         "-error-format",
         "json",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_helper.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_helper.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tone_conversion.mbt",
         "-o",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\pinyin.mi",
         "-pkg",
@@ -213,7 +295,40 @@
         "-all-pkgs",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\all_pkgs.json"
       ],
-      "wbtest-check-command": null,
+      "wbtest-check-command": [
+        "check",
+        "-error-format",
+        "json",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_helper.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_helper.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tone_conversion.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_helper_wbtest.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tone_conversion_wbtest.mbt",
+        "-o",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\pinyin.whitebox_test.mi",
+        "-pkg",
+        "pinyin/pinyin",
+        "-pkg-type",
+        "library",
+        "-std-path",
+        "C:\\Users\\Administrator\\.moon\\lib\\core\\_build\\wasm-gc\\release\\bundle",
+        "-i",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\data\\data.mi:data",
+        "-i",
+        "C:\\Users\\Administrator\\.moon\\lib\\core\\_build\\wasm-gc\\release\\bundle\\prelude\\prelude.mi:prelude",
+        "-pkg-sources",
+        "pinyin/pinyin:D:\\CodeWorkspace\\forMoonbit\\pinyin",
+        "-target",
+        "wasm-gc",
+        "-whitebox-test",
+        "-workspace-path",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin",
+        "-all-pkgs",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\all_pkgs.json"
+      ],
       "test-check-command": [
         "check",
         "-error-format",
@@ -225,13 +340,20 @@
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format_test.mbt",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_test.mbt",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tongyong_pinyin_dict_test.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\chinese_helper.mbt",
         "-doctest-only",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_dicts.mbt",
         "-doctest-only",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_error.mbt",
         "-doctest-only",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_format.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\pinyin_helper.mbt",
+        "-doctest-only",
+        "D:\\CodeWorkspace\\forMoonbit\\pinyin\\tone_conversion.mbt",
         "-include-doctests",
         "-o",
         "D:\\CodeWorkspace\\forMoonbit\\pinyin\\_build\\wasm-gc\\debug\\check\\pinyin.blackbox_test.mi",

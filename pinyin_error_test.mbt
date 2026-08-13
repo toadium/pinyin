@@ -9,7 +9,10 @@ fn raise_pinyin_error(msg : String) -> Unit raise @pinyin.PinyinError {
 /// 捕获后可提取携带的错误消息字符串，对齐源库 Pinyin4cjException 行为。
 test "pinyin_error_carries_message" {
   try raise_pinyin_error("test message") catch {
-    @pinyin.PinyinError::PinyinError(msg) => inspect(msg, content="test message")
+    @pinyin.PinyinError::PinyinError(msg) =>
+      debug_inspect(msg, content=(
+        #|"test message"
+      ))
   } noraise {
     _ => fail("expected PinyinError to be raised")
   }
@@ -19,7 +22,9 @@ test "pinyin_error_carries_message" {
 /// 边界条件：空字符串作为错误消息，验证 PinyinError 可承载空消息。
 test "pinyin_error_with_empty_message" {
   try raise_pinyin_error("") catch {
-    @pinyin.PinyinError::PinyinError(msg) => inspect(msg, content="")
+    @pinyin.PinyinError::PinyinError(msg) => debug_inspect(msg, content=(
+      #|""
+    ))
   } noraise {
     _ => fail("expected PinyinError to be raised")
   }
@@ -34,8 +39,12 @@ test "pinyin_error_preserves_distinct_messages" {
       try raise_pinyin_error("error two") catch {
         @pinyin.PinyinError::PinyinError(msg2) => {
           assert_true(msg1 != msg2)
-          inspect(msg1, content="error one")
-          inspect(msg2, content="error two")
+          debug_inspect(msg1, content=(
+            #|"error one"
+          ))
+          debug_inspect(msg2, content=(
+            #|"error two"
+          ))
         }
       } noraise {
         _ => fail("expected second PinyinError to be raised")

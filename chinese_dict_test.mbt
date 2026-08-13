@@ -2,7 +2,7 @@
 /// 验证 chinese_dict 条目数为 2533，对齐设计 §概述/实际条目数核对
 /// （源库条目第 13-2555 行共 2543 条（含 10 组重复 key），去重后 2533 条）。
 test "chinese_dict_has_2533_entries" {
-  inspect(@data.chinese_dict.length(), content="2533")
+  debug_inspect(@data.chinese_dict.length(), content="2533")
 }
 
 ///|
@@ -10,7 +10,7 @@ test "chinese_dict_has_2533_entries" {
 /// 对齐源库 chinese.dict.cj 条目 (r'臺', r'台')。
 test "chinese_dict_maps_0x81FA_to_0x53F0" {
   match @data.chinese_dict.get(0x81FA) {
-    Some(v) => inspect(v, content="21488")
+    Some(v) => debug_inspect(v, content="21488")
     None => fail("expected key 0x81FA in chinese_dict")
   }
 }
@@ -20,7 +20,7 @@ test "chinese_dict_maps_0x81FA_to_0x53F0" {
 /// 对齐源库 chinese.dict.cj 条目 (r'萬', r'万')。
 test "chinese_dict_maps_0x842C_to_0x4E07" {
   match @data.chinese_dict.get(0x842C) {
-    Some(v) => inspect(v, content="19975")
+    Some(v) => debug_inspect(v, content="19975")
     None => fail("expected key 0x842C in chinese_dict")
   }
 }

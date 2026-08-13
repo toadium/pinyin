@@ -1,5 +1,6 @@
 /// 单字拼音映射，由 scripts/gen_pinyin_dict.py 从源库 resource/pinyin.dict.txt 生成。
 /// 共 20903 条，key 为汉字（String），value 为逗号分隔多音（含带调元音）。
+
 ///|
 let seg0 : Map[String, String] = {
   "〇": "líng",
@@ -2004,6 +2005,7 @@ let seg0 : Map[String, String] = {
   "嗎": "ma,má,mǎ",
   "嗏": "chā",
 }
+
 ///|
 let seg1 : Map[String, String] = {
   "嗐": "hài",
@@ -4007,6 +4009,7 @@ let seg1 : Map[String, String] = {
   "嶞": "tuò",
   "嶟": "zūn",
 }
+
 ///|
 let seg2 : Map[String, String] = {
   "嶠": "jiào,qiáo",
@@ -6010,6 +6013,7 @@ let seg2 : Map[String, String] = {
   "敮": "xiá",
   "敯": "mǐn",
 }
+
 ///|
 let seg3 : Map[String, String] = {
   "数": "shǔ,shù,shuò",
@@ -8013,6 +8017,7 @@ let seg3 : Map[String, String] = {
   "派": "pài",
   "洿": "wū",
 }
+
 ///|
 let seg4 : Map[String, String] = {
   "浀": "qū",
@@ -10016,6 +10021,7 @@ let seg4 : Map[String, String] = {
   "甎": "zhuān",
   "甏": "bèng",
 }
+
 ///|
 let seg5 : Map[String, String] = {
   "甐": "lìn",
@@ -12019,6 +12025,7 @@ let seg5 : Map[String, String] = {
   "糞": "fèn",
   "糟": "zāo",
 }
+
 ///|
 let seg6 : Map[String, String] = {
   "糠": "kāng",
@@ -14022,6 +14029,7 @@ let seg6 : Map[String, String] = {
   "蒮": "yù",
   "蒯": "kuǎi",
 }
+
 ///|
 let seg7 : Map[String, String] = {
   "蒰": "pán",
@@ -16025,6 +16033,7 @@ let seg7 : Map[String, String] = {
   "豾": "pī",
   "豿": "gǒu",
 }
+
 ///|
 let seg8 : Map[String, String] = {
   "貀": "nà",
@@ -18028,6 +18037,7 @@ let seg8 : Map[String, String] = {
   "鑎": "guì",
   "鑏": "níng",
 }
+
 ///|
 let seg9 : Map[String, String] = {
   "鑐": "xū",
@@ -20031,6 +20041,7 @@ let seg9 : Map[String, String] = {
   "鰞": "wū",
   "鰟": "páng",
 }
+
 ///|
 let seg10 : Map[String, String] = {
   "鰠": "sāo",
@@ -20936,5 +20947,16 @@ let seg10 : Map[String, String] = {
   "龤": "xié",
   "龥": "yuè",
 }
+
 ///|
-pub let pinyin_dict : Map[String, String] = seg0.merge(seg1).merge(seg2).merge(seg3).merge(seg4).merge(seg5).merge(seg6).merge(seg7).merge(seg8).merge(seg9).merge(seg10)
+pub let pinyin_dict : Map[String, String] = seg0
+  .merge(seg1)
+  .merge(seg2)
+  .merge(seg3)
+  .merge(seg4)
+  .merge(seg5)
+  .merge(seg6)
+  .merge(seg7)
+  .merge(seg8)
+  .merge(seg9)
+  .merge(seg10)

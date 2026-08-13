@@ -1,3 +1,4 @@
+///|
 /// 繁体→简体汉字码点映射，由 scripts/gen_pinyin_dict.py 从源库 chinese.dict.cj 生成。
 /// 共 2533 条，key 为繁体码点（Int），value 为简体码点（Int），16 进制字面量。
 /// 源库含 10 组重复繁体 key，已按末次 value 去重（与 MoonBit Map 字面量语义一致）。

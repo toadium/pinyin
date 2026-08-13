@@ -2,7 +2,7 @@
 /// 验证 mutil_pinyin_dict 条目数为 843，对齐设计 §概述/实际条目数核对
 /// （源库条目第 13-857 行共 845 条（含 2 组重复 key），去重后 843 条）。
 test "mutil_pinyin_dict_has_843_entries" {
-  inspect(@data.mutil_pinyin_dict.length(), content="843")
+  debug_inspect(@data.mutil_pinyin_dict.length(), content="843")
 }
 
 ///|
@@ -10,7 +10,9 @@ test "mutil_pinyin_dict_has_843_entries" {
 /// 对齐源库 mutil_pinyin.dict.cj 条目 ("阿訇", "ā,hōng")。
 test "mutil_pinyin_dict_maps_a_hong_to_a_hong_pinyin" {
   match @data.mutil_pinyin_dict.get("阿訇") {
-    Some(v) => inspect(v, content="ā,hōng")
+    Some(v) => debug_inspect(v, content=(
+      #|"ā,hōng"
+    ))
     None => fail("expected key \"阿訇\" in mutil_pinyin_dict")
   }
 }
@@ -20,7 +22,9 @@ test "mutil_pinyin_dict_maps_a_hong_to_a_hong_pinyin" {
 /// 对齐源库 mutil_pinyin.dict.cj 条目 ("一丘之貉", "yī,qiū,zhī,hé")。
 test "mutil_pinyin_dict_maps_yi_qiu_zhi_he" {
   match @data.mutil_pinyin_dict.get("一丘之貉") {
-    Some(v) => inspect(v, content="yī,qiū,zhī,hé")
+    Some(v) => debug_inspect(v, content=(
+      #|"yī,qiū,zhī,hé"
+    ))
     None => fail("expected key \"一丘之貉\" in mutil_pinyin_dict")
   }
 }

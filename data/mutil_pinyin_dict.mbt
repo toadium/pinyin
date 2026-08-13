@@ -1,3 +1,4 @@
+///|
 /// 词组拼音映射，由 scripts/gen_pinyin_dict.py 从源库 mutil_pinyin.dict.cj 生成。
 /// 共 843 条，key 为词组（String），value 为逗号分隔拼音（含带调元音）。
 /// 源库含 2 组重复词组 key，已按末次 value 去重（与 MoonBit Map 字面量语义一致）。

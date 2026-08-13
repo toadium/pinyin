@@ -1,3 +1,4 @@
+///|
 /// 通用拼音映射，由 scripts/gen_pinyin_dict.py 从源库 tongyong_pinyin_dict.cj 生成。
 /// 共 82 条，key/value 均为纯 ASCII 字符串。
 pub let tongyong_pinyin_dict : Map[String, String] = {

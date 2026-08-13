@@ -2,7 +2,7 @@
 /// 验证 tongyong_pinyin_dict 条目数为 82，对齐设计 §概述/实际条目数核对
 /// （源库 tongyong_pinyin_dict.cj 92 行，去 9 行头 + 1 行收尾共 82 条）。
 test "tongyong_pinyin_dict_has_82_entries" {
-  inspect(@data.tongyong_pinyin_dict.length(), content="82")
+  debug_inspect(@data.tongyong_pinyin_dict.length(), content="82")
 }
 
 ///|
@@ -10,7 +10,9 @@ test "tongyong_pinyin_dict_has_82_entries" {
 /// 对齐源库 tongyong_pinyin_dict.cj 条目 ("chi", "chih")。
 test "tongyong_pinyin_dict_maps_chi_to_chih" {
   match @data.tongyong_pinyin_dict.get("chi") {
-    Some(v) => inspect(v, content="chih")
+    Some(v) => debug_inspect(v, content=(
+      #|"chih"
+    ))
     None => fail("expected key \"chi\" in tongyong_pinyin_dict")
   }
 }
@@ -20,7 +22,9 @@ test "tongyong_pinyin_dict_maps_chi_to_chih" {
 /// 对齐源库 tongyong_pinyin_dict.cj 条目 ("chui", "chuei")。
 test "tongyong_pinyin_dict_maps_chui_to_chuei" {
   match @data.tongyong_pinyin_dict.get("chui") {
-    Some(v) => inspect(v, content="chuei")
+    Some(v) => debug_inspect(v, content=(
+      #|"chuei"
+    ))
     None => fail("expected key \"chui\" in tongyong_pinyin_dict")
   }
 }

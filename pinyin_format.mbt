@@ -1,3 +1,4 @@
+///|
 /// 拼音输出格式枚举，对齐源库 pinyin4cj 的 PinyinFormat。
 /// 4 个变体分别对应：带声调标记 / 不带声调 / 带声调数字 / 首字母。
 pub(all) enum PinyinFormat {
@@ -7,6 +8,7 @@ pub(all) enum PinyinFormat {
   FirstLetter
 }
 
+///|
 /// 返回格式名称字符串（大写下划线形式），逐字符对齐源库 getName()。
 pub fn PinyinFormat::name(self : PinyinFormat) -> String {
   match self {

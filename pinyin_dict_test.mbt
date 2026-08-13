@@ -2,7 +2,7 @@
 /// 验证 pinyin_dict 条目数为 20903，对齐设计 §概述/实际条目数核对
 /// （源库 pinyin.dict.txt 41806 行 / 2 = 20903 组，精确匹配）。
 test "pinyin_dict_has_20903_entries" {
-  inspect(@data.pinyin_dict.length(), content="20903")
+  debug_inspect(@data.pinyin_dict.length(), content="20903")
 }
 
 ///|
@@ -10,7 +10,9 @@ test "pinyin_dict_has_20903_entries" {
 /// 对齐源库 pinyin.dict.txt 首组（第 1-2 行：〇 / líng）。
 test "pinyin_dict_maps_ling_to_ling" {
   match @data.pinyin_dict.get("〇") {
-    Some(v) => inspect(v, content="líng")
+    Some(v) => debug_inspect(v, content=(
+      #|"líng"
+    ))
     None => fail("expected key \"〇\" in pinyin_dict")
   }
 }
@@ -20,7 +22,9 @@ test "pinyin_dict_maps_ling_to_ling" {
 /// 对齐源库 pinyin.dict.txt 条目（一 / yī）。
 test "pinyin_dict_maps_yi_to_yi" {
   match @data.pinyin_dict.get("一") {
-    Some(v) => inspect(v, content="yī")
+    Some(v) => debug_inspect(v, content=(
+      #|"yī"
+    ))
     None => fail("expected key \"一\" in pinyin_dict")
   }
 }
@@ -30,7 +34,9 @@ test "pinyin_dict_maps_yi_to_yi" {
 /// 对齐源库 pinyin.dict.txt 条目（丁 / dīng,zhēng）。
 test "pinyin_dict_maps_ding_to_ding_zheng" {
   match @data.pinyin_dict.get("丁") {
-    Some(v) => inspect(v, content="dīng,zhēng")
+    Some(v) => debug_inspect(v, content=(
+      #|"dīng,zhēng"
+    ))
     None => fail("expected key \"丁\" in pinyin_dict")
   }
 }
