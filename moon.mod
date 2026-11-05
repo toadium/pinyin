@@ -1,6 +1,6 @@
 name = "walkzzz/pinyin"
 
-version = "0.1.5"
+version = "0.1.1"
 
 readme = "README.mbt.md"
 

@@ -22,32 +22,42 @@ pinyin 是一个支持将汉字转换成拼音的库，输出的拼音格式可�
 
 ```
 .
-├── src
-│   ├── data
-│   │   ├── chinese_dict.mbt
-│   │   ├── mutil_pinyin_dict.mbt
-│   │   ├── pinyin_dict.mbt
-│   │   └── tongyong_pinyin_dict.mbt
-│   ├── chinese_helper.mbt
-│   ├── pinyin_dicts.mbt
-│   ├── pinyin_error.mbt
-│   ├── pinyin_format.mbt
-│   ├── pinyin_helper.mbt
-│   └── tone_conversion.mbt
-├── doc
-│   └── feature_api.md
+├── data
+│   ├── chinese_dict.mbt
+│   ├── mutil_pinyin_dict.mbt
+│   ├── pinyin_dict.mbt
+│   └── tongyong_pinyin_dict.mbt
+├── examples
+│   ├── chinese_helper_example.mbt
+│   ├── pinyin_helper_example.mbt
+│   ├── pinyin_array_example.mbt
+│   └── custom_dict_example.mbt
+├── docs
+│   ├── roadmap.md
+│   ├── architecture.md
+│   ├── api.md
+│   └── testing.md
+├── chinese_helper.mbt
+├── pinyin_dicts.mbt
+├── pinyin_error.mbt
+├── pinyin_format.mbt
+├── pinyin_helper.mbt
+├── tone_conversion.mbt
 ├── scripts
 │   └── gen_pinyin_dict.py
 ├── moon.mod
+├── moon.pkg
 ├── CHANGELOG.md
 ├── LICENSE
-└── README.md
+├── README.md
+└── README.mbt.md
 ```
 
-- `src/data` 存放字典字面量（由生成脚本从源库 `resource/pinyin.dict.txt` 转写）
-- `src` 是库源码目录
-- `doc` 存放库的特性文档
-- `scripts` 存放字典生成脚本
+- `data/` 纯数据包，零依赖，存放字典字面量（由生成脚本从源库转写）
+- `examples/` 示例包，依赖根包，14 个示例测试覆盖所有公开 API
+- `docs/` 开发文档（roadmap / architecture / api / testing）
+- 根目录为库源码包（`walkzzz/pinyin`），含核心 API 与测试
+- `scripts/` 存放字典生成脚本
 
 ## 使用说明
 
@@ -66,7 +76,7 @@ moon test
 ///|
 test "readme_convert_to_simplified" {
   inspect(
-    ChineseHelper::convert_to_simplified_chinese("臺，喪，麗"),
+    @pinyin.ChineseHelper::convert_to_simplified_chinese("臺，喪，麗"),
     content="台，丧，丽",
   )
 }
@@ -78,7 +88,7 @@ test "readme_convert_to_simplified" {
 ///|
 test "readme_convert_to_traditional" {
   inspect(
-    ChineseHelper::convert_to_traditional_chinese("我是中国人"),
+    @pinyin.ChineseHelper::convert_to_traditional_chinese("我是中国人"),
     content="我是中國人",
   )
 }
@@ -90,7 +100,7 @@ test "readme_convert_to_traditional" {
 ///|
 test "readme_convert_to_pinyin_string" {
   inspect(
-    PinyinHelper::convert_to_pinyin_string("我是中国人", " "),
+    @pinyin.PinyinHelper::convert_to_pinyin_string("我是中国人", " "),
     content="wǒ shì zhōng zhòng guó rén",
   )
 }
@@ -102,10 +112,10 @@ test "readme_convert_to_pinyin_string" {
 ///|
 test "readme_with_tone_number" {
   inspect(
-    PinyinHelper::convert_to_pinyin_string(
+    @pinyin.PinyinHelper::convert_to_pinyin_string(
       "中国",
       " ",
-      format=PinyinFormat::WithToneNumber,
+      format=WithToneNumber,
     ),
     content="zhong1 zhong4 guo2",
   )
@@ -118,7 +128,7 @@ test "readme_with_tone_number" {
 ///|
 test "readme_convert_to_pinyin_array" {
   debug_inspect(
-    PinyinHelper::convert_to_pinyin_array('长'),
+    @pinyin.PinyinHelper::convert_to_pinyin_array('长'),
     content="[\"cháng\", \"zhǎng\"]",
   )
 }
@@ -130,7 +140,7 @@ test "readme_convert_to_pinyin_array" {
 ///|
 test "readme_tongyong_pinyin" {
   debug_inspect(
-    PinyinHelper::to_tongyong_pinyin_string_array('传'),
+    @pinyin.PinyinHelper::to_tongyong_pinyin_string_array('传'),
     content="[\"chuan2\", \"jhuan4\"]",
   )
 }
@@ -141,7 +151,7 @@ test "readme_tongyong_pinyin" {
 ```mbt check
 ///|
 test "readme_get_short_pinyin" {
-  inspect(PinyinHelper::get_short_pinyin("中国"), content="z z g")
+  inspect(@pinyin.PinyinHelper::get_short_pinyin("中国"), content="z z g")
 }
 ```
 
@@ -150,7 +160,7 @@ test "readme_get_short_pinyin" {
 ```mbt check
 ///|
 test "readme_has_multi_pinyin" {
-  inspect(PinyinHelper::has_multi_pinyin('中'), content="true")
+  inspect(@pinyin.PinyinHelper::has_multi_pinyin('中'), content="true")
 }
 ```
 
@@ -159,8 +169,8 @@ test "readme_has_multi_pinyin" {
 ```mbt check
 ///|
 test "readme_is_chinese" {
-  inspect(ChineseHelper::is_chinese('中'), content="true")
-  inspect(ChineseHelper::contains_chinese("abc中"), content="true")
+  inspect(@pinyin.ChineseHelper::is_chinese('中'), content="true")
+  inspect(@pinyin.ChineseHelper::contains_chinese("abc中"), content="true")
 }
 ```
 
@@ -188,6 +198,8 @@ python scripts/gen_pinyin_dict.py
 | 编号 | 依赖构建工具 | 版本号 |
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
+
+四后端（wasm / wasm-gc / js / native）各 60 测试全通过，严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 开源协议
 

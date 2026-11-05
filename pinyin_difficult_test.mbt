@@ -5,10 +5,10 @@
 /// mutil_pinyin_dict 843 条（源库 845 条含 2 组重复 key，去重后 843）。
 /// tongyong_pinyin_dict 82 条。
 test "dicts_have_expected_entry_counts" {
-  inspect(chinese_map.length(), content="2533")
-  inspect(pinyin_table.length(), content="20903")
-  inspect(mutil_pinyin_table.length(), content="843")
-  inspect(tongyong_pinyin_table.length(), content="82")
+  inspect(@pinyin.chinese_map.length(), content="2533")
+  inspect(@pinyin.pinyin_table.length(), content="20903")
+  inspect(@pinyin.mutil_pinyin_table.length(), content="843")
+  inspect(@pinyin.tongyong_pinyin_table.length(), content="82")
   inspect(@data.chinese_dict.length(), content="2533")
   inspect(@data.pinyin_dict.length(), content="20903")
   inspect(@data.mutil_pinyin_dict.length(), content="843")

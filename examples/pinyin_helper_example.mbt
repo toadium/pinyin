@@ -13,7 +13,7 @@ test "example_with_tone_number" {
   let result = @pinyin.PinyinHelper::convert_to_pinyin_string(
     "中国",
     " ",
-    format=@pinyin.PinyinFormat::WithToneNumber,
+    format=WithToneNumber,
   )
   println(result)
 }
@@ -24,7 +24,7 @@ test "example_without_tone" {
   let result = @pinyin.PinyinHelper::convert_to_pinyin_string(
     "中国",
     " ",
-    format=@pinyin.PinyinFormat::WithoutTone,
+    format=WithoutTone,
   )
   println(result)
 }
@@ -35,7 +35,7 @@ test "example_first_letter" {
   let result = @pinyin.PinyinHelper::convert_to_pinyin_string(
     "中国",
     " ",
-    format=@pinyin.PinyinFormat::FirstLetter,
+    format=FirstLetter,
   )
   println(result)
 }
