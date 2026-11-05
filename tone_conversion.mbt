@@ -15,7 +15,7 @@ let all_marked_vowel_array : Array[Char] = [
 
 ///|
 /// 在带调元音数组中查找字符索引，未找到返回 -1。对齐源库 findArrayKeyByValue。
-pub fn find_array_key_by_value(ch : Char) -> Int {
+pub fn find_array_key_by_value(ch : Char) -> Int32 {
   for i in 0..<all_marked_vowel_array.length() {
     if all_marked_vowel_array[i] == ch {
       return i

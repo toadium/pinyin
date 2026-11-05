@@ -2,7 +2,7 @@
 package "walkzzz/pinyin"
 
 // Values
-pub let chinese_map : Map[Int, Int]
+pub let chinese_map : Map[Int32, Int32]
 
 pub fn convert_to_pinyin_arrays(Char, PinyinFormat) -> Array[String]
 
@@ -10,7 +10,7 @@ pub fn convert_with_tone_number(String) -> Array[String]
 
 pub fn convert_without_tone(String) -> Array[String]
 
-pub fn find_array_key_by_value(Char) -> Int
+pub fn find_array_key_by_value(Char) -> Int32
 
 pub fn format_pinyin(String, PinyinFormat) -> Array[String]
 
@@ -30,7 +30,7 @@ pub(all) suberror PinyinError {
 // Types and methods
 pub struct ChineseHelper {
 }
-pub fn ChineseHelper::add_chinese_dict_resource(Map[Int, Int]) -> Unit
+pub fn ChineseHelper::add_chinese_dict_resource(Map[Int32, Int32]) -> Unit
 pub fn ChineseHelper::contains_chinese(String) -> Bool
 pub fn ChineseHelper::convert_to_simplified_chinese(String) -> String
 pub fn ChineseHelper::convert_to_traditional_chinese(String) -> String
@@ -59,4 +59,3 @@ pub fn PinyinHelper::to_tongyong_pinyin_string_array(Char) -> Array[String]
 // Type aliases
 
 // Traits
-

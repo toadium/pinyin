@@ -8,7 +8,7 @@ pub struct PinyinHelper {}
 pub fn PinyinHelper::convert_to_pinyin_string(
   str : String,
   separator : String,
-  format? : PinyinFormat = WithToneMark,
+  format~ : PinyinFormat = WithToneMark,
 ) -> String raise PinyinError {
   PinyinHelper::convert_to_pinyin_string_result(str, separator, format)
 }
@@ -18,7 +18,7 @@ pub fn PinyinHelper::convert_to_pinyin_string(
 pub fn PinyinHelper::convert_to_pinyin_string_traditional(
   str : String,
   separator : String,
-  format? : PinyinFormat = WithToneMark,
+  format~ : PinyinFormat = WithToneMark,
 ) -> String raise PinyinError {
   let simplified = ChineseHelper::convert_to_simplified_chinese(str)
   PinyinHelper::convert_to_pinyin_string(simplified, separator, format~)
@@ -28,7 +28,7 @@ pub fn PinyinHelper::convert_to_pinyin_string_traditional(
 /// 单字所有读音数组。对齐源库 convertToPinyinArray。非汉字返回 []。
 pub fn PinyinHelper::convert_to_pinyin_array(
   c : Char,
-  format? : PinyinFormat = WithToneMark,
+  format~ : PinyinFormat = WithToneMark,
 ) -> Array[String] {
   convert_to_pinyin_arrays(c, format)
 }

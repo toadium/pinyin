@@ -5,7 +5,7 @@
 
 ///|
 /// 繁体→简体汉字码点映射，2533 条，对应源库 CHINESE_MAP。
-pub let chinese_map : Map[Int, Int] = @data.chinese_dict
+pub let chinese_map : Map[Int32, Int32] = @data.chinese_dict
 
 ///|
 /// 单字拼音映射，20903 条，对应源库 PINYIN_TABLE。

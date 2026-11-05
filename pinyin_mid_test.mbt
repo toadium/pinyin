@@ -219,7 +219,7 @@ test "add_pinyin_dict_resource" {
 ///|
 /// 自定义繁简字典追加：add_chinese_dict_resource 原地合并。
 test "add_chinese_dict_resource" {
-  let custom_dict : Map[Int, Int] = { 0x41: 0x42 }
+  let custom_dict : Map[Int32, Int32] = { 0x41: 0x42 }
   ChineseHelper::add_chinese_dict_resource(custom_dict)
   match chinese_map.get(0x41) {
     Some(v) => inspect(v, content="66")

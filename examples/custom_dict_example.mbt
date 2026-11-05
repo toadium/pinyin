@@ -21,7 +21,7 @@ test "example_add_mutil_pinyin_dict_resource" {
 ///|
 /// 添加自定义中文字典
 test "example_add_chinese_dict_resource" {
-  let map : Map[Int, Int] = { 0x7691: 0x75C7 }
+  let map : Map[Int32, Int32] = { 0x7691: 0x75C7 }
   @pinyin.ChineseHelper::add_chinese_dict_resource(map)
   let result = @pinyin.ChineseHelper::convert_to_simplified_chinese("癥")
   println(result)
