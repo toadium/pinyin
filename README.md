@@ -3,7 +3,7 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.1.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.3.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/moon-0.1.20260713-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/targets-wasm%2Bwasm--gc%2Bjs%2Bnative-brightgreen" style="display: inline-block;" />
@@ -17,7 +17,15 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 ### 特性
 
 - 🚀 支持词、句转换成拼音
-- 💪 支持常用简体/繁体中文字符转换成拼音
+- 🧠 支持多音字上下文消歧（Viterbi + bigram 词频模型）
+- 🔍 支持拼音→汉字反向查找（无调/带调/数字调）
+- 📑 支持拼音搜索索引（首字母/连续拼音/模糊拼音搜索）
+- ✂️ 支持连续拼音串分词（Trie + 动态规划，处理歧义切分）
+- 🌫️ 支持拼音模糊匹配（zh↔z, ch↔c, sh↔s, n↔l, in↔ing, en↔eng）
+- 🎵 支持声调变调规则（三声变调/一变调/不变调）
+- 📏 支持拼音编辑距离（音节级 Levenshtein + 模糊距离）
+- 🔧 支持拼音规范化（大小写/ü/v/声调格式统一）
+- 💪 �=持常用简体/繁体中文字符转换成拼音
 - 🛠️ 支持常见多音字符转换成拼音
 - 🌍 支持 Unicode 格式的字符 ü、支持声调符号、支持首字母格式
 - 💪 支持常用简体、繁体中文字符互转
@@ -52,9 +60,27 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 ├── pinyin_format.mbt              # PinyinFormat 格式枚举
 ├── pinyin_error.mbt               # PinyinError 错误类型
 ├── pinyin_dicts.mbt               # 四张字典视图常量
+├── pinyin_trie.mbt                # PinyinTrie：拼音 Trie 数据结构 + 音节表
+├── pinyin_reverse.mbt             # ReversePinyinHelper：拼音→汉字反向查找
+├── pinyin_segmenter.mbt           # PinyinSegmenter：拼音分词（Trie+DP）
+├── pinyin_fuzzy.mbt               # FuzzyPinyinHelper：模糊匹配
+├── pinyin_disambiguator.mbt       # PinyinDisambiguator：多音字消歧（Viterbi+bigram）
+├── pinyin_search.mbt              # PinyinSearchIndex：拼音搜索索引
+├── pinyin_tone_sandhi.mbt         # ToneSandhiHelper：声调变调规则引擎
+├── pinyin_edit_distance.mbt       # PinyinEditDistance：拼音编辑距离
+├── pinyin_normalizer.mbt          # PinyinNormalizer：拼音规范化
 ├── pinyin_easy_wbtest.mbt         # 白盒测试（内部逻辑）
+├── pinyin_trie_wbtest.mbt         # Trie 白盒测试
 ├── pinyin_mid_test.mbt            # 黑盒测试（正向用例、格式、自定义字典）
 ├── pinyin_difficult_test.mbt      # 黑盒测试（字典完整性验证）
+├── pinyin_reverse_test.mbt        # 反向查找黑盒测试
+├── pinyin_segmenter_test.mbt      # 分词黑盒测试
+├── pinyin_fuzzy_test.mbt          # 模糊匹配黑盒测试
+├── pinyin_disambiguator_test.mbt  # 多音字消歧黑盒测试
+├── pinyin_search_test.mbt         # 搜索索引黑盒测试
+├── pinyin_tone_sandhi_test.mbt    # 变调规则黑盒测试
+├── pinyin_edit_distance_test.mbt  # 编辑距离黑盒测试
+├── pinyin_normalizer_test.mbt     # 拼音规范化黑盒测试
 ├── scripts/
 │   └── gen_pinyin_dict.py         # 字典生成脚本
 ├── moon.mod                       # 模块元数据
@@ -88,7 +114,24 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 | `ChineseHelper` | `is_traditional_chinese` | 繁体汉字判断 |
 | `ChineseHelper` | `contains_chinese` | 包含汉字判断 |
 | `ChineseHelper` | `add_chinese_dict_resource` | 添加自定义中文字典 |
+| `ReversePinyinHelper` | `reverse_lookup` | 拼音→汉字反向查找（无调） |
+| `ReversePinyinHelper` | `reverse_lookup_tone_mark` | 拼音→汉字反向查找（带调） |
+| `ReversePinyinHelper` | `reverse_lookup_tone_number` | 拼音→汉字反向查找（数字调） |
+| `ReversePinyinHelper` | `is_valid_pinyin` | 合法拼音音节判断 |
+| `PinyinSegmenter` | `segment` | 连续拼音串全切分（所有方案） |
+| `PinyinSegmenter` | `segment_best` | 连续拼音串最优切分（最少音节） |
+| `PinyinSegmenter` | `can_segment` | 判断是否可完全切分 |
+| `FuzzyPinyinHelper` | `fuzzy_expand` | 拼音模糊扩展（生成等价集合） |
+| `FuzzyPinyinHelper` | `fuzzy_match` | 两个拼音是否模糊等价 |
+| `FuzzyPinyinHelper` | `fuzzy_reverse_lookup` | 模糊拼音→汉字反向查找 |
+| `PinyinTrie` | `new` / `insert` / `contains` / `prefix_lengths` | Trie 数据结构 |
+| `PinyinDisambiguator` | `disambiguate` | 多音字上下文消歧（Viterbi + bigram 词频模型） |
+| `PinyinSearchIndex` | `new` / `add_document` / `search_initial` / `search_pinyin` / `search_fuzzy` | 拼音搜索索引（倒排索引） |
+| `ToneSandhiHelper` | `apply_tone_sandhi` | 声调变调规则（三声变调/一变调/不变调） |
+| `PinyinEditDistance` | `distance` / `fuzzy_distance` | 拼音编辑距离（音节级 Levenshtein + 模糊距离） |
+| `PinyinNormalizer` | `normalize` / `normalize_to_tone_number` / `normalize_to_without_tone` | 拼音规范化（大小写/ü/v/声调格式统一） |
 | `PinyinFormat` | `WithToneMark` / `WithoutTone` / `WithToneNumber` / `FirstLetter` | 输出格式枚举 |
+| `FuzzyRule` | `Prefix` / `Suffix` | 模糊匹配规则枚举 |
 | `PinyinError` | `PinyinError(String)` | 统一错误类型（`pub(all) suberror`） |
 
 ## 使用说明
@@ -96,7 +139,7 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 ### 安装
 
 ```bash
-moon add walkzzz/pinyin@0.1.1
+moon add walkzzz/pinyin@0.3.0
 ```
 
 ### 编译构建
@@ -201,6 +244,121 @@ println(traditionalPinyin)
 //       ["chuan2", "jhuan4"]
 ```
 
+#### 拼音→汉字反向查找
+
+```moonbit
+let chars = @pinyin.ReversePinyinHelper::reverse_lookup("zhong")
+println(chars)
+// 输出: ["中", "重", "种", ...]
+
+let chars2 = @pinyin.ReversePinyinHelper::reverse_lookup_tone_mark("zhōng")
+println(chars2)
+// 输出: ["中", ...]
+
+let chars3 = @pinyin.ReversePinyinHelper::reverse_lookup_tone_number("zhong1")
+println(chars3)
+// 输出: ["中", ...]
+```
+
+#### 拼音分词
+
+```moonbit
+let segments = @pinyin.PinyinSegmenter::segment("nihao")
+println(segments)
+// 输出: [["ni", "hao"]]
+
+let segments2 = @pinyin.PinyinSegmenter::segment("xian")
+println(segments2)
+// 输出: [["xi", "an"], ["xian"]]
+
+let best = @pinyin.PinyinSegmenter::segment_best("xian")
+println(best)
+// 输出: ["xian"]
+```
+
+#### 模糊匹配
+
+```moonbit
+let variants = @pinyin.FuzzyPinyinHelper::fuzzy_expand("zhong")
+println(variants)
+// 输出: ["zhong", "zong"]
+
+let match = @pinyin.FuzzyPinyinHelper::fuzzy_match("zhong", "zong")
+println(match)
+// 输出: true
+
+let chars = @pinyin.FuzzyPinyinHelper::fuzzy_reverse_lookup("zhong")
+println(chars)
+// 输出: ["中", "重", "种", ..., "总", "宗", ...]
+```
+
+#### 多音字消歧
+
+```moonbit
+let result = @pinyin.PinyinDisambiguator::disambiguate("中国")
+println(result)
+// 输出: ["zhong1", "guo2"]
+
+let result2 = @pinyin.PinyinDisambiguator::disambiguate("重要")
+println(result2)
+// 输出: ["zhong4", "yao4"]
+```
+
+#### 拼音搜索索引
+
+```moonbit
+let index = @pinyin.PinyinSearchIndex::new()
+index.add_document(1, "中国")
+index.add_document(2, "中华")
+let results = index.search_initial("zhg")
+println(results)
+// 输出: [1, 2]
+
+let results2 = index.search_pinyin("zhongguo")
+println(results2)
+// 输出: [1]
+```
+
+#### 声调变调
+
+```moonbit
+let result = @pinyin.ToneSandhiHelper::apply_tone_sandhi(["ni3", "hao3"])
+println(result)
+// 输出: ["ni2", "hao3"]  // 三声变调：ni3→ni2
+
+let result2 = @pinyin.ToneSandhiHelper::apply_tone_sandhi(["yi1", "ge4"])
+println(result2)
+// 输出: ["yi2", "ge4"]  // 一变调：yi1→yi2
+```
+
+#### 拼音编辑距离
+
+```moonbit
+let dist = @pinyin.PinyinEditDistance::distance(["zhong", "guo"], ["zhong", "ren"])
+println(dist)
+// 输出: 1
+
+let fuzzy_dist = @pinyin.PinyinEditDistance::fuzzy_distance(["zhong"], ["zong"])
+println(fuzzy_dist)
+// 输出: 0  // zh↔z 模糊等价
+```
+
+#### 拼音规范化
+
+```moonbit
+let result = @pinyin.PinyinNormalizer::normalize("ZHONG1")
+println(result)
+// 输出: "zhōng"  // 大写转小写 + 数字调→带调标记
+
+let result2 = @pinyin.PinyinNormalizer::normalize("lv3")
+println(result2)
+// 输出: "lǚ"  // v→ü + 数字调→带调标记
+
+let result3 = @pinyin.PinyinNormalizer::normalize_to_without_tone("zhōng")
+println(result3)
+// 输出: "zhong"  // 去除声调标记
+```
+
 ## 字典条目数
 
 | 字典 | 条目数 | 类型 | 源库对应 |
@@ -226,7 +384,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
-四后端（wasm / wasm-gc / js / native）各 60 个测试全通过，共 240 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 144 个测试全通过，共 576 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 移植说明
 

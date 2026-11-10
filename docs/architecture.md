@@ -22,12 +22,31 @@ examples ──> pinyin (根包) ──> data
 | `pinyin_format.mbt` | 输出格式枚举 | 20 |
 | `pinyin_error.mbt` | 统一错误类型 | 7 |
 | `pinyin_dicts.mbt` | 字典视图常量 | 20 |
+| `pinyin_trie.mbt` | PinyinTrie 数据结构 + ~420 拼音音节 + strip_tone/strip_tone_number | 237 |
+| `pinyin_reverse.mbt` | ReversePinyinHelper：拼音→汉字反向查找 | 78 |
+| `pinyin_segmenter.mbt` | PinyinSegmenter：Trie+DP 拼音分词 | 116 |
+| `pinyin_fuzzy.mbt` | FuzzyPinyinHelper：模糊匹配 + FuzzyRule 枚举 | 120 |
+| `pinyin_disambiguator.mbt` | PinyinDisambiguator：多音字消歧（Viterbi+bigram） | 180 |
+| `pinyin_search.mbt` | PinyinSearchIndex：拼音搜索索引（倒排索引） | 130 |
+| `pinyin_tone_sandhi.mbt` | ToneSandhiHelper：声调变调规则引擎 | 140 |
+| `pinyin_edit_distance.mbt` | PinyinEditDistance：音节级编辑距离 + 模糊距离 | 100 |
+| `pinyin_normalizer.mbt` | PinyinNormalizer：拼音规范化 | 120 |
 
 ### 公开 API
 
 - `PinyinHelper`：convert_to_pinyin_string / convert_to_pinyin_string_traditional / convert_to_pinyin_array / get_short_pinyin / has_multi_pinyin / to_tongyong_pinyin_string_array / add_pinyin_dict_resource / add_mutil_pinyin_dict_resource
 - `ChineseHelper`：is_chinese / is_traditional_chinese / contains_chinese / convert_to_simplified_chinese / convert_to_traditional_chinese / add_chinese_dict_resource
+- `ReversePinyinHelper`：reverse_lookup / reverse_lookup_tone_mark / reverse_lookup_tone_number / is_valid_pinyin
+- `PinyinSegmenter`：segment / segment_best / can_segment
+- `FuzzyPinyinHelper`：fuzzy_expand / fuzzy_match / fuzzy_reverse_lookup
+- `PinyinDisambiguator`：disambiguate（Viterbi + bigram 词频模型）
+- `PinyinSearchIndex`：new / add_document / search_initial / search_pinyin / search_fuzzy
+- `ToneSandhiHelper`：apply_tone_sandhi（三声变调/一变调/不变调）
+- `PinyinEditDistance`：distance / fuzzy_distance（音节级 Levenshtein + 模糊距离）
+- `PinyinNormalizer`：normalize / normalize_to_tone_number / normalize_to_without_tone
+- `PinyinTrie`：new / insert / contains / prefix_lengths
 - `PinyinFormat`：WithToneMark / WithoutTone / WithToneNumber / FirstLetter
+- `FuzzyRule`：Prefix / Suffix
 - `PinyinError`：`pub(all) suberror`，统一错误类型，可用 `raise PinyinError("msg")` 抛错
 
 ### 错误处理
@@ -64,6 +83,6 @@ examples ──> pinyin (根包) ──> data
 ## 多后端
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 60 测试全通过，共 240 测试
+- 四后端各 144 测试全通过，共 576 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 无 WASM local count 问题（字典用 Map 字面量，非大 match）
