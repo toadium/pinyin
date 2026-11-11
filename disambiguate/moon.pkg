@@ -1,0 +1,4 @@
+import {
+  "walkzzz/pinyin/core",
+  "walkzzz/pinyin/convert",
+}

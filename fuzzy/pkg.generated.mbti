@@ -1,0 +1,22 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/fuzzy"
+
+import {
+  "walkzzz/pinyin/core",
+}
+
+// Values
+pub let fuzzy_rules : Array[@core.FuzzyRule]
+
+// Errors
+
+// Types and methods
+pub struct FuzzyPinyinHelper {
+}
+pub fn FuzzyPinyinHelper::fuzzy_expand(String) -> Array[String]
+pub fn FuzzyPinyinHelper::fuzzy_match(String, String) -> Bool
+pub fn FuzzyPinyinHelper::fuzzy_reverse_lookup(String) -> Array[String] raise @core.PinyinError
+
+// Type aliases
+
+// Traits

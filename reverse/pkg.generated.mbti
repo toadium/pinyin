@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/reverse"
+
+import {
+  "walkzzz/pinyin/core",
+}
+
+// Values
+pub let reverse_pinyin_table : Map[String, Array[String]]
+
+// Errors
+
+// Types and methods
+pub struct ReversePinyinHelper {
+}
+pub fn ReversePinyinHelper::is_valid_pinyin(String) -> Bool
+pub fn ReversePinyinHelper::reverse_lookup(String) -> Array[String] raise @core.PinyinError
+pub fn ReversePinyinHelper::reverse_lookup_tone_mark(String) -> Array[String] raise @core.PinyinError
+pub fn ReversePinyinHelper::reverse_lookup_tone_number(String) -> Array[String] raise @core.PinyinError
+
+// Type aliases
+
+// Traits

@@ -1,0 +1,66 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/core"
+
+// Values
+pub let all_marked_vowel_array : Array[Char]
+
+pub let all_unmarked_vowel_array : Array[Char]
+
+pub let chinese_ling : Char
+
+pub fn convert_with_tone_number(String) -> Array[String]
+
+pub fn convert_without_tone(String) -> Array[String]
+
+pub fn find_array_key_by_value(Char) -> Int32
+
+pub fn format_pinyin(String, PinyinFormat) -> Array[String]
+
+pub fn get_tone_number(String) -> Int32
+
+pub fn is_vowel_char(Char) -> Bool
+
+pub let pinyin_separator : String
+
+pub let pinyin_trie : PinyinTrie
+
+pub fn raise_invalid_input(String) -> Unit raise PinyinError
+
+pub fn set_tone(String, Int32) -> String
+
+pub fn strip_tone(String) -> String
+
+pub fn strip_tone_number(String) -> String
+
+// Errors
+pub(all) suberror PinyinError {
+  InvalidInput(String)
+}
+
+// Types and methods
+pub(all) enum FuzzyRule {
+  Prefix(String, String)
+  Suffix(String, String)
+}
+
+pub(all) enum PinyinFormat {
+  WithToneMark
+  WithoutTone
+  WithToneNumber
+  FirstLetter
+}
+pub fn PinyinFormat::name(Self) -> String
+
+pub struct PinyinTrie {
+  root : PinyinTrieNode
+}
+pub fn PinyinTrie::contains(Self, String) -> Bool
+pub fn PinyinTrie::insert(Self, String) -> Unit
+pub fn PinyinTrie::new() -> Self
+pub fn PinyinTrie::prefix_lengths(Self, String, Int32) -> Array[Int32]
+
+type PinyinTrieNode
+
+// Type aliases
+
+// Traits

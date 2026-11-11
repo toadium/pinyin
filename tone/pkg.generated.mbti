@@ -1,0 +1,15 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/tone"
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct ToneSandhiHelper {
+}
+pub fn ToneSandhiHelper::apply_tone_sandhi(Array[String]) -> Array[String]
+
+// Type aliases
+
+// Traits

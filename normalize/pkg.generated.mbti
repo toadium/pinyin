@@ -1,0 +1,22 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/normalize"
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct PinyinEditDistance {
+}
+pub fn PinyinEditDistance::distance(String, String) -> Int32
+pub fn PinyinEditDistance::fuzzy_distance(String, String) -> Int32
+
+pub struct PinyinNormalizer {
+}
+pub fn PinyinNormalizer::normalize(String) -> String
+pub fn PinyinNormalizer::normalize_to_tone_number(String) -> String
+pub fn PinyinNormalizer::normalize_to_without_tone(String) -> String
+
+// Type aliases
+
+// Traits

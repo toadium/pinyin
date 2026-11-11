@@ -30,3 +30,22 @@
 - mooncakes 发布 `walkzzz/pinyin@0.1.1`
 
 > 内部迭代历史：v0.1.2（根布局+多后端）→ v0.1.3（白盒测试）→ v0.1.4（字典分段）→ v0.1.5（warning 治理），统一对外发布为 v0.1.1。
+#### V0.4.0
+- **架构重构：单包 → 10 包扁平多根布局**（参照 owl-mbt 项目理念）
+  - `core`：核心类型 + 声调转换 + Trie（零依赖）
+  - `data`：字典数据（零依赖）
+  - `convert`：核心转换引擎 PinyinHelper / ChineseHelper（依赖 core + data）
+  - `reverse`：拼音→汉字反向查找（依赖 core + data）
+  - `segment`：拼音分词 Trie+DP（依赖 core）
+  - `fuzzy`：模糊匹配（依赖 core + reverse）
+  - `disambiguate`：多音字消歧 Viterbi+bigram（依赖 core + convert）
+  - `search`：搜索索引倒排索引（依赖 core + convert + segment + fuzzy）
+  - `tone`：声调变调规则（依赖 core）
+  - `normalize`：规范化 + 编辑距离（依赖 core + segment + fuzzy）
+- 根包改为文档入口（不导入任何子包），用户直接导入子包
+- PinyinError 变体从 `PinyinError(String)` 改为 `InvalidInput(String)`
+- 解决 MoonBit [0073] 跨包 bug：添加 `pub fn raise_invalid_input` 包装函数
+- 黑盒测试迁移到各自子包目录，白盒测试拆分到 core / convert
+- 测试数量：60 → 135 / 后端（共 540 测试，四后端全通过）
+- CI 升级为严格模式 `--target all --warn-list +73 --deny-warn`
+- 文档全面更新：README.md / README.mbt.md / docs/ / AGENTS.md 同步至 v0.4.0 现状

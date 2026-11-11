@@ -1,27 +1,23 @@
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
-      - name: Check (all targets)
-        run: moon check --target all
-
-      - name: Test
-        run: moon test
-
       - name: Format check
         run: moon fmt --check
+      - name: Check (all targets, strict)
+        run: moon check --target all --warn-list +73 --deny-warn
+      - name: Build (all targets, strict)
+        run: moon build --target all --warn-list +73 --deny-warn
+      - name: Test (all targets, strict)
+        run: moon test --target all --warn-list +73 --deny-warn

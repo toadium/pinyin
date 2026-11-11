@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/search"
+
+import {
+  "walkzzz/pinyin/core",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct PinyinSearchIndex {
+  initial_index : Map[String, Array[Int32]]
+  pinyin_index : Map[String, Array[Int32]]
+  documents : Array[String]
+}
+pub fn PinyinSearchIndex::add_document(Self, String) -> Int32 raise @core.PinyinError
+pub fn PinyinSearchIndex::new() -> Self
+pub fn PinyinSearchIndex::search_fuzzy(Self, String) -> Array[String]
+pub fn PinyinSearchIndex::search_initial(Self, String) -> Array[String]
+pub fn PinyinSearchIndex::search_pinyin(Self, String) -> Array[String]
+
+// Type aliases
+
+// Traits

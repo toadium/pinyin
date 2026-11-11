@@ -1,0 +1,19 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/disambiguate"
+
+import {
+  "walkzzz/pinyin/core",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct PinyinDisambiguator {
+}
+pub fn PinyinDisambiguator::disambiguate(String) -> Array[String] raise @core.PinyinError
+
+// Type aliases
+
+// Traits

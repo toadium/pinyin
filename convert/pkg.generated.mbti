@@ -1,0 +1,44 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/convert"
+
+import {
+  "walkzzz/pinyin/core",
+}
+
+// Values
+pub let chinese_map : Map[Int32, Int32]
+
+pub fn convert_to_pinyin_arrays(Char, @core.PinyinFormat) -> Array[String]
+
+pub let mutil_pinyin_table : Map[String, String]
+
+pub let pinyin_table : Map[String, String]
+
+pub let tongyong_pinyin_table : Map[String, String]
+
+// Errors
+
+// Types and methods
+pub struct ChineseHelper {
+}
+pub fn ChineseHelper::add_chinese_dict_resource(Map[Int32, Int32]) -> Unit
+pub fn ChineseHelper::contains_chinese(String) -> Bool
+pub fn ChineseHelper::convert_to_simplified_chinese(String) -> String
+pub fn ChineseHelper::convert_to_traditional_chinese(String) -> String
+pub fn ChineseHelper::is_chinese(Char) -> Bool
+pub fn ChineseHelper::is_traditional_chinese(Char) -> Bool
+
+pub struct PinyinHelper {
+}
+pub fn PinyinHelper::add_mutil_pinyin_dict_resource(Map[String, String]) -> Unit
+pub fn PinyinHelper::add_pinyin_dict_resource(Map[String, String]) -> Unit
+pub fn PinyinHelper::convert_to_pinyin_array(Char, format? : @core.PinyinFormat) -> Array[String]
+pub fn PinyinHelper::convert_to_pinyin_string(String, String, format? : @core.PinyinFormat) -> String raise @core.PinyinError
+pub fn PinyinHelper::convert_to_pinyin_string_traditional(String, String, format? : @core.PinyinFormat) -> String raise @core.PinyinError
+pub fn PinyinHelper::get_short_pinyin(String) -> String raise @core.PinyinError
+pub fn PinyinHelper::has_multi_pinyin(Char) -> Bool raise @core.PinyinError
+pub fn PinyinHelper::to_tongyong_pinyin_string_array(Char) -> Array[String]
+
+// Type aliases
+
+// Traits
