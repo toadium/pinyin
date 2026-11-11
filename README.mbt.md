@@ -15,6 +15,9 @@ pinyin 是一个支持将汉字转换成拼音的库，输出的拼音格式可�
 - 支持常用简体、繁体中文字符互转
 - 支持添加自定义字典
 - 支持常用简体/繁体中文字符转换成通用拼音
+- 支持拼音流式处理（PinyinStreamProcessor，逐字符输入实时输出）
+- 支持拼音模糊匹配（9 组规则：zh↔z, ch↔c, sh↔s, n↔l, f↔h, in↔ing, en↔eng, an↔ang, ong↔eng）
+- 支持声调变调规则（三声变调/一变调/不变调/七变调/八变调）
 
 ## 软件架构
 
@@ -40,9 +43,11 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── pinyin_dicts.mbt            # 字典视图常量
 │   ├── chinese_helper.mbt          # ChineseHelper 命名空间
 │   ├── pinyin_helper.mbt           # PinyinHelper 命名空间
+│   ├── pinyin_stream_processor.mbt # PinyinStreamProcessor 流式处理器
 │   ├── convert_wbtest.mbt          # 白盒测试（8）
 │   ├── convert_test.mbt            # 黑盒测试（19）
-│   └── convert_dict_test.mbt       # 黑盒测试（5）
+│   ├── convert_dict_test.mbt       # 黑盒测试（5）
+│   └── stream_processor_test.mbt   # 黑盒测试（7）
 ├── reverse/                        # 拼音→汉字反向查找（依赖 core + data）
 │   ├── pinyin_reverse.mbt
 │   └── reverse_test.mbt            # 黑盒测试（10）
@@ -51,7 +56,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   └── segment_test.mbt            # 黑盒测试（12）
 ├── fuzzy/                          # 模糊匹配（依赖 core + reverse）
 │   ├── pinyin_fuzzy.mbt
-│   └── fuzzy_test.mbt              # 黑盒测试（14）
+│   └── fuzzy_test.mbt              # 黑盒测试（19）
 ├── disambiguate/                   # 多音字消歧（依赖 core + convert）
 │   ├── pinyin_disambiguator.mbt
 │   └── disambiguate_test.mbt       # 黑盒测试（7）
@@ -60,7 +65,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   └── search_test.mbt             # 黑盒测试（7）
 ├── tone/                           # 声调变调（依赖 core）
 │   ├── pinyin_tone_sandhi.mbt
-│   └── tone_test.mbt               # 黑盒测试（8）
+│   └── tone_test.mbt               # 黑盒测试（12）
 ├── normalize/                      # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
 │   ├── pinyin_normalizer.mbt
 │   ├── pinyin_edit_distance.mbt
@@ -240,7 +245,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
-四后端（wasm / wasm-gc / js / native）各 135 测试全通过，严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 151 测试全通过，共 604 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 开源协议
 

@@ -60,9 +60,11 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── pinyin_dicts.mbt            # 字典视图常量
 │   ├── chinese_helper.mbt          # ChineseHelper 命名空间
 │   ├── pinyin_helper.mbt           # PinyinHelper 命名空间
+│   ├── pinyin_stream_processor.mbt # PinyinStreamProcessor 流式处理器
 │   ├── convert_wbtest.mbt          # 白盒测试（8）
 │   ├── convert_test.mbt            # 黑盒测试（19）
-│   └── convert_dict_test.mbt       # 黑盒测试（5）
+│   ├── convert_dict_test.mbt       # 黑盒测试（5）
+│   └── stream_processor_test.mbt   # 黑盒测试（7）
 ├── reverse/                        # 拼音→汉字反向查找（依赖 core + data）
 │   ├── pinyin_reverse.mbt
 │   └── reverse_test.mbt            # 黑盒测试（10）
@@ -71,7 +73,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   └── segment_test.mbt            # 黑盒测试（12）
 ├── fuzzy/                          # 模糊匹配（依赖 core + reverse）
 │   ├── pinyin_fuzzy.mbt
-│   └── fuzzy_test.mbt              # 黑盒测试（14）
+│   └── fuzzy_test.mbt              # 黑盒测试（19）
 ├── disambiguate/                   # 多音字消歧（依赖 core + convert）
 │   ├── pinyin_disambiguator.mbt
 │   └── disambiguate_test.mbt       # 黑盒测试（7）
@@ -80,7 +82,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   └── search_test.mbt             # 黑盒测试（7）
 ├── tone/                           # 声调变调（依赖 core）
 │   ├── pinyin_tone_sandhi.mbt
-│   └── tone_test.mbt               # 黑盒测试（8）
+│   └── tone_test.mbt               # 黑盒测试（12）
 ├── normalize/                      # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
 │   ├── pinyin_normalizer.mbt
 │   ├── pinyin_edit_distance.mbt
@@ -146,6 +148,7 @@ reverse segment  fuzzy    disambiguate
 | `convert` | `ChineseHelper` | `is_traditional_chinese` | 繁体汉字判断 |
 | `convert` | `ChineseHelper` | `contains_chinese` | 包含汉字判断 |
 | `convert` | `ChineseHelper` | `add_chinese_dict_resource` | 添加自定义中文字典 |
+| `convert` | `PinyinStreamProcessor` | `new` / `feed` / `flush` / `reset` | 流式拼音处理器（逐字符输入实时输出） |
 | `reverse` | `ReversePinyinHelper` | `reverse_lookup` | 拼音→汉字反向查找（无调） |
 | `reverse` | `ReversePinyinHelper` | `reverse_lookup_tone_mark` | 拼音→汉字反向查找（带调） |
 | `reverse` | `ReversePinyinHelper` | `reverse_lookup_tone_number` | 拼音→汉字反向查找（数字调） |
@@ -359,6 +362,21 @@ println(result2)
 // 输出: ["yi2", "ge4"]  // 一变调：yi1→yi2
 ```
 
+#### 拼音流式处理
+
+```moonbit
+let processor = @convert.PinyinStreamProcessor::new()
+let delta1 = processor.feed('你')
+println(delta1)
+// 输出: nǐ
+
+let delta2 = processor.feed('好')
+println(delta2)
+// 输出: hǎo
+
+processor.reset()
+```
+
 #### 拼音编辑距离
 
 ```moonbit
@@ -412,7 +430,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
-四后端（wasm / wasm-gc / js / native）各 135 个测试全通过，共 540 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 151 个测试全通过，共 604 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 移植说明
 

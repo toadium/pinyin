@@ -62,6 +62,7 @@ reverse segment  fuzzy    disambiguate
 | `pinyin_dicts.mbt` | 字典视图常量（与 data 包共享引用） |
 | `chinese_helper.mbt` | ChineseHelper 命名空间（繁简转换 + 汉字判断） |
 | `pinyin_helper.mbt` | PinyinHelper 命名空间（拼音转换主入口） |
+| `pinyin_stream_processor.mbt` | PinyinStreamProcessor 流式处理器（逐字符输入实时输出） |
 
 ### 字典视图共享
 
@@ -77,7 +78,7 @@ reverse segment  fuzzy    disambiguate
 
 ## fuzzy 包（依赖 core + reverse）
 
-拼音模糊匹配，支持 zh↔z, ch↔c, sh↔s, n↔l, in↔ing, en↔eng 等规则。
+拼音模糊匹配，支持 9 组双向规则：zh↔z, ch↔c, sh↔s, n↔l, f↔h, in↔ing, en↔eng, an↔ang, ong↔eng。
 
 ## disambiguate 包（依赖 core + convert）
 
@@ -89,7 +90,7 @@ reverse segment  fuzzy    disambiguate
 
 ## tone 包（依赖 core）
 
-声调变调规则引擎，支持三声变调/一变调/不变调。
+声调变调规则引擎，支持 5 类变调：三声变调、一变调、不变调、七变调、八变调。
 
 ## normalize 包（依赖 core + segment + fuzzy）
 
@@ -106,6 +107,6 @@ reverse segment  fuzzy    disambiguate
 ## 多后端
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 135 测试全通过，共 540 测试
+- 四后端各 151 测试全通过，共 604 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 无 WASM local count 问题（字典用 Map 字面量，非大 match）

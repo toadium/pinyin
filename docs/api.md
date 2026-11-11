@@ -198,6 +198,45 @@ pub fn ChineseHelper::add_chinese_dict_resource(dict : Map[Int, Int]) -> Unit
 
 追加自定义繁简映射（原地合并）。
 
+### PinyinStreamProcessor
+
+流式拼音处理器，支持逐字符输入汉字实时输出拼音，适用于输入法等实时场景。
+
+#### new
+
+```moonbit
+pub fn PinyinStreamProcessor::new(
+  format~ : PinyinFormat = WithToneMark,
+  separator~ : String = " ",
+) -> PinyinStreamProcessor
+```
+
+创建流式拼音处理器。
+
+#### feed
+
+```moonbit
+pub fn PinyinStreamProcessor::feed(self : PinyinStreamProcessor, c : Char) -> String
+```
+
+输入一个字符，返回增量拼音输出（与上次相比新增的片段）。
+
+#### flush
+
+```moonbit
+pub fn PinyinStreamProcessor::flush(self : PinyinStreamProcessor) -> String
+```
+
+刷新缓冲区，输出剩余未处理的字符。
+
+#### reset
+
+```moonbit
+pub fn PinyinStreamProcessor::reset(self : PinyinStreamProcessor) -> Unit
+```
+
+重置处理器，清空缓冲区。
+
 ## reverse 包
 
 ### ReversePinyinHelper
@@ -270,7 +309,7 @@ pub fn PinyinSegmenter::can_segment(pinyin : String) -> Bool
 
 ### FuzzyPinyinHelper
 
-拼音模糊匹配。
+拼音模糊匹配，支持 9 组双向规则：zh↔z, ch↔c, sh↔s, n↔l, f↔h, in↔ing, en↔eng, an↔ang, ong↔eng。
 
 #### fuzzy_expand
 
@@ -368,7 +407,7 @@ pub fn PinyinSearchIndex::search_fuzzy(self : PinyinSearchIndex, pinyin : String
 pub fn ToneSandhiHelper::apply_tone_sandhi(syllables : Array[String]) -> Array[String]
 ```
 
-声调变调规则（三声变调/一变调/不变调）。
+声调变调规则（三声变调/一变调/不变调/七变调/八变调）。
 
 ## normalize 包
 

@@ -60,7 +60,7 @@ You can browse and install extra skills here:
 ## Project: pinyin
 
 拼音引擎，移植自 `pinyin4cj`（仓颉）。
-汉字→拼音 + 拼音→汉字 + 繁简转换 + 多音字消歧 + 拼音分词 + 模糊匹配 + 搜索索引 + 变调规则 + 编辑距离 + 规范化。
+汉字→拼音 + 拼音→汉字 + 繁简转换 + 多音字消歧 + 拼音分词 + 模糊匹配 + 搜索索引 + 变调规则 + 编辑距离 + 规范化 + 流式处理。
 
 - 模块名：`walkzzz/pinyin`，版本 0.4.0，MIT 许可证
 - 仓库：https://github.com/toadium/pinyin.git
@@ -88,15 +88,17 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   ├── pinyin_dicts.mbt        #   字典视图常量（与 data 包共享引用）
 │   ├── chinese_helper.mbt      #   ChineseHelper（6 方法）
 │   ├── pinyin_helper.mbt       #   PinyinHelper（8 方法）
+│   ├── pinyin_stream_processor.mbt # PinyinStreamProcessor（4 方法）
 │   ├── convert_wbtest.mbt      #   白盒测试（8）
 │   ├── convert_test.mbt        #   黑盒测试（19）
-│   └── convert_dict_test.mbt   #   黑盒测试（5）
+│   ├── convert_dict_test.mbt   #   黑盒测试（5）
+│   └── stream_processor_test.mbt # 黑盒测试（7）
 ├── reverse/                    # 拼音→汉字反向查找（依赖 core + data）
 ├── segment/                    # 拼音分词 Trie+DP（依赖 core）
-├── fuzzy/                      # 模糊匹配 BFS（依赖 core + reverse）
+├── fuzzy/                      # 模糊匹配 BFS（依赖 core + reverse，9 组规则）
 ├── disambiguate/               # 多音字消歧 Viterbi+bigram（依赖 core + convert）
 ├── search/                     # 搜索索引倒排（依赖 core + convert + segment + fuzzy）
-├── tone/                       # 声调变调规则（依赖 core）
+├── tone/                       # 声调变调规则（依赖 core，5 类变调）
 ├── normalize/                  # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
 ├── examples/                   # 示例包（依赖 convert，14 个示例测试）
 ├── docs/                       # 开发文档（roadmap/architecture/api/testing）
@@ -121,7 +123,7 @@ reverse segment  fuzzy    disambiguate
 ### 多后端支持
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 135 测试全通过，共 540 测试
+- 四后端各 151 测试全通过，共 604 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 无 WASM local count 问题（字典用 Map 字面量，非大 match）
 

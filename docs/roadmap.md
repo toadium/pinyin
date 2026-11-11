@@ -17,9 +17,12 @@
 - ✅ PinyinError 变体从 `PinyinError(String)` 改为 `InvalidInput(String)`
 - ✅ 解决 MoonBit [0073] 跨包 bug：添加 `pub fn raise_invalid_input` 包装函数
 - ✅ 黑盒测试迁移到各自子包目录，白盒测试拆分到 core / convert
-- ✅ 测试数 144→135/后端（四后端共 540 测试全通过）
+- ✅ 测试数 144→151/后端（四后端共 604 测试全通过）
 - ✅ CI 升级为严格模式 `--target all --warn-list +73 --deny-warn`
 - ✅ 文档全面更新：README / README.mbt.md / docs/ / AGENTS.md / CHANGELOG.md
+- ✅ 新增七变调/八变调规则（tone 包，5 类变调）
+- ✅ 新增 3 组模糊规则：f↔h, an↔ang, ong↔eng（fuzzy 包，9 组规则）
+- ✅ 新增 PinyinStreamProcessor 流式处理接口（convert 包，逐字符输入实时输出）
 
 ## 版本 0.3.0
 
@@ -59,5 +62,3 @@
 - 基准测试（bench）
 - 更多字典格式支持
 - 拼音→汉字反向查找的声调精确匹配
-- 更多变调规则（"不"变调、"七/八"变调）
-- 拼音流式处理接口
