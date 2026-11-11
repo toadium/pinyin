@@ -105,3 +105,39 @@ test "fuzzy_reverse_lookup_empty_raises" {
     _ => fail("expected PinyinError for empty string")
   }
 }
+
+///|
+/// 模糊扩展：f↔h 规则，"fan" → ["fan", "han"]。
+test "fuzzy_expand_fan" {
+  let variants = @fuzzy.FuzzyPinyinHelper::fuzzy_expand("fan")
+  assert_true(variants.contains("fan"))
+  assert_true(variants.contains("han"))
+}
+
+///|
+/// 模糊扩展：an↔ang 规则，"ban" → ["ban", "bang"]。
+test "fuzzy_expand_ban" {
+  let variants = @fuzzy.FuzzyPinyinHelper::fuzzy_expand("ban")
+  assert_true(variants.contains("ban"))
+  assert_true(variants.contains("bang"))
+}
+
+///|
+/// 模糊扩展：ong↔eng 规则，"hong" → ["hong", "heng"]。
+test "fuzzy_expand_hong" {
+  let variants = @fuzzy.FuzzyPinyinHelper::fuzzy_expand("hong")
+  assert_true(variants.contains("hong"))
+  assert_true(variants.contains("heng"))
+}
+
+///|
+/// 模糊匹配：f↔h，"fan" 和 "han" 模糊等价。
+test "fuzzy_match_fan_han" {
+  assert_true(@fuzzy.FuzzyPinyinHelper::fuzzy_match("fan", "han"))
+}
+
+///|
+/// 模糊匹配：an↔ang，"ban" 和 "bang" 模糊等价。
+test "fuzzy_match_ban_bang" {
+  assert_true(@fuzzy.FuzzyPinyinHelper::fuzzy_match("ban", "bang"))
+}

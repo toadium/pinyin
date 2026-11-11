@@ -1,13 +1,14 @@
 ///|
 /// FuzzyPinyinHelper 命名空间类型，提供拼音模糊匹配能力。
-/// 支持南方方言常见混淆：zh↔z, ch↔c, sh↔s, n↔l, in↔ing, en↔eng。
+/// 支持南方方言常见混淆：zh↔z, ch↔c, sh↔s, n↔l, f↔h,
+/// in↔ing, en↔eng, an↔ang, ong↔eng。
 #warnings("-struct_never_constructed")
 pub struct FuzzyPinyinHelper {}
 
 ///|
 /// 全部模糊匹配规则。
-/// zh↔z, ch↔c, sh↔s（声母混淆），n↔l（声母混淆），
-/// in↔ing, en↔eng（韵母后缀混淆）。
+/// zh↔z, ch↔c, sh↔s（翘舌↔平舌），n↔l, f↔h（声母混淆），
+/// in↔ing, en↔eng, an↔ang, ong↔eng（韵母后缀混淆）。
 pub let fuzzy_rules : Array[@core.FuzzyRule] = [
   Prefix("zh", "z"),
   Prefix("z", "zh"),
@@ -17,10 +18,16 @@ pub let fuzzy_rules : Array[@core.FuzzyRule] = [
   Prefix("s", "sh"),
   Prefix("n", "l"),
   Prefix("l", "n"),
+  Prefix("f", "h"),
+  Prefix("h", "f"),
   Suffix("in", "ing"),
   Suffix("ing", "in"),
   Suffix("en", "eng"),
   Suffix("eng", "en"),
+  Suffix("an", "ang"),
+  Suffix("ang", "an"),
+  Suffix("ong", "eng"),
+  Suffix("eng", "ong"),
 ]
 
 ///|

@@ -39,6 +39,17 @@ pub fn PinyinHelper::get_short_pinyin(String) -> String raise @core.PinyinError
 pub fn PinyinHelper::has_multi_pinyin(Char) -> Bool raise @core.PinyinError
 pub fn PinyinHelper::to_tongyong_pinyin_string_array(Char) -> Array[String]
 
+pub struct PinyinStreamProcessor {
+  pending : StringBuilder
+  mut last_output : String
+  format : @core.PinyinFormat
+  separator : String
+}
+pub fn PinyinStreamProcessor::feed(Self, Char) -> String
+pub fn PinyinStreamProcessor::flush(Self) -> String
+pub fn PinyinStreamProcessor::new(format? : @core.PinyinFormat, separator? : String) -> Self
+pub fn PinyinStreamProcessor::reset(Self) -> Unit
+
 // Type aliases
 
 // Traits

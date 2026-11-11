@@ -58,3 +58,35 @@ test "tone_sandhi: 三声变调链 很好 → hén hǎo" {
   assert_eq(result[0], "hén")
   assert_eq(result[1], "hǎo")
 }
+
+///|
+test "tone_sandhi: 七+四声 → 二声 七个" {
+  let result = @tone.ToneSandhiHelper::apply_tone_sandhi(["qī", "gè"])
+  assert_eq(result.length(), 2)
+  assert_eq(result[0], "qí")
+  assert_eq(result[1], "gè")
+}
+
+///|
+test "tone_sandhi: 七+一声 → 四声 七天" {
+  let result = @tone.ToneSandhiHelper::apply_tone_sandhi(["qī", "tiān"])
+  assert_eq(result.length(), 2)
+  assert_eq(result[0], "qì")
+  assert_eq(result[1], "tiān")
+}
+
+///|
+test "tone_sandhi: 八+四声 → 二声 八个" {
+  let result = @tone.ToneSandhiHelper::apply_tone_sandhi(["bā", "gè"])
+  assert_eq(result.length(), 2)
+  assert_eq(result[0], "bá")
+  assert_eq(result[1], "gè")
+}
+
+///|
+test "tone_sandhi: 八+一声 → 四声 八天" {
+  let result = @tone.ToneSandhiHelper::apply_tone_sandhi(["bā", "tiān"])
+  assert_eq(result.length(), 2)
+  assert_eq(result[0], "bà")
+  assert_eq(result[1], "tiān")
+}

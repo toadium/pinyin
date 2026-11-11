@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.4.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/tests-540-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/tests-604-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/packages-10-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/moon-0.1.20260713-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/targets-wasm%2Bwasm--gc%2Bjs%2Bnative-brightgreen" style="display: inline-block;" />
@@ -23,10 +23,11 @@ pinyin 是一个支持将汉字转换成拼音的 MoonBit 三方库，输出的�
 - 🔍 支持拼音→汉字反向查找（无调/带调/数字调）
 - 📑 支持拼音搜索索引（首字母/连续拼音/模糊拼音搜索）
 - ✂️ 支持连续拼音串分词（Trie + 动态规划，处理歧义切分）
-- 🌫️ 支持拼音模糊匹配（zh↔z, ch↔c, sh↔s, n↔l, in↔ing, en↔eng）
-- 🎵 支持声调变调规则（三声变调/一变调/不变调）
+- 🌫️ 支持拼音模糊匹配（zh↔z, ch↔c, sh↔s, n↔l, f↔h, in↔ing, en↔eng, an↔ang, ong↔eng）
+- 🎵 支持声调变调规则（三声变调/一变调/不变调/七变调/八变调）
 - 📏 支持拼音编辑距离（音节级 Levenshtein + 模糊距离）
 - 🔧 支持拼音规范化（大小写/ü/v/声调格式统一）
+- 🌊 支持拼音流式处理（PinyinStreamProcessor，逐字符输入实时输出）
 - 💪 支持常用简体/繁体中文字符转换成拼音
 - 🛠️ 支持常见多音字符转换成拼音
 - 🌍 支持 Unicode 格式的字符 ü、支持声调符号、支持首字母格式
