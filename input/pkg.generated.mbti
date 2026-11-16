@@ -1,0 +1,33 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/input"
+
+import {
+  "walkzzz/pinyin/core",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct InputCandidate {
+  text : String
+  score : Double
+  segments : Array[String]
+}
+
+pub struct PinyinInputEngine {
+  mut beam_width : Int32
+}
+pub fn PinyinInputEngine::beam_width(Self) -> Int32
+pub fn PinyinInputEngine::input(Self, String) -> Array[InputCandidate] raise @core.PinyinError
+pub fn PinyinInputEngine::input_all_segments(Self, String) -> Array[InputCandidate] raise @core.PinyinError
+pub fn PinyinInputEngine::input_from_segments(Self, Array[String]) -> Array[InputCandidate]
+pub fn PinyinInputEngine::input_with_limit(Self, String, Int32) -> Array[InputCandidate] raise @core.PinyinError
+pub fn PinyinInputEngine::new() -> Self
+pub fn PinyinInputEngine::set_beam_width(Self, Int32) -> Unit
+pub fn PinyinInputEngine::with_beam_width(Int32) -> Self
+
+// Type aliases
+
+// Traits

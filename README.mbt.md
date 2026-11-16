@@ -1,10 +1,10 @@
 # pinyin
 
-MoonBit port of pinyin4cj: Chinese-to-pinyin conversion.
+自研 MoonBit 拼音引擎：汉字→拼音、拼音→汉字、繁简转换、多音字消歧、拼音分词、模糊匹配、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎。
 
 ## 介绍
 
-pinyin 是一个支持将汉字转换成拼音的库，输出的拼音格式可以自定义设置。移植自 Cangjie 库 `pinyin4cj`。
+pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音→汉字、繁简转换、多音字消歧、拼音分词、模糊匹配、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎等全栈拼音能力。
 
 ### 特性
 
@@ -18,10 +18,12 @@ pinyin 是一个支持将汉字转换成拼音的库，输出的拼音格式可�
 - 支持拼音流式处理（PinyinStreamProcessor，逐字符输入实时输出）
 - 支持拼音模糊匹配（9 组规则：zh↔z, ch↔c, sh↔s, n↔l, f↔h, in↔ing, en↔eng, an↔ang, ong↔eng）
 - 支持声调变调规则（三声变调/一变调/不变调/七变调/八变调）
+- 支持 N-gram 语言模型（Unigram/Bigram/Trigram 频率表、Laplace 平滑、Katz 回退、困惑度）
+- 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、可配置 beam 宽度）
 
 ## 软件架构
 
-### 包结构（10 包扁平多根布局）
+### 包结构（12 包扁平多根布局）
 
 ```
 pinyin/                             # 根包 — 文档入口（不导入任何子包）
@@ -71,6 +73,12 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── pinyin_edit_distance.mbt
 │   ├── normalizer_test.mbt         # 黑盒测试（10）
 │   └── edit_distance_test.mbt      # 黑盒测试（7）
+├── lm/                             # N-gram 语言模型（依赖 core + data + math）
+│   ├── pinyin_lm.mbt               # PinyinLM + LMStats + Laplace 平滑 + Katz 回退
+│   └── lm_test.mbt                 # 黑盒测试（8）
+├── input/                          # 拼音输入法引擎（依赖 core + segment + reverse + lm + math）
+│   ├── pinyin_input.mbt            # PinyinInputEngine + InputCandidate + Beam Search
+│   └── input_test.mbt              # 黑盒测试（10）
 ├── examples/                       # 示例包（依赖 convert）
 │   ├── chinese_helper_example.mbt  # 示例测试（2）
 │   ├── pinyin_helper_example.mbt   # 示例测试（5）
@@ -101,6 +109,8 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 - `search/` 搜索索引（倒排索引），依赖 core + convert + segment + fuzzy
 - `tone/` 声调变调规则，依赖 core
 - `normalize/` 规范化 + 编辑距离，依赖 core + segment + fuzzy
+- `lm/` N-gram 语言模型，依赖 core + data + math，含 PinyinLM / LMStats / Laplace 平滑 / Katz 回退
+- `input/` 拼音输入法引擎，依赖 core + segment + reverse + lm + math，含 PinyinInputEngine / InputCandidate / Beam Search
 - `examples/` 示例包，依赖 convert，14 个示例测试
 - `docs/` 开发文档（roadmap / architecture / api / testing）
 - 根包为文档入口（如 owl-mbt），不导入任何子包
@@ -220,6 +230,57 @@ test "readme_is_chinese" {
 }
 ```
 
+#### N-gram 语言模型
+
+```mbt nocheck
+///|
+test "readme_lm_unigram_prob" {
+  let p = @lm.PinyinLM::unigram_prob("zhong")
+  assert_true(p > 0.0)
+  assert_true(p < 1.0)
+}
+```
+
+```mbt nocheck
+///|
+test "readme_lm_bigram_prob" {
+  let p = @lm.PinyinLM::bigram_prob("zhong", "guo")
+  assert_true(p > 0.0)
+  assert_true(p < 1.0)
+}
+```
+
+```mbt nocheck
+///|
+test "readme_lm_sentence_log_prob" {
+  let log_p = @lm.PinyinLM::sentence_log_prob(["zhong", "guo"])
+  assert_true(log_p < 0.0)
+}
+```
+
+#### 拼音输入法引擎
+
+```mbt nocheck
+///|
+test "readme_input" {
+  let engine = @input.PinyinInputEngine::new()
+  let candidates = engine.input("nihao")
+  assert_true(candidates.length() > 0)
+  assert_true(candidates[0].text.length() > 0)
+  assert_true(candidates[0].score < 0.0)
+  assert_true(candidates[0].segments.length() > 0)
+}
+```
+
+```mbt nocheck
+///|
+test "readme_input_all_segments" {
+  let engine = @input.PinyinInputEngine::new()
+  let candidates = engine.input_all_segments("xian")
+  assert_true(candidates.length() > 0)
+}
+```
+
 ## 字典条目数
 
 | 字典 | 条目数 | 类型 | 源库对应 |
@@ -229,9 +290,9 @@ test "readme_is_chinese" {
 | `mutil_pinyin_table` | 843 | `Map[String, String]` | `MUTIL_PINYIN_TABLE` |
 | `tongyong_pinyin_table` | 82 | `Map[String, String]` | `TONGYONG_PINYIN_TABLE` |
 
-## 字典生成
+## 参考来源
 
-字典字面量由 `scripts/gen_pinyin_dict.py` 从源库 `pinyin4cj` 生成：
+本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)（MIT 许可证），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎等十大核心引擎。字典字面量由 `scripts/gen_pinyin_dict.py` 生成：
 
 ```bash
 python scripts/gen_pinyin_dict.py
@@ -245,7 +306,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
-四后端（wasm / wasm-gc / js / native）各 151 测试全通过，共 604 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 169 测试全通过，共 676 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 开源协议
 

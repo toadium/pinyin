@@ -1,0 +1,7 @@
+import {
+  "walkzzz/pinyin/core",
+  "walkzzz/pinyin/segment",
+  "walkzzz/pinyin/reverse",
+  "walkzzz/pinyin/lm",
+  "moonbitlang/core/math",
+}

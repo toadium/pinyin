@@ -14,9 +14,13 @@ reverse segment  fuzzy    disambiguate
   search（core+convert+segment+fuzzy）
   normalize（core+segment+fuzzy）
   tone（core）
+
+lm（core+data+math）
+  ↑
+input（core+segment+reverse+lm+math）
 ```
 
-线性无环依赖，core 和 data 零依赖，各子包职责单一。参照 owl-mbt 项目的扁平多根包布局理念。
+线性无环依赖，core 和 data 零依赖，各子包职责单一。lm 和 input 形成独立链条，不引入循环。参照 owl-mbt 项目的扁平多根包布局理念。
 
 ## 根包（pinyin）
 
@@ -96,6 +100,36 @@ reverse segment  fuzzy    disambiguate
 
 拼音规范化 + 编辑距离。大小写/ü/v/声调格式统一，音节级 Levenshtein + 模糊距离。
 
+## lm 包（依赖 core + data + moonbitlang/core/math）
+
+N-gram 语言模型，从 data 包字典自动构建 unigram/bigram/trigram 频率表，提供概率查询与困惑度评估。
+
+| 文件 | 职责 |
+|------|------|
+| `pinyin_lm.mbt` | PinyinLM 命名空间 + LMStats 结构体 + Laplace 平滑 + Katz 回退 |
+
+### 平滑策略
+
+- **Laplace 平滑**：P(w) = (C(w) + 1) / (N + V)，避免零概率
+- **Katz 回退**：高阶 n-gram 频率不足时回退到低阶，trigram→bigram→unigram 逐级降级
+
+## input 包（依赖 core + segment + reverse + lm + moonbitlang/core/math）
+
+拼音输入法引擎，基于 Beam Search 解码 + LM 评分，将连续拼音串转换为汉字候选列表。
+
+| 文件 | 职责 |
+|------|------|
+| `pinyin_input.mbt` | PinyinInputEngine 结构体 + InputCandidate 结构体 + Beam Search |
+
+### 算法流程
+
+1. **分词**：segment 包对拼音串执行最优切分
+2. **反查**：reverse 包将各音节映射为候选汉字集合
+3. **Beam Search**：逐音节扩展候选路径，LM 评分剪枝，保留 top-B 条路径
+4. **排序**：按 LM 对数概率降序排列，去重输出
+
+时间复杂度 O(S×B×C)，其中 S=音节数、B=beam 宽度、C=单音节最大候选数。
+
 ## examples 包（依赖 convert）
 
 示例包，4 个示例文件共 14 个示例测试：
@@ -107,6 +141,6 @@ reverse segment  fuzzy    disambiguate
 ## 多后端
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 151 测试全通过，共 604 测试
+- 四后端各 169 测试全通过，共 676 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 无 WASM local count 问题（字典用 Map 字面量，非大 match）

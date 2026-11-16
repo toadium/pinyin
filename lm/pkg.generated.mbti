@@ -1,0 +1,35 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/lm"
+
+// Values
+pub let bigram_freq : Map[String, Map[String, Int32]]
+
+pub let unigram_freq : Map[String, Int32]
+
+// Errors
+
+// Types and methods
+pub struct LMStats {
+  vocab_size : Int32
+  unigram_total : Int32
+  bigram_total : Int32
+  trigram_total : Int32
+  unigram_types : Int32
+  bigram_types : Int32
+  trigram_types : Int32
+}
+
+pub struct PinyinLM {
+}
+pub fn PinyinLM::bigram_prob(String, String) -> Double
+pub fn PinyinLM::perplexity(Array[Array[String]]) -> Double
+pub fn PinyinLM::perplexity_trigram(Array[Array[String]]) -> Double
+pub fn PinyinLM::sentence_log_prob(Array[String]) -> Double
+pub fn PinyinLM::sentence_log_prob_trigram(Array[String]) -> Double
+pub fn PinyinLM::stats() -> LMStats
+pub fn PinyinLM::trigram_prob(String, String, String) -> Double
+pub fn PinyinLM::unigram_prob(String) -> Double
+
+// Type aliases
+
+// Traits

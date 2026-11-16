@@ -30,6 +30,23 @@
 - mooncakes 发布 `walkzzz/pinyin@0.1.1`
 
 > 内部迭代历史：v0.1.2（根布局+多后端）→ v0.1.3（白盒测试）→ v0.1.4（字典分段）→ v0.1.5（warning 治理），统一对外发布为 v0.1.1。
+#### V0.5.0
+- **新增 `lm` 包：N-gram 语言模型**
+  - unigram / bigram / trigram 频率表（从 data 包字典自动构建）
+  - Laplace 平滑 + Katz 回退（解决数据稀疏问题）
+  - 句子对数概率（bigram / trigram 模型）
+  - 困惑度评估（bigram / trigram）
+  - LMStats 统计信息（词汇量 / 总频次 / n-gram 类型数）
+- **新增 `input` 包：拼音输入法引擎**
+  - PinyinInputEngine：Beam Search 解码 + LM 评分
+  - InputCandidate 候选结构（text / score / segments）
+  - 单条切分候选生成 + 全切分路径候选生成
+  - 可配置 beam 宽度，候选自动去重排序
+- 依赖拓扑扩展：`lm(core+data+math)` → `input(core+segment+reverse+lm+math)`
+- 测试数量：151 → 169 / 后端（共 676 测试，四后端全通过）
+- 关键词新增 `ngram`、`input-method`
+- 项目描述更新：去除"移植自 pinyin4cj"，新增 N-gram 语言模型 + 拼音输入法
+
 #### V0.4.0
 - **架构重构：单包 → 10 包扁平多根布局**（参照 owl-mbt 项目理念）
   - `core`：核心类型 + 声调转换 + Trie（零依赖）

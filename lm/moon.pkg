@@ -1,0 +1,5 @@
+import {
+  "walkzzz/pinyin/core",
+  "walkzzz/pinyin/data",
+  "moonbitlang/core/math",
+}

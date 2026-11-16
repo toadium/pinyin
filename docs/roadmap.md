@@ -1,6 +1,23 @@
 # 路线图
 
-## 版本 0.4.0（当前）
+## 版本 0.5.0（当前）
+
+- ✅ 新增 `lm` 包：N-gram 语言模型
+  - unigram / bigram / trigram 频率表（从 data 包字典自动构建）
+  - Laplace 平滑 + Katz 回退
+  - 句子对数概率（bigram / trigram）
+  - 困惑度评估（bigram / trigram）
+  - LMStats 统计信息查询
+- ✅ 新增 `input` 包：拼音输入法引擎
+  - PinyinInputEngine：Beam Search 解码 + LM 评分
+  - InputCandidate 候选结构（text / score / segments）
+  - 单条/全切分路径候选生成
+  - 可配置 beam 宽度，候选去重排序
+- ✅ 依赖拓扑扩展：`lm(core+data+math)` → `input(core+segment+reverse+lm+math)`
+- ✅ 测试数量：151 → 169 / 后端（共 676 测试，四后端全通过）
+- ✅ 项目叙事重构：去除"移植"定位，强调自研算法能力
+
+## 版本 0.4.0
 
 - ✅ 架构重构：3 包 → 10 包扁平多根布局（参照 owl-mbt 项目理念）
   - core（零依赖）：PinyinFormat / PinyinError / FuzzyRule / PinyinTrie / 声调转换

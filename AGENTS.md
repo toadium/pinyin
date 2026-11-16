@@ -59,14 +59,13 @@ You can browse and install extra skills here:
 
 ## Project: pinyin
 
-拼音引擎，移植自 `pinyin4cj`（仓颉）。
-汉字→拼音 + 拼音→汉字 + 繁简转换 + 多音字消歧 + 拼音分词 + 模糊匹配 + 搜索索引 + 变调规则 + 编辑距离 + 规范化 + 流式处理。
+拼音引擎：汉字→拼音 + 拼音→汉字 + 繁简转换 + 多音字消歧 + 拼音分词 + 模糊匹配 + 搜索索引 + 变调规则 + 编辑距离 + 规范化 + 流式处理 + N-gram 语言模型 + 拼音输入法。
 
-- 模块名：`walkzzz/pinyin`，版本 0.4.0，MIT 许可证
+- 模块名：`walkzzz/pinyin`，版本 0.5.0，MIT 许可证
 - 仓库：https://github.com/toadium/pinyin.git
 - moon 工具链：0.1.20260713
 
-### 包结构（10 包扁平多根布局）
+### 包结构（12 包扁平多根布局）
 
 ```
 pinyin/                         # 根包 — 文档入口（不导入任何子包）
@@ -100,6 +99,12 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 ├── search/                     # 搜索索引倒排（依赖 core + convert + segment + fuzzy）
 ├── tone/                       # 声调变调规则（依赖 core，5 类变调）
 ├── normalize/                  # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
+├── lm/                         # N-gram 语言模型（依赖 core + data + math）
+│   ├── pinyin_lm.mbt           #   PinyinLM + LMStats + Laplace 平滑 + Katz 回退
+│   └── lm_test.mbt             #   黑盒测试（8）
+├── input/                      # 拼音输入法引擎（依赖 core + segment + reverse + lm + math）
+│   ├── pinyin_input.mbt        #   PinyinInputEngine + InputCandidate + Beam Search
+│   └── input_test.mbt          #   黑盒测试（10）
 ├── examples/                   # 示例包（依赖 convert，14 个示例测试）
 ├── docs/                       # 开发文档（roadmap/architecture/api/testing）
 └── scripts/                    # 字典生成脚本（gen_pinyin_dict.py）
@@ -116,6 +121,10 @@ convert（core+data）
 reverse segment  fuzzy    disambiguate
     ↑         ↑         ↑
   search    normalize    tone
+    ↑
+lm（core+data+math）
+  ↑
+input（core+segment+reverse+lm+math）
 ```
 
 线性无环依赖，core/data 零依赖，各子包职责单一。参照 owl-mbt 项目理念。
@@ -123,7 +132,7 @@ reverse segment  fuzzy    disambiguate
 ### 多后端支持
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 151 测试全通过，共 604 测试
+- 四后端各 169 测试全通过，共 676 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 无 WASM local count 问题（字典用 Map 字面量，非大 match）
 
@@ -167,3 +176,10 @@ reverse segment  fuzzy    disambiguate
 |---|---|---|
 | `[0073] unnecessary_annotation` | `raise @core.PinyinError::InvalidInput("msg")` 在子包中触发误报（MoonBit 编译器 bug） | 添加 `pub fn raise_invalid_input` 包装函数，子包用 `@core.raise_invalid_input("msg")`；catch 块改用 `_` 匹配 |
 | `[0025] test_unqualified_package` | 黑盒测试迁移到子包目录后仍需 `@包名.` 前缀 | 各子包黑盒测试文件加对应 `@包名.` 前缀 |
+
+#### v0.5.0
+
+| Warning | 根因 | 治理 |
+|---|---|---|
+| `[0073] unnecessary_annotation` | `LMStats::{...}` / `PinyinInputEngine::{...}` 构造注释冗余 | 去除类型注解，裸用 `{...}` 构造 |
+| `[0073] unnecessary_annotation` | `Int` 类型注解与 `Int32` 不一致 | `moon fmt` 自动将 `Int` 修正为 `Int32` |

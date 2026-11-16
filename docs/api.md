@@ -458,3 +458,189 @@ pub fn PinyinEditDistance::fuzzy_distance(s1 : Array[String], s2 : Array[String]
 ```
 
 模糊编辑距离（模糊等价音节距离为 0）。
+
+## lm 包
+
+### PinyinLM
+
+N-gram 语言模型，从 data 包字典自动构建频率表，提供概率查询与困惑度评估。
+
+#### unigram_prob
+
+```moonbit
+pub fn PinyinLM::unigram_prob(pinyin : String) -> Double
+```
+
+查询 unigram 概率。使用 Laplace 平滑：P(w) = (C(w) + 1) / (N + V)，其中 C(w) 为该音节频率，N 为总音节数，V 为词汇表大小。
+
+#### bigram_prob
+
+```moonbit
+pub fn PinyinLM::bigram_prob(prev : String, curr : String) -> Double
+```
+
+查询 bigram 概率 P(curr|prev)。Katz 回退条件：当 C(prev, curr) ≥ 阈值时使用折扣估计，否则回退到 α(prev) × P(curr)（unigram）。
+
+#### trigram_prob
+
+```moonbit
+pub fn PinyinLM::trigram_prob(p2 : String, p1 : String, curr : String) -> Double
+```
+
+查询 trigram 概率 P(curr|p2,p1)。Katz 回退条件：当 C(p2,p1,curr) ≥ 阈值时使用折扣估计，否则回退到 α(p2,p1) × P(curr|p1)（bigram），逐级降级到 unigram。
+
+#### sentence_log_prob
+
+```moonbit
+pub fn PinyinLM::sentence_log_prob(pinyin_array : Array[String]) -> Double
+```
+
+计算句子 bigram 对数概率：log P(s) = Σ log P(w_i | w_{i-1})。
+
+#### sentence_log_prob_trigram
+
+```moonbit
+pub fn PinyinLM::sentence_log_prob_trigram(pinyin_array : Array[String]) -> Double
+```
+
+计算句子 trigram 对数概率：log P(s) = Σ log P(w_i | w_{i-2}, w_{i-1})。
+
+#### perplexity
+
+```moonbit
+pub fn PinyinLM::perplexity(sentences : Array[Array[String]]) -> Double
+```
+
+计算 bigram 困惑度：PP = exp(-1/N × Σ log P(w_i | w_{i-1}))，N 为总音节数。
+
+#### perplexity_trigram
+
+```moonbit
+pub fn PinyinLM::perplexity_trigram(sentences : Array[Array[String]]) -> Double
+```
+
+计算 trigram 困惑度：PP = exp(-1/N × Σ log P(w_i | w_{i-2}, w_{i-1}))。
+
+#### stats
+
+```moonbit
+pub fn PinyinLM::stats() -> LMStats
+```
+
+返回语言模型统计信息。
+
+### LMStats
+
+```moonbit
+pub struct LMStats {
+  vocab_size : Int32
+  unigram_total : Int32
+  bigram_total : Int32
+  trigram_total : Int32
+  unigram_types : Int32
+  bigram_types : Int32
+  trigram_types : Int32
+}
+```
+
+语言模型统计信息：词汇表大小、各阶 n-gram 总频次与类型数。
+
+### unigram_freq
+
+```moonbit
+pub let unigram_freq : Map[String, Int32]
+```
+
+unigram 频率表（从 data 包字典自动构建）。
+
+### bigram_freq
+
+```moonbit
+pub let bigram_freq : Map[String, Map[String, Int32]]
+```
+
+bigram 频率表（从 data 包字典自动构建，嵌套 Map 结构）。
+
+## input 包
+
+### PinyinInputEngine
+
+拼音输入法引擎，基于 Beam Search 解码 + LM 评分。
+
+算法流程：分词（segment）→ 反查（reverse）→ Beam Search 扩展 + LM 剪枝 → 排序去重输出。时间复杂度 O(S×B×C)，S=音节数、B=beam 宽度、C=单音节最大候选数。
+
+#### new
+
+```moonbit
+pub fn PinyinInputEngine::new() -> PinyinInputEngine
+```
+
+创建输入法引擎，默认 beam 宽度 5。
+
+#### with_beam_width
+
+```moonbit
+pub fn PinyinInputEngine::with_beam_width(beam_width : Int32) -> PinyinInputEngine
+```
+
+创建指定 beam 宽度的输入法引擎。
+
+#### set_beam_width
+
+```moonbit
+pub fn PinyinInputEngine::set_beam_width(self, w : Int32) -> Unit
+```
+
+动态设置 beam 宽度。
+
+#### beam_width
+
+```moonbit
+pub fn PinyinInputEngine::beam_width(self) -> Int32
+```
+
+获取当前 beam 宽度。
+
+#### input
+
+```moonbit
+pub fn PinyinInputEngine::input(self, pinyin_str : String) -> Array[InputCandidate] raise PinyinError
+```
+
+主输入接口：对拼音串执行最优分词 → 反查 → Beam Search，返回排序后的候选列表。无效拼音抛 `PinyinError`。
+
+#### input_from_segments
+
+```moonbit
+pub fn PinyinInputEngine::input_from_segments(self, segments : Array[String]) -> Array[InputCandidate]
+```
+
+从已有音节序列直接执行 Beam Search（跳过分词步骤）。
+
+#### input_all_segments
+
+```moonbit
+pub fn PinyinInputEngine::input_all_segments(self, pinyin_str : String) -> Array[InputCandidate] raise PinyinError
+```
+
+全切分路径输入：对拼音串执行全切分，对每种切分方案分别执行 Beam Search，合并去重后返回候选列表。
+
+#### input_with_limit
+
+```moonbit
+pub fn PinyinInputEngine::input_with_limit(self, pinyin_str : String, limit : Int32) -> Array[InputCandidate] raise PinyinError
+```
+
+限定候选数量的输入接口，返回最多 `limit` 个候选。
+
+### InputCandidate
+
+```moonbit
+pub(all) struct InputCandidate {
+  text : String
+  score : Double
+  segments : Array[String]
+}
+```
+
+输入法候选结构：`text` 为候选汉字文本，`score` 为 LM 对数概率评分（越高越好），`segments` 为对应的拼音音节切分。

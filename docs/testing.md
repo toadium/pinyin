@@ -19,18 +19,20 @@
 | `normalize` | `normalizer_test.mbt` | 黑盒 | 10 | 规范化（大小写/ü/v/声调格式） |
 | `normalize` | `edit_distance_test.mbt` | 黑盒 | 7 | 编辑距离（Levenshtein/模糊距离） |
 | `examples` | `*.mbt` | 黑盒 | 14 | 示例测试（chinese 2 + pinyin_helper 5 + array 4 + custom 3） |
-| **总计** | | | **151 / 后端** | |
+| `lm` | `lm_test.mbt` | 黑盒 | 8 | N-gram 语言模型（unigram/bigram/trigram 概率、句子对数概率、困惑度、LMStats） |
+| `input` | `input_test.mbt` | 黑盒 | 10 | 输入法引擎（Beam Search、候选生成、beam 宽度、全切分路径、候选限制） |
+| **总计** | | | **169 / 后端** | |
 
 ## 四后端验证
 
 ```bash
-moon test --target wasm      --warn-list +73 --deny-warn   # 151/151 ✓
-moon test --target wasm-gc   --warn-list +73 --deny-warn   # 151/151 ✓
-moon test --target js        --warn-list +73 --deny-warn   # 151/151 ✓
-moon test --target native    --warn-list +73 --deny-warn   # 151/151 ✓
+moon test --target wasm      --warn-list +73 --deny-warn   # 169/169 ✓
+moon test --target wasm-gc   --warn-list +73 --deny-warn   # 169/169 ✓
+moon test --target js        --warn-list +73 --deny-warn   # 169/169 ✓
+moon test --target native    --warn-list +73 --deny-warn   # 169/169 ✓
 ```
 
-四后端共 604 测试全通过，严格模式零警告零错误。
+四后端共 676 测试全通过，严格模式零警告零错误。
 
 ## CI 流程
 
@@ -66,3 +68,10 @@ moon info   --target all                                  # 生成接口文件
 |---|---|---|
 | `[0073] unnecessary_annotation` | `raise @core.PinyinError::InvalidInput("msg")` 在子包中触发误报（MoonBit 编译器 bug：[0073] 检查未考虑去掉前缀后标识符不可见） | 添加 `pub fn raise_invalid_input` 包装函数，子包用 `@core.raise_invalid_input("msg")` 代替直接 raise；catch 块改用 `_` 匹配 |
 | `[0025] test_unqualified_package` | 黑盒测试迁移到子包目录后仍需 `@包名.` 前缀 | 各子包黑盒测试文件加对应 `@包名.` 前缀 |
+
+### v0.5.0
+
+| Warning | 根因 | 治理 |
+|---|---|---|
+| `[0073] unnecessary_annotation` | `LMStats::{...}` / `PinyinInputEngine::{...}` 构造注释冗余 | 去除类型注解，裸用 `{...}` 构造 |
+| `[0073] unnecessary_annotation` | `Int` 类型注解与 `Int32` 不一致 | `moon fmt` 自动将 `Int` 修正为 `Int32` |
