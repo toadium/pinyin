@@ -293,7 +293,10 @@ pub fn PinyinLM::sentence_log_prob_trigram(
 /// 困惑度（Perplexity）：PP = exp(-1/N × Σ log P(w_i | context))。
 /// 使用 Bigram 模型。输入为拼音数组列表（多句子）。
 /// 困惑度越低表示模型对数据拟合越好。
-pub fn PinyinLM::perplexity(sentences : Array[Array[String]]) -> Double {
+/// 空句子列表或所有句子均为空时抛 PinyinError（困惑度无定义）。
+pub fn PinyinLM::perplexity(
+  sentences : Array[Array[String]],
+) -> Double raise @core.PinyinError {
   let mut total_log_prob : Double = 0.0
   let mut total_words : Int32 = 0
   for sentence in sentences {
@@ -301,14 +304,19 @@ pub fn PinyinLM::perplexity(sentences : Array[Array[String]]) -> Double {
     total_log_prob += PinyinLM::sentence_log_prob(sentence)
   }
   if total_words == 0 {
-    return 1.0 / 0.0
+    @core.raise_invalid_input(
+      "Cannot compute perplexity: empty sentences or all sentences are empty",
+    )
   }
   @math.exp(-total_log_prob / total_words.to_double())
 }
 
 ///|
 /// 困惑度（Trigram 模型）。
-pub fn PinyinLM::perplexity_trigram(sentences : Array[Array[String]]) -> Double {
+/// 空句子列表或所有句子均为空时抛 PinyinError（困惑度无定义）。
+pub fn PinyinLM::perplexity_trigram(
+  sentences : Array[Array[String]],
+) -> Double raise @core.PinyinError {
   let mut total_log_prob : Double = 0.0
   let mut total_words : Int32 = 0
   for sentence in sentences {
@@ -316,7 +324,98 @@ pub fn PinyinLM::perplexity_trigram(sentences : Array[Array[String]]) -> Double 
     total_log_prob += PinyinLM::sentence_log_prob_trigram(sentence)
   }
   if total_words == 0 {
-    return 1.0 / 0.0
+    @core.raise_invalid_input(
+      "Cannot compute perplexity: empty sentences or all sentences are empty",
+    )
+  }
+  @math.exp(-total_log_prob / total_words.to_double())
+}
+
+///|
+/// 线性插值平滑概率：P(w3|w1,w2) = λ1·P_trigram + λ2·P_bigram + λ3·P_unigram。
+/// λ1 + λ2 + λ3 应等于 1.0，函数不做归一化检查（调用者负责）。
+/// 任意 λ 为负数时抛 PinyinError。
+/// 提供比 Katz 回退更平滑的概率估计，是 NLP 教科书标准方法。
+pub fn PinyinLM::interpolation_prob(
+  p2 : String,
+  p1 : String,
+  curr : String,
+  lambda1 : Double,
+  lambda2 : Double,
+  lambda3 : Double,
+) -> Double raise @core.PinyinError {
+  if lambda1 < 0.0 || lambda2 < 0.0 || lambda3 < 0.0 {
+    @core.raise_invalid_input(
+      "Interpolation lambdas must be non-negative, got: " +
+      lambda1.to_string() +
+      ", " +
+      lambda2.to_string() +
+      ", " +
+      lambda3.to_string(),
+    )
+  }
+  lambda1 * PinyinLM::trigram_prob(p2, p1, curr) +
+  lambda2 * PinyinLM::bigram_prob(p1, curr) +
+  lambda3 * PinyinLM::unigram_prob(curr)
+}
+
+///|
+/// 整句概率（Interpolation 模型，对数概率）：
+/// log P(s) = Σ log P(w_i | w_{i-2}, w_{i-1}, λ1, λ2, λ3)。
+/// 首词用 unigram，次词用 bigram，之后用 interpolation。
+/// 空串返回 0.0。负数 λ 抛 PinyinError。
+pub fn PinyinLM::sentence_log_prob_interpolation(
+  pinyin_array : Array[String],
+  lambda1 : Double,
+  lambda2 : Double,
+  lambda3 : Double,
+) -> Double raise @core.PinyinError {
+  if pinyin_array.length() == 0 {
+    return 0.0
+  }
+  let mut log_prob : Double = 0.0
+  log_prob += @math.ln(PinyinLM::unigram_prob(pinyin_array[0]))
+  if pinyin_array.length() >= 2 {
+    log_prob += @math.ln(
+      PinyinLM::bigram_prob(pinyin_array[0], pinyin_array[1]),
+    )
+  }
+  for i in 2..<pinyin_array.length() {
+    log_prob += @math.ln(
+      PinyinLM::interpolation_prob(
+        pinyin_array[i - 2],
+        pinyin_array[i - 1],
+        pinyin_array[i],
+        lambda1,
+        lambda2,
+        lambda3,
+      ),
+    )
+  }
+  log_prob
+}
+
+///|
+/// 困惑度（Interpolation 模型）。
+/// 空句子列表或所有句子均为空时抛 PinyinError（困惑度无定义）。
+pub fn PinyinLM::perplexity_interpolation(
+  sentences : Array[Array[String]],
+  lambda1 : Double,
+  lambda2 : Double,
+  lambda3 : Double,
+) -> Double raise @core.PinyinError {
+  let mut total_log_prob : Double = 0.0
+  let mut total_words : Int32 = 0
+  for sentence in sentences {
+    total_words += sentence.length()
+    total_log_prob += PinyinLM::sentence_log_prob_interpolation(
+      sentence, lambda1, lambda2, lambda3,
+    )
+  }
+  if total_words == 0 {
+    @core.raise_invalid_input(
+      "Cannot compute perplexity: empty sentences or all sentences are empty",
+    )
   }
   @math.exp(-total_log_prob / total_words.to_double())
 }

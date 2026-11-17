@@ -56,6 +56,8 @@ pub fn PinyinHelper::has_multi_pinyin(c : Char) -> Bool raise @core.PinyinError 
 ///|
 /// 追加自定义单字拼音字典到 pinyin_table（原地合并）。
 /// 对齐源库 addPinyinDictResource。
+/// **全局状态副作用**：修改共享 pinyin_table，对 convert 包和 data 包均可见，
+/// 但不影响 reverse 包的反向查找索引或 lm 包的频率表（这些在构建期固化）。
 pub fn PinyinHelper::add_pinyin_dict_resource(
   dict : Map[String, String],
 ) -> Unit {
@@ -67,6 +69,8 @@ pub fn PinyinHelper::add_pinyin_dict_resource(
 ///|
 /// 追加自定义词组拼音字典到 mutil_pinyin_table（原地合并）。
 /// 对齐源库 addMutilPinyinDictResource。
+/// **全局状态副作用**：修改共享 mutil_pinyin_table，对 convert 包和 data 包均可见，
+/// 但不影响 lm 包的频率表（构建期固化）。
 pub fn PinyinHelper::add_mutil_pinyin_dict_resource(
   dict : Map[String, String],
 ) -> Unit {

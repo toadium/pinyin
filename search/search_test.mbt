@@ -59,3 +59,23 @@ test "search: 模糊搜索去重" {
   let result = index.search_fuzzy("zhongzong")
   assert_eq(result.length(), 1)
 }
+
+///|
+test "search: 空文档抛 PinyinError" {
+  let index = @search.PinyinSearchIndex::new()
+  let caught = try {
+    let _ = index.add_document("")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
+}
+
+///|
+test "search: 无匹配拼音搜索返回空" {
+  let index = @search.PinyinSearchIndex::new()
+  ignore(index.add_document("中国"))
+  let result = index.search_pinyin("abc")
+  assert_eq(result.length(), 0)
+}

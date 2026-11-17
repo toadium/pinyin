@@ -3,5 +3,7 @@ import {
   "walkzzz/pinyin/segment",
   "walkzzz/pinyin/reverse",
   "walkzzz/pinyin/lm",
+  "walkzzz/pinyin/data",
+  "walkzzz/pinyin/fuzzy",
   "moonbitlang/core/math",
 }

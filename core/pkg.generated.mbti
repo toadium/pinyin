@@ -16,7 +16,13 @@ pub fn find_array_key_by_value(Char) -> Int32
 
 pub fn format_pinyin(String, PinyinFormat) -> Array[String]
 
+pub fn get_final(String) -> String raise PinyinError
+
+pub fn get_initial(String) -> String raise PinyinError
+
 pub fn get_tone_number(String) -> Int32
+
+pub let initials_list : Array[String]
 
 pub fn is_vowel_char(Char) -> Bool
 

@@ -30,22 +30,61 @@
 - mooncakes 发布 `walkzzz/pinyin@0.1.1`
 
 > 内部迭代历史：v0.1.2（根布局+多后端）→ v0.1.3（白盒测试）→ v0.1.4（字典分段）→ v0.1.5（warning 治理），统一对外发布为 v0.1.1。
+#### V0.6.0
+- **输入校验与错误处理强化（对照上游库规范）**
+  - `segment`/`segment_best`：空串从返回 `[]` 改为抛 `PinyinError`（破坏性变更，v0.x 允许）
+  - `fuzzy_expand`/`fuzzy_match`：空串从静默处理改为抛 `PinyinError`
+  - `get_initial`/`get_final`：空串从返回空字符串改为抛 `PinyinError`
+  - `PinyinEditDistance::distance`/`fuzzy_distance`：空串抛 `PinyinError`，级联 raise 签名
+  - `PinyinLM::perplexity`/`perplexity_trigram`/`perplexity_interpolation`：空句子从返回 ∞ 改为抛 `PinyinError`
+  - `PinyinLM::interpolation_prob`：负数 λ 抛 `PinyinError`
+  - `PinyinLM::sentence_log_prob_interpolation`：级联 raise 签名
+  - `PinyinInputEngine::input_from_segments`：空 segments 从返回 `[]` 改为抛 `PinyinError`
+  - `PinyinInputEngine::input_with_limit`：limit < 1 抛 `PinyinError`
+  - `PinyinSearchIndex::search_fuzzy`：级联 raise 签名
+- **扩展点增强（对照上游库规范 §6 低侵入可扩展）**
+  - `FuzzyPinyinHelper::add_fuzzy_rules`：支持追加自定义模糊规则（如方言 r→l 混淆）
+  - `PinyinInputEngine::InputScoringConfig`：新增可配置评分结构体（user_dict_bonus/phrase_bonus/candidate_limit）
+  - `PinyinInputEngine::set_scoring_config` / `scoring_config`：运行时调整评分策略
+  - 原硬编码 10.0/5.0/20 全部改为配置项，默认值不变，向下兼容
+- **错误路径测试补全**
+  - 新增 18 个错误路径+扩展点测试：segment(2) + search(2) + tone(2) + lm(3) + normalize(2) + convert(3) + fuzzy(1) + input(4)
+  - 所有公开 `raise` 函数均有非法输入→PinyinError 测试覆盖
+- **文档完善（对照上游库规范 §9）**
+  - README 新增「适用场景」与「不适用场景」
+  - README 新增「常见问题」（6 条 FAQ）
+  - 新增 `CONTRIBUTING.md`（贡献流程、代码规范、测试要求、维护响应时效）
+  - `add_pinyin_dict_resource`/`add_mutil_pinyin_dict_resource`/`add_chinese_dict_resource`：新增「全局状态副作用」文档（共享引用、影响范围、不受影响组件）
+- **测试数量**：207 → 225 / 后端（共 900 测试，四后端全通过）
+- 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
+
 #### V0.5.0
 - **新增 `lm` 包：N-gram 语言模型**
   - unigram / bigram / trigram 频率表（从 data 包字典自动构建）
   - Laplace 平滑 + Katz 回退（解决数据稀疏问题）
-  - 句子对数概率（bigram / trigram 模型）
-  - 困惑度评估（bigram / trigram）
+  - Interpolation 平滑（可配置 λ₁/λ₂/λ₃ 插值权重）
+  - 句子对数概率（bigram / trigram / interpolation 模型）
+  - 困惑度评估（bigram / trigram / interpolation）
   - LMStats 统计信息（词汇量 / 总频次 / n-gram 类型数）
 - **新增 `input` 包：拼音输入法引擎**
   - PinyinInputEngine：Beam Search 解码 + LM 评分
   - InputCandidate 候选结构（text / score / segments）
   - 单条切分候选生成 + 全切分路径候选生成
+  - 用户词库（add_user_dict，+10.0 加分）+ 词组优先（build_phrase_table，+5.0 加分）
+  - 模糊拼音输入（input_fuzzy，自动扩展模糊音节）
   - 可配置 beam 宽度，候选自动去重排序
-- 依赖拓扑扩展：`lm(core+data+math)` → `input(core+segment+reverse+lm+math)`
-- 测试数量：151 → 169 / 后端（共 676 测试，四后端全通过）
+- **新增 `core` 包声母/韵母提取**
+  - get_initial：提取声母（zh/ch/sh/z/c/s/...）
+  - get_final：提取韵母（ong/ang/eng/...）
+  - initials_list：22 个声母表
+- **新增 `examples/` 子包全覆盖示例**
+  - 10 个新示例文件：initials_finals/reverse/segment/fuzzy/disambiguate/search/tone/normalize/lm/input
+  - 示例测试：14 → 37
+- 依赖拓扑扩展：`lm(core+data+math)` → `input(core+segment+reverse+lm+math+data+fuzzy)`
+- 测试数量：169 → 207 / 后端（共 828 测试，四后端全通过）
 - 关键词新增 `ngram`、`input-method`
 - 项目描述更新：去除"移植自 pinyin4cj"，新增 N-gram 语言模型 + 拼音输入法
+- 文档全面更新：README.md / README.mbt.md / docs/ / AGENTS.md / 申报书同步至 v0.5.0
 
 #### V0.4.0
 - **架构重构：单包 → 10 包扁平多根布局**（参照 owl-mbt 项目理念）

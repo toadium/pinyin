@@ -9,6 +9,7 @@ pub struct FuzzyPinyinHelper {}
 /// 全部模糊匹配规则。
 /// zh↔z, ch↔c, sh↔s（翘舌↔平舌），n↔l, f↔h（声母混淆），
 /// in↔ing, en↔eng, an↔ang, ong↔eng（韵母后缀混淆）。
+/// 可通过 add_fuzzy_rules 追加自定义规则（如方言特有混淆）。
 pub let fuzzy_rules : Array[@core.FuzzyRule] = [
   Prefix("zh", "z"),
   Prefix("z", "zh"),
@@ -31,10 +32,29 @@ pub let fuzzy_rules : Array[@core.FuzzyRule] = [
 ]
 
 ///|
+/// 追加自定义模糊匹配规则到 fuzzy_rules（原地合并）。
+/// 允许添加方言特有的声母/韵母混淆规则。
+/// **全局状态副作用**：修改共享 fuzzy_rules，后续 fuzzy_expand/fuzzy_match 调用立即生效。
+/// 示例：`add_fuzzy_rules([Prefix("r", "l")])` 添加 r→l 混淆。
+pub fn FuzzyPinyinHelper::add_fuzzy_rules(
+  rules : Array[@core.FuzzyRule],
+) -> Unit {
+  for rule in rules {
+    fuzzy_rules.push(rule)
+  }
+}
+
+///|
 /// 对单个拼音应用所有模糊规则，生成模糊等价拼音集合（含原始拼音）。
 /// 仅保留合法拼音音节（通过 pinyin_trie 验证）。
 /// 例如 "zhong" → ["zhong", "zong"]，"zhen" → ["zhen", "zheng", "zen", "zeng"]。
-pub fn FuzzyPinyinHelper::fuzzy_expand(pinyin : String) -> Array[String] {
+/// 空串抛 PinyinError。
+pub fn FuzzyPinyinHelper::fuzzy_expand(
+  pinyin : String,
+) -> Array[String] raise @core.PinyinError {
+  if pinyin.length() == 0 {
+    @core.raise_invalid_input("Pinyin syllable must not be empty")
+  }
   let result : Array[String] = [pinyin]
   let seen : Map[String, Unit] = Map([])
   seen[pinyin] = ()
@@ -78,10 +98,14 @@ fn FuzzyPinyinHelper::apply_fuzzy_rules(pinyin : String) -> Array[String] {
 
 ///|
 /// 判断两个拼音是否模糊等价（含完全相同）。
+/// 空串抛 PinyinError。
 pub fn FuzzyPinyinHelper::fuzzy_match(
   pinyin1 : String,
   pinyin2 : String,
-) -> Bool {
+) -> Bool raise @core.PinyinError {
+  if pinyin1.length() == 0 || pinyin2.length() == 0 {
+    @core.raise_invalid_input("Pinyin syllables must not be empty")
+  }
   if pinyin1 == pinyin2 {
     return true
   }

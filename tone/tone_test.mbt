@@ -90,3 +90,16 @@ test "tone_sandhi: 八+一声 → 四声 八天" {
   assert_eq(result[0], "bà")
   assert_eq(result[1], "tiān")
 }
+
+///|
+test "tone_sandhi: 空数组返回空数组" {
+  let result = @tone.ToneSandhiHelper::apply_tone_sandhi([])
+  assert_eq(result.length(), 0)
+}
+
+///|
+test "tone_sandhi: 单元素不变" {
+  let result = @tone.ToneSandhiHelper::apply_tone_sandhi(["nǐ"])
+  assert_eq(result.length(), 1)
+  assert_eq(result[0], "nǐ")
+}

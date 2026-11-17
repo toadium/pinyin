@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "walkzzz/pinyin/normalize"
 
+import {
+  "walkzzz/pinyin/core",
+}
+
 // Values
 
 // Errors
@@ -8,8 +12,8 @@ package "walkzzz/pinyin/normalize"
 // Types and methods
 pub struct PinyinEditDistance {
 }
-pub fn PinyinEditDistance::distance(String, String) -> Int32
-pub fn PinyinEditDistance::fuzzy_distance(String, String) -> Int32
+pub fn PinyinEditDistance::distance(String, String) -> Int32 raise @core.PinyinError
+pub fn PinyinEditDistance::fuzzy_distance(String, String) -> Int32 raise @core.PinyinError
 
 pub struct PinyinNormalizer {
 }

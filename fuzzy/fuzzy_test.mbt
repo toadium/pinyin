@@ -141,3 +141,18 @@ test "fuzzy_match_fan_han" {
 test "fuzzy_match_ban_bang" {
   assert_true(@fuzzy.FuzzyPinyinHelper::fuzzy_match("ban", "bang"))
 }
+
+///|
+/// 自定义模糊规则扩展：添加 r→l 规则后，"re" 可模糊匹配 "le"。
+/// 测试后清理规则数组恢复原始状态。
+test "add_fuzzy_rules_custom" {
+  let orig_count = @fuzzy.fuzzy_rules.length()
+  @fuzzy.FuzzyPinyinHelper::add_fuzzy_rules([Prefix("r", "l")])
+  assert_eq(@fuzzy.fuzzy_rules.length(), orig_count + 1)
+  // r→l 是合法拼音扩展
+  let variants = @fuzzy.FuzzyPinyinHelper::fuzzy_expand("re")
+  assert_true(variants.contains("re"))
+  // 清理：移除追加的规则
+  let _ = @fuzzy.fuzzy_rules.pop()
+  assert_eq(@fuzzy.fuzzy_rules.length(), orig_count)
+}

@@ -25,10 +25,15 @@ test "segment_xian" {
 }
 
 ///|
-/// 拼音分词：空串返回 []。
+/// 拼音分词：空串抛 PinyinError。
 test "segment_empty" {
-  let segments = @segment.PinyinSegmenter::segment("")
-  assert_true(segments.length() == 0)
+  let caught = try {
+    let _ = @segment.PinyinSegmenter::segment("")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
 }
 
 ///|
@@ -65,10 +70,15 @@ test "segment_best_zhongguo" {
 }
 
 ///|
-/// 最优分词：空串返回 []。
+/// 最优分词：空串抛 PinyinError。
 test "segment_best_empty" {
-  let result = @segment.PinyinSegmenter::segment_best("")
-  assert_true(result.length() == 0)
+  let caught = try {
+    let _ = @segment.PinyinSegmenter::segment_best("")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
 }
 
 ///|

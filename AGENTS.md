@@ -55,7 +55,7 @@ You can browse and install extra skills here:
   ```
 
 - In the last step, run `moon info && moon fmt` to update the interface and
-  format the code.
+- format the code.
 
 ## Project: pinyin
 
@@ -70,14 +70,16 @@ You can browse and install extra skills here:
 ```
 pinyin/                         # 根包 — 文档入口（不导入任何子包）
 ├── pinyin.mbt                  #   根包文档入口
-├── core/                       # 核心类型 + 声调转换 + Trie（零依赖）
+├── core/                       # 核心类型 + 声调转换 + Trie + 声母韵母（零依赖）
 │   ├── pinyin_format.mbt       #   PinyinFormat 枚举（4 变体）
 │   ├── pinyin_error.mbt        #   PinyinError suberror + raise_invalid_input
 │   ├── fuzzy_rule.mbt          #   FuzzyRule 枚举
 │   ├── tone_conversion.mbt     #   声调转换函数
 │   ├── pinyin_trie.mbt         #   PinyinTrie + ~420 音节 + strip_tone
+│   ├── pinyin_initials_finals.mbt # get_initial/get_final/initials_list
 │   ├── pinyin_core_wbtest.mbt  #   白盒测试（5）
-│   └── pinyin_trie_wbtest.mbt  #   白盒测试（9）
+│   ├── pinyin_trie_wbtest.mbt  #   白盒测试（9）
+│   └── pinyin_initials_finals_wbtest.mbt # 白盒测试（7）
 ├── data/                       # 字典数据包（零依赖）
 │   ├── chinese_dict.mbt        #   繁→简映射（2533 条）
 │   ├── pinyin_dict.mbt         #   单字拼音（20903 条，分 11 段 merge）
@@ -100,12 +102,12 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 ├── tone/                       # 声调变调规则（依赖 core，5 类变调）
 ├── normalize/                  # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
 ├── lm/                         # N-gram 语言模型（依赖 core + data + math）
-│   ├── pinyin_lm.mbt           #   PinyinLM + LMStats + Laplace 平滑 + Katz 回退
-│   └── lm_test.mbt             #   黑盒测试（8）
-├── input/                      # 拼音输入法引擎（依赖 core + segment + reverse + lm + math）
-│   ├── pinyin_input.mbt        #   PinyinInputEngine + InputCandidate + Beam Search
-│   └── input_test.mbt          #   黑盒测试（10）
-├── examples/                   # 示例包（依赖 convert，14 个示例测试）
+│   ├── pinyin_lm.mbt           #   PinyinLM + LMStats + Laplace + Katz + Interpolation
+│   └── lm_test.mbt             #   黑盒测试（12）
+├── input/                      # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy）
+│   ├── pinyin_input.mbt        #   PinyinInputEngine + InputCandidate + Beam Search + 用户词库 + 模糊输入
+│   └── input_test.mbt          #   黑盒测试（14）
+├── examples/                   # 示例包（12 子包全覆盖，37 个示例测试）
 ├── docs/                       # 开发文档（roadmap/architecture/api/testing）
 └── scripts/                    # 字典生成脚本（gen_pinyin_dict.py）
 ```
@@ -124,7 +126,7 @@ reverse segment  fuzzy    disambiguate
     ↑
 lm（core+data+math）
   ↑
-input（core+segment+reverse+lm+math）
+input（core+segment+reverse+lm+math+data+fuzzy）
 ```
 
 线性无环依赖，core/data 零依赖，各子包职责单一。参照 owl-mbt 项目理念。
@@ -132,7 +134,7 @@ input（core+segment+reverse+lm+math）
 ### 多后端支持
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 169 测试全通过，共 676 测试
+- 四后端各 225 测试全通过，共 900 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 无 WASM local count 问题（字典用 Map 字面量，非大 match）
 

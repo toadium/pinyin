@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "walkzzz/pinyin/segment"
 
+import {
+  "walkzzz/pinyin/core",
+}
+
 // Values
 
 // Errors
@@ -9,8 +13,8 @@ package "walkzzz/pinyin/segment"
 pub struct PinyinSegmenter {
 }
 pub fn PinyinSegmenter::can_segment(String) -> Bool
-pub fn PinyinSegmenter::segment(String) -> Array[Array[String]]
-pub fn PinyinSegmenter::segment_best(String) -> Array[String]
+pub fn PinyinSegmenter::segment(String) -> Array[Array[String]] raise @core.PinyinError
+pub fn PinyinSegmenter::segment_best(String) -> Array[String] raise @core.PinyinError
 
 // Type aliases
 

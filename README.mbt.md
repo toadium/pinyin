@@ -19,7 +19,8 @@ pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音�
 - 支持拼音模糊匹配（9 组规则：zh↔z, ch↔c, sh↔s, n↔l, f↔h, in↔ing, en↔eng, an↔ang, ong↔eng）
 - 支持声调变调规则（三声变调/一变调/不变调/七变调/八变调）
 - 支持 N-gram 语言模型（Unigram/Bigram/Trigram 频率表、Laplace 平滑、Katz 回退、困惑度）
-- 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、可配置 beam 宽度）
+- 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、用户词库、模糊输入、可配置 beam 宽度）
+- 支持声母/韵母提取（get_initial/get_final/initials_list）
 
 ## 软件架构
 
@@ -28,12 +29,13 @@ pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音�
 ```
 pinyin/                             # 根包 — 文档入口（不导入任何子包）
 ├── pinyin.mbt                      # 根包文档入口
-├── core/                           # 核心类型 + 声调转换 + Trie（零依赖）
+├── core/                           # 核心类型 + 声调转换 + Trie + 声母韵母（零依赖）
 │   ├── pinyin_format.mbt           # PinyinFormat 枚举
 │   ├── pinyin_error.mbt            # PinyinError suberror + raise_invalid_input
 │   ├── fuzzy_rule.mbt              # FuzzyRule 枚举
 │   ├── tone_conversion.mbt         # 声调转换函数
 │   ├── pinyin_trie.mbt             # PinyinTrie + pinyin_syllables + strip_tone
+│   ├── pinyin_initials_finals.mbt  # get_initial/get_final/initials_list
 │   ├── pinyin_core_wbtest.mbt      # 白盒测试（5）
 │   └── pinyin_trie_wbtest.mbt      # 白盒测试（9）
 ├── data/                           # 字典数据包（零依赖）
@@ -74,16 +76,26 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── normalizer_test.mbt         # 黑盒测试（10）
 │   └── edit_distance_test.mbt      # 黑盒测试（7）
 ├── lm/                             # N-gram 语言模型（依赖 core + data + math）
-│   ├── pinyin_lm.mbt               # PinyinLM + LMStats + Laplace 平滑 + Katz 回退
-│   └── lm_test.mbt                 # 黑盒测试（8）
-├── input/                          # 拼音输入法引擎（依赖 core + segment + reverse + lm + math）
-│   ├── pinyin_input.mbt            # PinyinInputEngine + InputCandidate + Beam Search
-│   └── input_test.mbt              # 黑盒测试（10）
-├── examples/                       # 示例包（依赖 convert）
+│   ├── pinyin_lm.mbt               # PinyinLM + LMStats + Laplace 平滑 + Katz 回退 + Interpolation
+│   └── lm_test.mbt                 # 黑盒测试（12）
+├── input/                          # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy）
+│   ├── pinyin_input.mbt            # PinyinInputEngine + InputCandidate + Beam Search + 用户词库 + 模糊输入
+│   └── input_test.mbt              # 黑盒测试（14）
+├── examples/                       # 示例包（12 子包全覆盖，37 个示例测试）
 │   ├── chinese_helper_example.mbt  # 示例测试（2）
 │   ├── pinyin_helper_example.mbt   # 示例测试（5）
 │   ├── pinyin_array_example.mbt    # 示例测试（4）
-│   └── custom_dict_example.mbt     # 示例测试（3）
+│   ├── custom_dict_example.mbt     # 示例测试（3）
+│   ├── initials_finals_example.mbt # 示例测试（2）
+│   ├── reverse_example.mbt         # 示例测试（2）
+│   ├── segment_example.mbt         # 示例测试（2）
+│   ├── fuzzy_example.mbt           # 示例测试（2）
+│   ├── disambiguate_example.mbt    # 示例测试（1）
+│   ├── search_example.mbt          # 示例测试（2）
+│   ├── tone_example.mbt            # 示例测试（1）
+│   ├── normalize_example.mbt       # 示例测试（2）
+│   ├── lm_example.mbt              # 示例测试（5）
+│   └── input_example.mbt           # 示例测试（4）
 ├── docs/                           # 开发文档
 │   ├── roadmap.md
 │   ├── architecture.md
@@ -110,8 +122,8 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 - `tone/` 声调变调规则，依赖 core
 - `normalize/` 规范化 + 编辑距离，依赖 core + segment + fuzzy
 - `lm/` N-gram 语言模型，依赖 core + data + math，含 PinyinLM / LMStats / Laplace 平滑 / Katz 回退
-- `input/` 拼音输入法引擎，依赖 core + segment + reverse + lm + math，含 PinyinInputEngine / InputCandidate / Beam Search
-- `examples/` 示例包，依赖 convert，14 个示例测试
+- `input/` 拼音输入法引擎，依赖 core + segment + reverse + lm + math + data + fuzzy，含 PinyinInputEngine / InputCandidate / Beam Search / 用户词库 / 模糊输入
+- `examples/` 示例包，12 子包全覆盖，37 个示例测试
 - `docs/` 开发文档（roadmap / architecture / api / testing）
 - 根包为文档入口（如 owl-mbt），不导入任何子包
 
@@ -281,6 +293,30 @@ test "readme_input_all_segments" {
 }
 ```
 
+#### 用户词库与模糊输入
+
+```mbt nocheck
+///|
+test "readme_input_user_dict" {
+  let engine = @input.PinyinInputEngine::new()
+  engine.add_user_dict({ "zhangsan" => "张三" })
+  let candidates = engine.input("zhangsan")
+  let found = candidates.iter().any(fn(c) { c.text == "张三" })
+  assert_true(found)
+}
+```
+
+#### N-gram 语言模型 Interpolation 平滑
+
+```mbt nocheck
+///|
+test "readme_lm_interpolation" {
+  let p = @lm.PinyinLM::interpolation_prob("zhong", "guo", "ren", 0.5, 0.3, 0.2)
+  assert_true(p > 0.0)
+  assert_true(p < 1.0)
+}
+```
+
 ## 字典条目数
 
 | 字典 | 条目数 | 类型 | 源库对应 |
@@ -292,7 +328,7 @@ test "readme_input_all_segments" {
 
 ## 参考来源
 
-本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)（MIT 许可证），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎等十大核心引擎。字典字面量由 `scripts/gen_pinyin_dict.py` 生成：
+本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)（MIT 许可证），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、声母韵母提取、N-gram 语言模型、拼音输入法引擎等十大核心引擎。字典字面量由 `scripts/gen_pinyin_dict.py` 生成：
 
 ```bash
 python scripts/gen_pinyin_dict.py
@@ -306,7 +342,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
-四后端（wasm / wasm-gc / js / native）各 169 测试全通过，共 676 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 225 测试全通过，共 900 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 开源协议
 

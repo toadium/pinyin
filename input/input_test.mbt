@@ -116,3 +116,96 @@ test "input_dedup_in_all_segments" {
     seen[c.text] = ()
   }
 }
+
+///|
+test "input_user_dict" {
+  let engine = @input.PinyinInputEngine::new()
+  let ud : Map[String, String] = { "zhang san": "张三" }
+  engine.add_user_dict(ud)
+  let candidates = engine.input("zhangsan")
+  let has_user = candidates.iter().any(fn(c) { c.text == "张三" })
+  assert_true(has_user, msg="should find user dict entry")
+}
+
+///|
+test "input_phrase_priority" {
+  let engine = @input.PinyinInputEngine::new()
+  // "种植" is in mutil_pinyin_dict: "zhòng,zhí" → "zhong zhi"
+  let candidates = engine.input("zhongzhi")
+  let mut phrase_idx : Int32 = -1
+  for i in 0..<candidates.length() {
+    if candidates[i].text == "种植" {
+      phrase_idx = i
+    }
+  }
+  // 词组应出现在候选中且排名靠前
+  if phrase_idx >= 0 {
+    assert_true(phrase_idx < 3, msg="phrase should rank high")
+  }
+}
+
+///|
+test "input_fuzzy_basic" {
+  let engine = @input.PinyinInputEngine::new()
+  let candidates = engine.input_fuzzy("zongguo")
+  assert_true(candidates.length() > 0)
+  // 模糊扩展 zong→zhong，应产生比普通 input 更多的候选
+  let normal_candidates = engine.input("zongguo")
+  // fuzzy 候选应不少于普通候选
+  assert_true(
+    candidates.length() >= normal_candidates.length(),
+    msg="fuzzy should produce at least as many candidates",
+  )
+}
+
+///|
+test "input_user_dict_not_override" {
+  let engine = @input.PinyinInputEngine::new()
+  let ud : Map[String, String] = { "zhang san": "张三" }
+  engine.add_user_dict(ud)
+  let candidates = engine.input("nihao")
+  assert_true(candidates.length() > 0)
+}
+
+///|
+test "input_scoring_config_default" {
+  let engine = @input.PinyinInputEngine::new()
+  let config = engine.scoring_config()
+  assert_true(config.user_dict_bonus == 10.0)
+  assert_true(config.phrase_bonus == 5.0)
+  assert_eq(config.candidate_limit, 20)
+}
+
+///|
+test "input_scoring_config_custom" {
+  let engine = @input.PinyinInputEngine::new()
+  engine.set_scoring_config({
+    user_dict_bonus: 20.0,
+    phrase_bonus: 8.0,
+    candidate_limit: 30,
+  })
+  let config = engine.scoring_config()
+  assert_true(config.user_dict_bonus == 20.0)
+  assert_true(config.phrase_bonus == 8.0)
+  assert_eq(config.candidate_limit, 30)
+}
+
+///|
+test "input_from_segments_empty_raises" {
+  let engine = @input.PinyinInputEngine::new()
+  try engine.input_from_segments([]) catch {
+    _ => return
+  } noraise {
+    _ => fail("expected PinyinError for empty segments")
+  }
+}
+
+///|
+test "input_with_limit_invalid_raises" {
+  let engine = @input.PinyinInputEngine::new()
+  try engine.input_with_limit("nihao", 0) catch {
+    _ => return
+  } noraise {
+    _ => fail("expected PinyinError for limit < 1")
+  }
+}

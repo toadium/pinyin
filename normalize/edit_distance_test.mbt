@@ -38,7 +38,23 @@ test "edit_distance: 完全不同" {
 }
 
 ///|
-test "edit_distance: 空串" {
-  let d = @normalize.PinyinEditDistance::distance("", "nihao")
-  assert_eq(d, 2)
+test "edit_distance: 空串抛错" {
+  let caught = try {
+    let _ = @normalize.PinyinEditDistance::distance("", "nihao")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
+}
+
+///|
+test "edit_distance: fuzzy_distance 空串抛错" {
+  let caught = try {
+    let _ = @normalize.PinyinEditDistance::fuzzy_distance("", "nihao")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
 }

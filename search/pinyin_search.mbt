@@ -112,7 +112,7 @@ pub fn PinyinSearchIndex::search_pinyin(
 pub fn PinyinSearchIndex::search_fuzzy(
   self : PinyinSearchIndex,
   query : String,
-) -> Array[String] {
+) -> Array[String] raise @core.PinyinError {
   let exact = PinyinSearchIndex::search_pinyin(self, query)
   if exact.length() > 0 {
     return exact
@@ -142,7 +142,7 @@ fn PinyinSearchIndex::search_combinations(
   current : String,
   result : Array[String],
   seen : Map[String, Unit],
-) -> Unit {
+) -> Unit raise @core.PinyinError {
   if pos >= expanded_segments.length() {
     match self.pinyin_index.get(current) {
       Some(arr) =>

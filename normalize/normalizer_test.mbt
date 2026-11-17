@@ -57,3 +57,15 @@ test "normalize: nü3 → nǚ" {
   let result = @normalize.PinyinNormalizer::normalize("nü3")
   assert_eq(result, "nǚ")
 }
+
+///|
+test "normalize: 空串透传" {
+  let result = @normalize.PinyinNormalizer::normalize("")
+  assert_eq(result, "")
+}
+
+///|
+test "normalize: 纯数字调到无调 lv4 → lü" {
+  let result = @normalize.PinyinNormalizer::normalize("lv4")
+  assert_eq(result, "lǜ")
+}

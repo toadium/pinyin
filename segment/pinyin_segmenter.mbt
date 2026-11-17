@@ -8,9 +8,12 @@ pub struct PinyinSegmenter {}
 /// 连续拼音串分词：返回所有可能的切分方案。
 /// 例如 "nihao" → [["ni","hao"]]，"xian" → [["xi","an"],["xian"]]。
 /// 空串返回 []，无法切分的串返回 []。
-pub fn PinyinSegmenter::segment(pinyin_str : String) -> Array[Array[String]] {
+/// 空串时抛 PinyinError。
+pub fn PinyinSegmenter::segment(
+  pinyin_str : String,
+) -> Array[Array[String]] raise @core.PinyinError {
   if pinyin_str.length() == 0 {
-    return []
+    @core.raise_invalid_input("Pinyin string must not be empty")
   }
   let n = pinyin_str.length()
   let chars = pinyin_str.to_array()
@@ -38,10 +41,12 @@ pub fn PinyinSegmenter::segment(pinyin_str : String) -> Array[Array[String]] {
 /// 连续拼音串最优分词：返回音节数最少的切分方案。
 /// 使用动态规划，贪心选择最长匹配优先。
 /// 例如 "nihao" → ["ni","hao"]，"xian" → ["xian"]。
-/// 空串返回 []，无法切分的串返回 []。
-pub fn PinyinSegmenter::segment_best(pinyin_str : String) -> Array[String] {
+/// 空串抛 PinyinError，无法切分的串返回 []。
+pub fn PinyinSegmenter::segment_best(
+  pinyin_str : String,
+) -> Array[String] raise @core.PinyinError {
   if pinyin_str.length() == 0 {
-    return []
+    @core.raise_invalid_input("Pinyin string must not be empty")
   }
   let n = pinyin_str.length()
   let chars = pinyin_str.to_array()

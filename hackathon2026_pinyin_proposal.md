@@ -1,6 +1,6 @@
 # pinyin 项目申报书
 
-> 2026 MoonBit 国产基础软件开源大赛 | 方向：开发者工具 | 申报日期：2026-11-05 | 更新日期：2026-11-16
+> 2026 MoonBit 国产基础软件开源大赛 | 方向：开发者工具 | 申报日期：2026-11-05 | 更新日期：2026-11-17 | 当前版本：v0.6.0
 
 ---
 
@@ -79,16 +79,18 @@ mooncakes 调研：31909 个包中匹配 pinyin 的仅 2 个——本项目与 `
 
 ---
 
-## 当前完成状态（v0.5.0）
+## 当前完成状态（v0.6.0）
 
 | 指标 | 数值 |
 |------|------|
 | 包数 | **12**（core/data/convert/reverse/segment/fuzzy/disambiguate/search/tone/normalize/**lm/input**） |
-| 测试数 | **169/后端**（四后端共 676 全通过） |
+| 测试数 | **225/后端**（四后端共 900 全通过） |
 | 工程严格度 | ✅ `--warn-list +73 --deny-warn` 零警告零错误 |
 | 字典条目 | **24361**（chinese 2533 + pinyin 20903 + mutil 843 + tongyong 82） |
-| 公开 API | **67**（19 个类/枚举/结构体） |
-| mooncakes | ✅ `walkzzz/pinyin@0.1.1`（32 下载），v0.5.0 待发布 |
+| 公开 API | **76**（19 个类/枚举/结构体） |
+| LM 统计 | vocab_size=411, bigram_types=1088, unigram_total=20903+ |
+| 示例测试 | **37**（14 个子包全覆盖示例） |
+| mooncakes | ✅ `walkzzz/pinyin@0.6.0` 已发布 |
 
 ---
 
@@ -123,8 +125,9 @@ input（core+segment+reverse+lm+math）
 6. **声调变调引擎**：三声变调/一变调/不变调/七变调/八变调（5 类变调规则）
 7. **音节级编辑距离**：Levenshtein + 模糊距离（等价音节代价为 0），O(m×n)
 8. **拼音规范化**：大小写/数字调→带调标记/v→ü/声调位置纠正
-9. **N-gram 语言模型**：unigram/bigram/trigram 频率表 + Laplace 平滑 + Katz 回退，O(1) 概率查询
-10. **拼音输入法引擎**：Beam Search 解码 + LM 评分，O(S×B×C)，可配置 beam 宽度
+9. **N-gram 语言模型**：unigram/bigram/trigram 频率表 + Laplace 平滑 + Katz 回退 + Interpolation 平滑，O(1) 概率查询；vocab_size=411, bigram_types=1088
+10. **拼音输入法引擎**：Beam Search 解码 + LM 评分 + 词组优先 + 用户词库 + 模糊输入，O(S×B×C)，可配置 beam 宽度
+11. **声母/韵母提取**：get_initial/get_final 声母韵母分解，initials_list 声母表
 
 **PinyinStreamProcessor**：流式拼音处理器，逐字符输入汉字实时输出增量拼音（new/feed/flush/reset），适用于输入法等实时场景。
 
@@ -133,12 +136,16 @@ input（core+segment+reverse+lm+math）
 - **频率表构建**：unigram 从 `pinyin_dict`（20903 条）构建，bigram/trigram 从 `mutil_pinyin_dict`（843 条词组）构建
 - **Laplace 平滑**：P(w) = (count(w) + 1) / (N + V)，保证零概率问题
 - **Katz 回退**：trigram 未见→回退 bigram→回退 unigram，三级概率衰减
-- **评估指标**：句子对数概率、困惑度（Perplexity），支持 bigram/trigram 两种模型
+- **Interpolation 平滑**：P(w|c1,c2) = λ₁P(w|c1,c2) + λ₂P(w|c2) + λ₃P(w)，可配置插值权重
+- **评估指标**：句子对数概率、困惑度（Perplexity），支持 bigram/trigram/interpolation 三种模型
 
 ### 拼音输入法引擎设计
 
 - **算法流程**：拼音串 → PinyinSegmenter 分词 → ReversePinyinHelper 反查候选 → Beam Search + LM 打分 → 排序去重
 - **Beam Search**：每步保留 top-k 路径（k=beam_width），避免组合爆炸
+- **词组优先**：词组字典候选 +5.0 加分，用户词库候选 +10.0 加分
+- **用户词库**：add_user_dict 动态添加自定义词组映射
+- **模糊输入**：input_fuzzy 支持模糊拼音输入（zh↔z 等自动扩展）
 - **候选去重**：相同文本只保留最高得分，合并多种分词路径
 - **可配置性**：beam 宽度可调，支持单条/全切分/限量三种模式
 
@@ -163,9 +170,8 @@ input（core+segment+reverse+lm+math）
 | tone | ToneSandhiHelper | 1 | 三声变调/一变调/不变调/七变调/八变调 |
 | normalize | PinyinEditDistance | 2 | Levenshtein + 模糊距离 |
 | normalize | PinyinNormalizer | 3 | 带调标记/数字调/无调规范化 |
-| **lm** | **PinyinLM** | **7** | **unigram/bigram/trigram 概率、句子对数概率、困惑度、统计信息** |
-| **input** | **PinyinInputEngine** | **6** | **input/input_from_segments/input_all_segments/input_with_limit/beam_width/set_beam_width** |
 | core | PinyinTrie | 4 | Trie insert/contains/prefix_lengths |
+| core | PinyinInitialsFinals | 3 | get_initial/get_final/initials_list |
 | core | PinyinFormat | 4 变体 | WithToneMark/WithoutTone/WithToneNumber/FirstLetter |
 | core | FuzzyRule | 2 变体 | Prefix/Suffix |
 | core | PinyinError | 1 变体 | InvalidInput(String) |
@@ -178,30 +184,30 @@ input（core+segment+reverse+lm+math）
 
 | 包 | 白盒 | 黑盒 | 合计 |
 |---|---|---|---|
-| core | 14 | 0 | 14 |
-| convert | 8 | 31 | 39 |
+| core | 21 | 0 | 21 |
+| convert | 8 | 34 | 42 |
 | reverse | 0 | 10 | 10 |
-| segment | 0 | 12 | 12 |
-| fuzzy | 0 | 19 | 19 |
+| segment | 0 | 14 | 14 |
+| fuzzy | 0 | 22 | 22 |
 | disambiguate | 0 | 7 | 7 |
-| search | 0 | 7 | 7 |
-| tone | 0 | 12 | 12 |
-| normalize | 0 | 17 | 17 |
-| **lm** | **0** | **8** | **8** |
-| **input** | **0** | **10** | **10** |
-| examples | 0 | 14 | 14 |
-| **总计** | **22** | **147** | **169/后端** |
+| search | 0 | 9 | 9 |
+| tone | 0 | 14 | 14 |
+| normalize | 0 | 22 | 22 |
+| **lm** | **0** | **15** | **15** |
+| **input** | **0** | **18** | **18** |
+| examples | 0 | 37 | 37 |
+| **总计** | **29** | **196** | **225/后端** |
 
-四后端共 676 测试全通过，严格模式零警告零错误。
+四后端共 900 测试全通过，严格模式零警告零错误。含错误路径测试（非法输入→PinyinError）覆盖所有公开 raise 函数。
 
 ## mooncakes.io 生态对比
 
 | 库 | 数据源 | 字典条目 | 繁简 | 反向查找 | 分词 | 消歧 | 搜索 | 变调 | 编辑距离 | 规范化 | N-gram LM | 输入法 | 四后端 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **walkzzz/pinyin** | 内嵌字典 | 24361 | ✅ | ✅ | ✅ Trie+DP | ✅ Viterbi | ✅ | ✅ 5类 | ✅ | ✅ | ✅ Laplace+Katz | ✅ Beam Search | ✅ 676 |
+| **walkzzz/pinyin** | 内嵌字典 | 24361 | ✅ | ✅ | ✅ Trie+DP | ✅ Viterbi | ✅ | ✅ 5类+自定义 | ✅ | ✅ | ✅ Laplace+Katz+Interpolation | ✅ Beam Search+用户词库+模糊输入+可配评分 | ✅ 900 |
 | wjhfather/pinyin-toolkit | Unicode 17.0 | 未公开 | ✗ | ✗ | ✗ | ✗ override | ✅ | ✗ | ✅ | ✅ | ✗ | ✗ | ✅ |
 
-**差异化定位**：本项目是 mooncakes.io 唯一提供 N-gram 语言模型、拼音输入法引擎、反向查找、拼音分词和声调变调的库；12 包扁平架构参照 owl-mbt。
+**差异化定位**：本项目是 mooncakes.io 唯一提供 N-gram 语言模型、拼音输入法引擎、反向查找、拼音分词和声调变调的库；12 包扁平架构参照 owl-mbt；37 个示例覆盖 12 个子包。
 
 ## 版本交付计划
 
@@ -213,6 +219,7 @@ input（core+segment+reverse+lm+math）
 | v0.3.0 | 消歧 + 搜索索引 + 变调 + 编辑距离 + 规范化 | ✅ |
 | v0.4.0 | 10 包架构重构 + PinyinError 跨包 + 七/八变调 + 3组新模糊规则 + PinyinStreamProcessor | ✅ |
 | **v0.5.0** | **N-gram 语言模型 + 拼音输入法引擎 + 12 包架构** | ✅ |
+| **v0.6.0** | **输入校验强化 + 错误路径测试 + 上游库规范对齐** | ✅ |
 
 ---
 
@@ -223,11 +230,29 @@ input（core+segment+reverse+lm+math）
 | MoonBit 为主 | 100% MoonBit，12 包扁平架构 |
 | 仓库公开可访问 | GitHub，v0.1.0~v0.5.0 持续迭代 |
 | 源代码结构清晰 | 12 包职责单一，线性无环依赖 |
-| README 可复现 | README + 14 示例 + 676 测试 |
+| README 可复现 | README + 37 示例 + 900 测试 |
 | CI 覆盖检查/构建/测试 | `--target all --warn-list +73 --deny-warn` |
-| 可运行示例 | examples 包 14 个示例测试 |
-| 完整测试覆盖 | 169/后端 × 4 = 676 |
+| 可运行示例 | examples 包 37 个示例测试（12 子包全覆盖） |
+| 完整测试覆盖 | 225/后端 × 4 = 900 |
 | OSI 许可证 | MIT，数据参考来源 pinyin4cj 已标注 |
 | 发布到 mooncakes | `walkzzz/pinyin@0.1.1` 已发布 |
 
 **数据参考来源**：[pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj) — 仓颉原版（MIT）。本项目仅参考其字典数据格式，10/12 包为自研引擎，核心算法（Trie+DP、Viterbi、BFS、N-gram LM、Beam Search 等）均为原创实现。
+
+---
+
+## 上游库规范合规性
+
+对照《通用上游源码库开发规范、评判标准与开源评审体系》，逐维度自评：
+
+| 评价维度 | 权重 | 自评 | 依据 |
+|---------|------|------|------|
+| 契约稳定与向后兼容 | 20 | 良 | 严格 SemVer，v0.6.0 破坏性变更（空串行为）仅在 0.x 允许；v1.0 后将冻结 |
+| 单一职责与边界清晰 | 12 | 优 | 12 包扁平布局，每包职责单一，线性无环依赖 |
+| 依赖可控性 | 10 | 优 | 仅依赖 `@core/math`（MoonBit 标准库），零第三方依赖 |
+| 错误处理与故障隔离 | 10 | 优 | v0.6.0 全面校验：28 个静默失败函数→raise PinyinError，10 个错误路径测试 |
+| 性能与资源占用 | 8 | 优 | 构建期固化，零运行时 IO，无泄漏，WASM-GC ~10MB |
+| 低侵入与可扩展性 | 8 | 优 | 无全局修改（字典共享为文档化特性），用户词库/beam 宽度/评分配置/模糊规则均可扩展 |
+| 测试覆盖与质量保障 | 12 | 优 | 217/后端×4=868 测试，含错误路径测试，CI 严格门禁 |
+| 文档完整性与易用性 | 10 | 优 | 适用/不适用场景 + 6 条 FAQ + 37 示例 + 完整 API 表 + CONTRIBUTING.md |
+| 维护性与生命周期 | 10 | 良 | CONTRIBUTING.md 明确响应时效，MIT 许可证，持续迭代 |

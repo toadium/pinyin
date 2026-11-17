@@ -8,7 +8,14 @@ pub struct PinyinEditDistance {}
 /// 计算两个拼音串之间的音节级编辑距离。
 /// 先将拼音串分词为音节，再计算音节数组之间的 Levenshtein 距离。
 /// 例如 "zhongguo" 与 "zongguo" 的距离为 1（一个音节差异）。
-pub fn PinyinEditDistance::distance(s1 : String, s2 : String) -> Int32 {
+/// 空串抛 PinyinError。
+pub fn PinyinEditDistance::distance(
+  s1 : String,
+  s2 : String,
+) -> Int32 raise @core.PinyinError {
+  if s1.length() == 0 || s2.length() == 0 {
+    @core.raise_invalid_input("Pinyin strings must not be empty")
+  }
   let segs1 = @segment.PinyinSegmenter::segment_best(s1)
   let segs2 = @segment.PinyinSegmenter::segment_best(s2)
   PinyinEditDistance::levenshtein(segs1, segs2)
@@ -59,7 +66,14 @@ fn PinyinEditDistance::levenshtein(
 ///|
 /// 计算两个拼音串之间的音节级编辑距离，考虑模糊匹配。
 /// 模糊等价的音节（如 zhong 和 zong）视为相同，距离为 0。
-pub fn PinyinEditDistance::fuzzy_distance(s1 : String, s2 : String) -> Int32 {
+/// 空串抛 PinyinError。
+pub fn PinyinEditDistance::fuzzy_distance(
+  s1 : String,
+  s2 : String,
+) -> Int32 raise @core.PinyinError {
+  if s1.length() == 0 || s2.length() == 0 {
+    @core.raise_invalid_input("Pinyin strings must not be empty")
+  }
   let segs1 = @segment.PinyinSegmenter::segment_best(s1)
   let segs2 = @segment.PinyinSegmenter::segment_best(s2)
   PinyinEditDistance::fuzzy_levenshtein(segs1, segs2)
@@ -70,7 +84,7 @@ pub fn PinyinEditDistance::fuzzy_distance(s1 : String, s2 : String) -> Int32 {
 fn PinyinEditDistance::fuzzy_levenshtein(
   arr1 : Array[String],
   arr2 : Array[String],
-) -> Int32 {
+) -> Int32 raise @core.PinyinError {
   let m = arr1.length()
   let n = arr2.length()
   if m == 0 {

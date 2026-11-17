@@ -152,6 +152,8 @@ pub fn is_vowel_char(ch : Char) -> Bool {
 ///|
 /// 将无调拼音 + 声调数字 → 带调拼音。
 /// 声调标记位置遵循汉语拼音规则：a > e > o > iu(ui标在后) > 最后元音。
+/// tone 须在 1-4 范围内，否则返回原字符串不变。
+/// 空串返回空串。
 pub fn set_tone(pinyin_without_tone : String, tone : Int32) -> String {
   if tone < 1 || tone > 4 {
     return pinyin_without_tone

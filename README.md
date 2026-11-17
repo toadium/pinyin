@@ -3,9 +3,9 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.5.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.6.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/tests-676-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/tests-900-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/packages-12-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/moon-0.1.20260713-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/targets-wasm%2Bwasm--gc%2Bjs%2Bnative-brightgreen" style="display: inline-block;" />
@@ -15,6 +15,23 @@
 ## 介绍
 
 pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音→汉字、繁简转换、多音字消歧、拼音分词、模糊匹配、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎等全栈拼音能力。
+
+### 适用场景
+
+- 拼音输入法引擎核心（Beam Search + N-gram LM 评分）
+- 中文文本搜索与索引（拼音首字母/连续/模糊搜索）
+- 多音字上下文消歧（Viterbi + bigram 动态规划）
+- 拼音教学与声调变调规则处理
+- 拼音规范化与拼写纠错（编辑距离 + 模糊匹配）
+- 中文 NLP 前处理（繁简转换 + 拼音标注）
+- WASM/Web 端中文处理（四后端支持，零 IO 依赖）
+
+### 不适用场景
+
+- 不提供中文分词（专注于拼音层面处理）
+- 不提供语音合成/语音识别
+- 不支持方言拼音（仅支持普通话汉语拼音）
+- N-gram 语言模型基于内置字典训练，不支持外部语料训练
 
 ### 特性
 
@@ -28,8 +45,9 @@ pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音�
 - 📏 支持拼音编辑距离（音节级 Levenshtein + 模糊距离）
 - 🔧 支持拼音规范化（大小写/ü/v/声调格式统一）
 - 🌊 支持拼音流式处理（PinyinStreamProcessor，逐字符输入实时输出）
-- 📊 支持 N-gram 语言模型（Unigram/Bigram/Trigram 频率表、Laplace 平滑、Katz 回退、困惑度）
-- ⌨️ 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、可配置 beam 宽度）
+- 📊 支持 N-gram 语言模型（Unigram/Bigram/Trigram 频率表、Laplace 平滑、Katz 回退、Interpolation 平滑、困惑度）
+- ⌨️ 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、用户词库、模糊输入、可配置 beam 宽度）
+- 🔤 支持声母/韵母提取（get_initial/get_final/initials_list）
 - 💪 支持常用简体/繁体中文字符转换成拼音
 - 🛠️ 支持常见多音字符转换成拼音
 - 🌍 支持 Unicode 格式的字符 ü、支持声调符号、支持首字母格式
@@ -71,14 +89,16 @@ mooncakes.io 31909 个包中仅有 2 个拼音库，本项目是功能最完整�
 ```
 pinyin/                             # 根包 — 文档入口（不导入任何子包）
 ├── pinyin.mbt                      # 根包文档入口
-├── core/                           # 核心类型 + 声调转换 + Trie（零依赖）
+├── core/                           # 核心类型 + 声调转换 + Trie + 声母韵母（零依赖）
 │   ├── pinyin_format.mbt           # PinyinFormat 枚举
 │   ├── pinyin_error.mbt            # PinyinError suberror + raise_invalid_input
 │   ├── fuzzy_rule.mbt              # FuzzyRule 枚举
 │   ├── tone_conversion.mbt         # 声调转换函数
 │   ├── pinyin_trie.mbt             # PinyinTrie + pinyin_syllables + strip_tone
+│   ├── pinyin_initials_finals.mbt  # get_initial/get_final/initials_list
 │   ├── pinyin_core_wbtest.mbt      # 白盒测试（5）
-│   └── pinyin_trie_wbtest.mbt      # 白盒测试（9）
+│   ├── pinyin_trie_wbtest.mbt      # 白盒测试（9）
+│   └── pinyin_initials_finals_wbtest.mbt # 白盒测试（7）
 ├── data/                           # 字典数据包（零依赖）
 │   ├── chinese_dict.mbt            # 繁→简映射（2533 条）
 │   ├── pinyin_dict.mbt             # 单字拼音（20903 条，分 11 段 merge）
@@ -117,16 +137,26 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── normalizer_test.mbt         # 黑盒测试（10）
 │   └── edit_distance_test.mbt      # 黑盒测试（7）
 ├── lm/                             # N-gram 语言模型（依赖 core + data + math）
-│   ├── pinyin_lm.mbt               # PinyinLM + LMStats + Laplace 平滑 + Katz 回退
-│   └── lm_test.mbt                 # 黑盒测试（8）
-├── input/                          # 拼音输入法引擎（依赖 core + segment + reverse + lm + math）
-│   ├── pinyin_input.mbt            # PinyinInputEngine + InputCandidate + Beam Search
-│   └── input_test.mbt              # 黑盒测试（10）
-├── examples/                       # 示例包（依赖 convert）
+│   ├── pinyin_lm.mbt               # PinyinLM + LMStats + Laplace 平滑 + Katz 回退 + Interpolation
+│   └── lm_test.mbt                 # 黑盒测试（12）
+├── input/                          # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy）
+│   ├── pinyin_input.mbt            # PinyinInputEngine + InputCandidate + Beam Search + 用户词库 + 模糊输入
+│   └── input_test.mbt              # 黑盒测试（14）
+├── examples/                       # 示例包（12 子包全覆盖，37 个示例测试）
 │   ├── chinese_helper_example.mbt  # 示例测试（2）
 │   ├── pinyin_helper_example.mbt   # 示例测试（5）
 │   ├── pinyin_array_example.mbt    # 示例测试（4）
-│   └── custom_dict_example.mbt     # 示例测试（3）
+│   ├── custom_dict_example.mbt     # 示例测试（3）
+│   ├── initials_finals_example.mbt # 示例测试（2）
+│   ├── reverse_example.mbt         # 示例测试（2）
+│   ├── segment_example.mbt         # 示例测试（2）
+│   ├── fuzzy_example.mbt           # 示例测试（2）
+│   ├── disambiguate_example.mbt    # 示例测试（1）
+│   ├── search_example.mbt          # 示例测试（2）
+│   ├── tone_example.mbt            # 示例测试（1）
+│   ├── normalize_example.mbt       # 示例测试（2）
+│   ├── lm_example.mbt              # 示例测试（5）
+│   └── input_example.mbt           # 示例测试（4）
 ├── docs/                           # 开发文档
 │   ├── roadmap.md
 │   ├── architecture.md
@@ -159,7 +189,7 @@ reverse segment  fuzzy    disambiguate
     ↑
 lm（core+data+math）
   ↑
-input（core+segment+reverse+lm+math）
+input（core+segment+reverse+lm+math+data+fuzzy）
 ```
 
 线性无环依赖，core 和 data 零依赖，各子包职责单一。
@@ -172,6 +202,7 @@ input（core+segment+reverse+lm+math）
 | `core` | `FuzzyRule` | `Prefix` / `Suffix` | 模糊匹配规则枚举 |
 | `core` | `PinyinError` | `InvalidInput(String)` | 统一错误类型（`pub(all) suberror`） |
 | `core` | `PinyinTrie` | `new` / `insert` / `contains` / `prefix_lengths` | Trie 数据结构 |
+| `core` | `PinyinInitialsFinals` | `get_initial` / `get_final` / `initials_list` | 声母/韵母提取 |
 | `convert` | `PinyinHelper` | `convert_to_pinyin_string` | 词句转拼音字符串 |
 | `convert` | `PinyinHelper` | `convert_to_pinyin_string_traditional` | 繁体词句转拼音 |
 | `convert` | `PinyinHelper` | `convert_to_pinyin_array` | 单字转拼音数组 |
@@ -209,6 +240,9 @@ input（core+segment+reverse+lm+math）
 | `lm` | `PinyinLM` | `sentence_log_prob_trigram` | 整句对数概率（Trigram） |
 | `lm` | `PinyinLM` | `perplexity` | 困惑度（Bigram） |
 | `lm` | `PinyinLM` | `perplexity_trigram` | 困惑度（Trigram） |
+| `lm` | `PinyinLM` | `interpolation_prob` | Interpolation 平滑概率（λ₁trigram+λ₂bigram+λ₃unigram） |
+| `lm` | `PinyinLM` | `sentence_log_prob_interpolation` | 整句对数概率（Interpolation） |
+| `lm` | `PinyinLM` | `perplexity_interpolation` | 困惑度（Interpolation） |
 | `lm` | `PinyinLM` | `stats` | 语言模型统计信息 |
 | `lm` | `LMStats` | `vocab_size` / `unigram_total` / `bigram_total` / `trigram_total` / `unigram_types` / `bigram_types` / `trigram_types` | 统计信息结构体 |
 | `input` | `PinyinInputEngine` | `new` / `with_beam_width` / `set_beam_width` / `beam_width` | 输入法引擎创建与配置 |
@@ -216,6 +250,9 @@ input（core+segment+reverse+lm+math）
 | `input` | `PinyinInputEngine` | `input_all_segments` | 拼音串→汉字候选（全切分路径） |
 | `input` | `PinyinInputEngine` | `input_from_segments` | 从预分词音节生成候选 |
 | `input` | `PinyinInputEngine` | `input_with_limit` | 限制返回候选数量 |
+| `input` | `PinyinInputEngine` | `input_fuzzy` | 模糊拼音输入（自动扩展模糊音节） |
+| `input` | `PinyinInputEngine` | `add_user_dict` | 添加用户自定义词库 |
+| `input` | `PinyinInputEngine` | `build_phrase_table` | 构建词组优先查找表 |
 | `input` | `InputCandidate` | `text` / `score` / `segments` | 候选结果（文本+对数概率+音节切分） |
 
 ## 使用说明
@@ -223,7 +260,7 @@ input（core+segment+reverse+lm+math）
 ### 安装
 
 ```bash
-moon add walkzzz/pinyin@0.5.0
+moon add walkzzz/pinyin@0.6.0
 ```
 
 ### 编译构建
@@ -458,6 +495,22 @@ println(result3)
 // 输出: "zhong"  // 去除声调标记
 ```
 
+#### 声母/韵母提取
+
+```moonbit
+let initial = @core.PinyinInitialsFinals::get_initial("zhong")
+println(initial)
+// 输出: "zh"
+
+let final = @core.PinyinInitialsFinals::get_final("zhong")
+println(final)
+// 输出: "ong"
+
+let initials = @core.PinyinInitialsFinals::initials_list()
+println(initials.length())
+// 输出: 22  // 22 个声母
+```
+
 #### N-gram 语言模型
 
 ```moonbit
@@ -483,7 +536,18 @@ println(pp)
 
 let stats = @lm.PinyinLM::stats()
 println(stats.vocab_size)
-// 输出: 412  // 词汇量（不同音节数）
+// 输出: 411  // 词汇量（不同音节数）
+
+// Interpolation 平滑
+let p_interp = @lm.PinyinLM::interpolation_prob("zhong", "guo", "ren", 0.5, 0.3, 0.2)
+println(p_interp)
+// 输出: 0.002...  // λ₁P(trigram) + λ₂P(bigram) + λ₃P(unigram)
+
+let log_p_interp = @lm.PinyinLM::sentence_log_prob_interpolation(
+  ["zhong", "guo", "ren"], 0.5, 0.3, 0.2,
+)
+println(log_p_interp)
+// 输出: -12.8...  // Interpolation 整句对数概率
 ```
 
 #### 拼音输入法引擎
@@ -509,7 +573,44 @@ let all = engine.input_all_segments("xian")
 
 let top3 = engine.input_with_limit("nihao", 3)
 // 限制返回候选数量
+
+// 添加用户词库
+engine.add_user_dict({ "zhangsan" => "张三" })
+let result = engine.input("zhangsan")
+// "张三" 获得额外 +10.0 加分
+
+// 模糊拼音输入
+let fuzzy_candidates = engine.input_fuzzy("zongguo")
+// 自动扩展 zong→zhong/zong, guo→guo, 匹配 "中国" 等
 ```
+
+## 常见问题
+
+### Q: `reverse_lookup` 返回空数组？
+
+确认输入为合法无调拼音音节（如 `"zhong"` 而非 `"zhōng"`）。带调查找请使用 `reverse_lookup_tone_mark`，数字调查找请使用 `reverse_lookup_tone_number`。
+
+### Q: `segment` 抛出 PinyinError？
+
+空串会抛出 `PinyinError`，请先检查输入非空。无法完全切分的拼音串返回空数组（不抛错），可用 `can_segment` 预检。
+
+### Q: `perplexity` 抛出 PinyinError？
+
+空句子列表或所有句子均为空时困惑度无定义，会抛出 `PinyinError`。请确保至少传入一个非空句子。
+
+### Q: 自定义字典添加后不生效？
+
+`add_pinyin_dict_resource` 修改的是共享字典引用，对 `convert` 和 `data` 包均可见。但反向查找索引和语言模型频率表是构建期固化的，添加新拼音条目后 `reverse_lookup` 和 LM 概率不会自动更新。
+
+### Q: 输入法引擎候选质量如何提升？
+
+1. 使用 `add_user_dict` 添加领域专用词组（+10.0 加分优先）
+2. 调大 `beam_width`（默认 10，值越大候选越多）
+3. 使用 `input_fuzzy` 支持模糊输入（如 `zongguo` → `中国`）
+
+### Q: Interpolation 平滑的 λ 如何选择？
+
+λ₁ + λ₂ + λ₃ 应等于 1.0（函数不做归一化检查，调用者负责）。常见选择：λ₁=0.6, λ₂=0.3, λ₃=0.1（偏重高阶）或 λ₁=0.1, λ₂=0.3, λ₃=0.6（偏重低阶平滑）。负数 λ 会抛出 `PinyinError`。
 
 ## 字典条目数
 
@@ -536,11 +637,11 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20260713 |
 
-四后端（wasm / wasm-gc / js / native）各 169 个测试全通过，共 676 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 225 个测试全通过，共 900 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 参考来源
 
-本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)（MIT 许可证），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎等十大核心引擎。
+本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)（MIT 许可证），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、声母韵母提取、N-gram 语言模型、拼音输入法引擎等十大核心引擎。
 
 | 项 | 内容 |
 |---|---|
@@ -549,7 +650,7 @@ python scripts/gen_pinyin_dict.py
 | 参考项目语言 | Cangjie（仓颉） |
 | 参考项目许可证 | MIT |
 | 参考范围 | pinyin_helper + chinese_helper 的字典数据与接口设计 |
-| 自研引擎 | reverse / segment / fuzzy / disambiguate / search / tone / normalize / lm / input（共 9 包） |
+| 自研引擎 | reverse / segment / fuzzy / disambiguate / search / tone / normalize / lm / input + core 声母韵母（共 10 包自研引擎） |
 | 适配改造 | camelCase→snake_case、异常改用 raise、字典内嵌为字面量、12 包扁平布局 |
 
 ## 开源协议

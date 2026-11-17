@@ -239,3 +239,39 @@ test "add_chinese_dict_resource" {
   }
   @convert.chinese_map.remove(0x41)
 }
+
+///|
+/// 空串转拼音抛 PinyinError。
+test "convert_to_pinyin_string_empty_raises" {
+  let caught = try {
+    let _ = @convert.PinyinHelper::convert_to_pinyin_string("", " ")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
+}
+
+///|
+/// 非汉字字符 has_multi_pinyin 抛 PinyinError。
+test "has_multi_pinyin_non_chinese_raises" {
+  let caught = try {
+    let _ = @convert.PinyinHelper::has_multi_pinyin('A')
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
+}
+
+///|
+/// 空串 get_short_pinyin 抛 PinyinError。
+test "get_short_pinyin_empty_raises" {
+  let caught = try {
+    let _ = @convert.PinyinHelper::get_short_pinyin("")
+    false
+  } catch {
+    _ => true
+  }
+  assert_true(caught)
+}

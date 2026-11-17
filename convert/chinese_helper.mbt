@@ -54,6 +54,7 @@ pub fn ChineseHelper::convert_to_traditional_chinese(str : String) -> String {
 ///|
 /// 追加自定义繁简映射到 chinese_map（原地合并，键冲突新值覆盖）。
 /// 对齐源库 ChineseHelper.addChineseDictResource。
+/// **全局状态副作用**：修改共享 chinese_map，对 convert 包和 data 包均可见。
 pub fn ChineseHelper::add_chinese_dict_resource(
   dict : Map[Int32, Int32],
 ) -> Unit {

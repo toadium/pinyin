@@ -1,3 +1,13 @@
 import {
   "walkzzz/pinyin/convert",
+  "walkzzz/pinyin/core",
+  "walkzzz/pinyin/reverse",
+  "walkzzz/pinyin/segment",
+  "walkzzz/pinyin/fuzzy",
+  "walkzzz/pinyin/disambiguate",
+  "walkzzz/pinyin/search",
+  "walkzzz/pinyin/tone",
+  "walkzzz/pinyin/normalize",
+  "walkzzz/pinyin/lm",
+  "walkzzz/pinyin/input",
 }
