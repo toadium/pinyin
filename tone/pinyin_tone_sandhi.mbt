@@ -25,8 +25,9 @@ pub fn ToneSandhiHelper::apply_tone_sandhi(
     }
   }
   for i in 0..<n {
+    let tone_i = @core.get_tone_number(result[i])
     let without_tone_i = @core.strip_tone(result[i])
-    if without_tone_i == "yi" {
+    if without_tone_i == "yi" && tone_i == 1 {
       if i + 1 < n {
         let tone_next = @core.get_tone_number(result[i + 1])
         if tone_next == 4 {
@@ -42,8 +43,9 @@ pub fn ToneSandhiHelper::apply_tone_sandhi(
     }
   }
   for i in 0..<n {
+    let tone_i = @core.get_tone_number(result[i])
     let without_tone_i = @core.strip_tone(result[i])
-    if without_tone_i == "bu" {
+    if without_tone_i == "bu" && tone_i == 4 {
       if i + 1 < n {
         let tone_next = @core.get_tone_number(result[i + 1])
         if tone_next == 4 {
@@ -57,8 +59,9 @@ pub fn ToneSandhiHelper::apply_tone_sandhi(
     }
   }
   for i in 0..<n {
+    let tone_i = @core.get_tone_number(result[i])
     let without_tone_i = @core.strip_tone(result[i])
-    if without_tone_i == "qi" {
+    if without_tone_i == "qi" && tone_i == 1 {
       if i + 1 < n {
         let tone_next = @core.get_tone_number(result[i + 1])
         if tone_next == 4 {
@@ -74,8 +77,9 @@ pub fn ToneSandhiHelper::apply_tone_sandhi(
     }
   }
   for i in 0..<n {
+    let tone_i = @core.get_tone_number(result[i])
     let without_tone_i = @core.strip_tone(result[i])
-    if without_tone_i == "ba" {
+    if without_tone_i == "ba" && tone_i == 1 {
       if i + 1 < n {
         let tone_next = @core.get_tone_number(result[i + 1])
         if tone_next == 4 {

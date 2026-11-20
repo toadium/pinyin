@@ -1,35 +1,21 @@
-#### V0.1.0
-- 移植 pinyin4cj 至 MoonBit
-- 支持词、句转换成拼音
-- 支持常用简体/繁体中文字符转换成拼音
-- 支持常见多音字符转换成拼音
-- 支持 Unicode 格式的字符 ü、支持声调符号、支持首字母格式
-- 支持常用简体、繁体中文字符互转
-- 支持添加自定义字典
-- 支持常用简体/繁体中文字符转换成通用拼音
-- 适配 moon 版本 0.1.20260713
+#### V0.7.0
+- **输入法候选质量修复（常用字优先）**
+  - 新增 `data/common_chars.mbt`：GB2312-80 一级汉字 3755 字 + 高频字序（由 `scripts/gen_common_chars.py` 生成）
+  - `PinyinInputEngine` 反查候选按常用度排序并截断，修复生僻字优先问题
+  - Beam 路径同分时按候选汉字常用度排序，修复 "nihao" → "你好"、"zhongguo" → "中国"
+  - 候选按文本去重，消除重复候选
+- **变调同音误伤修复**
+  - 一/七/八/不 变调增加原调守卫（一、七、八仅一声，不已四声），避免 "qǐ" 被当作 "七" 改为 "qī"
+- **规范化边界修复**
+  - 轻声数字 5 正确去除（"ma5" → "ma"）；空串规范化不再返回 "5"
+- **工程证据**
+  - 测试 225 → 302 / 后端（四后端共 1208）
+  - 核心覆盖率 93.0%（排除 data/examples，门槛 92%，每包 ≥85%）
+  - 变异测试 13/13 KILLED
+  - 新增覆盖率/变异/文档一致性门禁脚本与 CI 多 job
+  - 新增 `demo/` 端到端可运行演示（`moon run demo --target native`）
+- **文档口径统一**：版本、测试数、工具链版本、包结构、roadmap 与实测对齐
 
-#### V0.1.1
-- 工程化：LICENSE、CHANGELOG.md、.gitignore、GitHub Actions CI、申报书与移植说明
-- 模块名改为 walkzzz/pinyin（匹配 mooncakes 用户名），设置 moon.mod repository 字段
-- inspect → debug_inspect，构建零警告
-- 源码布局重构：src/ → 根目录（对齐 chrono_tz-mbt 约定）
-- 多后端支持：wasm / wasm-gc / js / native（60/60 × 4 = 240 测试）
-- supported_targets = "+wasm+wasm-gc+js+native"
-- AGENTS.md 创建，docs/ 开发文档补充（roadmap / architecture / api / testing）
-- 白盒测试补充（pinyin_easy_wbtest.mbt，内部逻辑覆盖）
-- 测试组织调整：白盒 + 黑盒（mid/difficult）+ examples 分层
-- 字典视图常量与 data 包共享引用验证
-- pinyin_dict 分 11 段 merge，规避单段文本过长警告
-- Warning 全面治理（50 个 → 0）：
-  - [0025] test_unqualified_package：黑盒测试与 README 加 `@pinyin.` 限定前缀
-  - [0020] deprecated to_repr：example 改用 `Repr(x)`
-  - [0073] unnecessary_annotation：枚举变体在 `format=` 位置去除冗余限定
-- 严格模式 `--warn-list +73 --deny-warn` 四后端全绿，零警告零错误
-- 文档全面更新：README.md / README.mbt.md / docs/ / AGENTS.md 同步至 v0.1.1 现状
-- mooncakes 发布 `walkzzz/pinyin@0.1.1`
-
-> 内部迭代历史：v0.1.2（根布局+多后端）→ v0.1.3（白盒测试）→ v0.1.4（字典分段）→ v0.1.5（warning 治理），统一对外发布为 v0.1.1。
 #### V0.6.0
 - **输入校验与错误处理强化（对照上游库规范）**
   - `segment`/`segment_best`：空串从返回 `[]` 改为抛 `PinyinError`（破坏性变更，v0.x 允许）
@@ -108,3 +94,50 @@
 - 新增七变调/八变调规则（tone 包，变调规则 3→5 类）
 - 新增 3 组模糊规则：f↔h, an↔ang, ong↔eng（fuzzy 包，模糊规则 6→9 组）
 - 新增 PinyinStreamProcessor 流式处理接口（convert 包，4 方法：new/feed/flush/reset）
+
+#### V0.3.0
+- 新增多音字上下文消歧（PinyinDisambiguator：Viterbi + bigram 词频模型）
+- 新增拼音搜索索引（PinyinSearchIndex：首字母/连续/模糊搜索）
+- 新增声调变调规则（ToneSandhiHelper：三声/一/不/七/八变调）
+- 新增拼音编辑距离（PinyinEditDistance：音节级 Levenshtein + 模糊距离）
+- 新增拼音规范化（PinyinNormalizer：大小写/数字调/v→ü）
+- 公开 API 33 → 45
+
+#### V0.2.0
+- 新增拼音→汉字反向查找（ReversePinyinHelper：无调/带调/数字调）
+- 新增拼音分词（PinyinSegmenter：Trie + DP，全切分/最优切分）
+- 新增模糊匹配（FuzzyPinyinHelper：6 组规则，BFS 扩展）
+- 新增 PinyinTrie 数据结构（约 420 个拼音音节）
+- 新增 FuzzyRule 枚举（Prefix / Suffix）
+
+#### V0.1.1
+- 工程化：LICENSE、CHANGELOG.md、.gitignore、GitHub Actions CI、申报书与移植说明
+- 模块名改为 walkzzz/pinyin（匹配 mooncakes 用户名），设置 moon.mod repository 字段
+- inspect → debug_inspect，构建零警告
+- 源码布局重构：src/ → 根目录（对齐 chrono_tz-mbt 约定）
+- 多后端支持：wasm / wasm-gc / js / native（60/60 × 4 = 240 测试）
+- supported_targets = "+wasm+wasm-gc+js+native"
+- AGENTS.md 创建，docs/ 开发文档补充（roadmap / architecture / api / testing）
+- 白盒测试补充（pinyin_easy_wbtest.mbt，内部逻辑覆盖）
+- 测试组织调整：白盒 + 黑盒（mid/difficult）+ examples 分层
+- 字典视图常量与 data 包共享引用验证
+- pinyin_dict 分 11 段 merge，规避单段文本过长警告
+- Warning 全面治理（50 个 → 0）：
+  - [0025] test_unqualified_package：黑盒测试与 README 加 `@pinyin.` 限定前缀
+  - [0020] deprecated to_repr：example 改用 `Repr(x)`
+  - [0073] unnecessary_annotation：枚举变体在 `format=` 位置去除冗余限定
+- 严格模式 `--warn-list +73 --deny-warn` 四后端全绿，零警告零错误
+- 文档全面更新：README.md / README.mbt.md / docs/ / AGENTS.md 同步至 v0.1.1 现状
+- mooncakes 发布 `walkzzz/pinyin@0.1.1`
+
+> 内部迭代历史：v0.1.2（根布局+多后端）→ v0.1.3（白盒测试）→ v0.1.4（字典分段）→ v0.1.5（warning 治理），统一对外发布为 v0.1.1。
+#### V0.1.0
+- 移植 pinyin4cj 至 MoonBit
+- 支持词、句转换成拼音
+- 支持常用简体/繁体中文字符转换成拼音
+- 支持常见多音字符转换成拼音
+- 支持 Unicode 格式的字符 ü、支持声调符号、支持首字母格式
+- 支持常用简体、繁体中文字符互转
+- 支持添加自定义字典
+- 支持常用简体/繁体中文字符转换成通用拼音
+- 适配 moon 版本 0.1.20260713

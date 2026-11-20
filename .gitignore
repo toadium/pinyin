@@ -1,6 +1,9 @@
 # MoonBit build artifacts
 _build/
 
+# Temporary verification artifacts
+.tmp/
+
 # CodeArts agent workspace
 .codeartsdoer/
 

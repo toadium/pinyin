@@ -134,6 +134,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 ```bash
 moon check
 moon test
+moon run demo --target native
 ```
 
 ### 功能示例
@@ -340,9 +341,9 @@ python scripts/gen_pinyin_dict.py
 
 | 编号 | 依赖构建工具 | 版本号 |
 | ---- | ------------ | ------ |
-| 1    | **moon**     | 0.1.20260713 |
+| 1    | **moon**     | 0.1.20261117 |
 
-四后端（wasm / wasm-gc / js / native）各 225 测试全通过，共 900 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 302 测试全通过，共 1208 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 开源协议
 

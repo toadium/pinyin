@@ -209,3 +209,19 @@ test "input_with_limit_invalid_raises" {
     _ => fail("expected PinyinError for limit < 1")
   }
 }
+
+///|
+test "input_common_char_priority_nihao" {
+  let engine = @input.PinyinInputEngine::new()
+  let candidates = engine.input("nihao")
+  assert_true(candidates.length() > 0)
+  assert_eq(candidates[0].text, "你好")
+}
+
+///|
+test "input_common_char_priority_zhongguo" {
+  let engine = @input.PinyinInputEngine::new()
+  let candidates = engine.input("zhongguo")
+  assert_true(candidates.length() > 0)
+  assert_eq(candidates[0].text, "中国")
+}

@@ -2,32 +2,72 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  check:
+  quality:
+    name: Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
-
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Format check
         run: moon fmt --check
-
-      - name: Type check (strict, all targets)
+      - name: Type check
         run: moon check --target all --warn-list +73 --deny-warn
-
-      - name: Build (all targets)
+      - name: Build
         run: moon build --target all --warn-list +73 --deny-warn
-
-      - name: Test (all targets)
-        run: moon test --target all --warn-list +73 --deny-warn
-
-      - name: Update interface files
+      - name: Update interfaces
         run: moon info --target all
+      - name: Interface drift check
+        run: git diff --exit-code
+      - name: Docs consistency check
+        run: node scripts/check_docs.mjs
+      - name: Demo smoke
+        run: moon run demo --target native --warn-list +73 --deny-warn
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - wasm
+          - wasm-gc
+          - js
+          - native
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - name: Test target
+        run: moon test --target ${{ matrix.target }} --warn-list +73 --deny-warn
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Coverage gate
+        run: node scripts/check_coverage.mjs --min 92

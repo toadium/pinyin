@@ -130,6 +130,69 @@ priv struct BeamPath {
   log_prob : Double
   /// 上一个音节（用于 bigram 打分）
   last_syllable : String
+  /// 候选汉字常用度序号之和（越小越常用，用于同分排序）
+  rank_sum : Int32
+}
+
+///|
+/// 候选汉字的常用度序号。未收录于 GB2312 一级汉字表的字排在最后。
+fn char_common_rank(ch : String) -> Int32 {
+  @data.common_char_rank(ch)
+}
+
+///|
+/// 按常用度排序候选汉字，保证截断候选上限时优先保留常用字。
+fn sort_chars_by_commonness(chars : Array[String]) -> Array[String] {
+  let sorted = chars.copy()
+  sorted.sort_by(fn(a : String, b : String) -> Int32 {
+    let ra = char_common_rank(a)
+    let rb = char_common_rank(b)
+    if ra < rb {
+      -1
+    } else if ra > rb {
+      1
+    } else {
+      0
+    }
+  })
+  sorted
+}
+
+///|
+/// Beam 路径排序：对数概率优先，同分时常用度序号和更小者优先。
+fn compare_beam_path(a : BeamPath, b : BeamPath) -> Int32 {
+  if a.log_prob > b.log_prob {
+    -1
+  } else if a.log_prob < b.log_prob {
+    1
+  } else if a.rank_sum < b.rank_sum {
+    -1
+  } else if a.rank_sum > b.rank_sum {
+    1
+  } else {
+    0
+  }
+}
+
+///|
+/// 带常用度序号的候选，用于最终排序时保留同分次序。
+priv struct RankedCandidate {
+  candidate : InputCandidate
+  rank_sum : Int32
+}
+
+///|
+/// 按候选文本去重，保留排序后的首个（得分最高）候选。
+fn dedup_candidates(items : Array[InputCandidate]) -> Array[InputCandidate] {
+  let seen : Map[String, Unit] = Map([])
+  let result : Array[InputCandidate] = []
+  for item in items {
+    if !seen.contains(item.text) {
+      seen[item.text] = ()
+      result.push(item)
+    }
+  }
+  result
 }
 
 ///|
@@ -202,17 +265,18 @@ pub fn PinyinInputEngine::input_from_segments(
     if chars.length() == 0 {
       all_candidates.push([seg])
     } else {
-      let limit = if chars.length() > self.scoring_config.candidate_limit {
-        chars[:self.scoring_config.candidate_limit].to_owned()
+      let sorted_chars = sort_chars_by_commonness(chars)
+      let limit = if sorted_chars.length() > self.scoring_config.candidate_limit {
+        sorted_chars[:self.scoring_config.candidate_limit].to_owned()
       } else {
-        chars
+        sorted_chars
       }
       all_candidates.push(limit)
     }
   }
   // Beam Search
   let beam : Array[BeamPath] = [
-    { chars: [], log_prob: 0.0, last_syllable: "", },
+    { chars: [], log_prob: 0.0, last_syllable: "", rank_sum: 0, },
   ]
   let mut current_beam = beam
   for i in 0..<segments.length() {
@@ -233,18 +297,11 @@ pub fn PinyinInputEngine::input_from_segments(
           chars: new_chars,
           log_prob: new_log_prob,
           last_syllable: syllable,
+          rank_sum: path.rank_sum + char_common_rank(c),
         })
       }
     }
-    new_beam.sort_by(fn(a : BeamPath, b : BeamPath) -> Int32 {
-      if a.log_prob > b.log_prob {
-        -1
-      } else if a.log_prob < b.log_prob {
-        1
-      } else {
-        0
-      }
-    })
+    new_beam.sort_by(compare_beam_path)
     let max_k = if new_beam.length() > self.beam_width {
       self.beam_width
     } else {
@@ -253,25 +310,39 @@ pub fn PinyinInputEngine::input_from_segments(
     current_beam = new_beam[:max_k].to_owned()
   }
   // 转换为 InputCandidate
-  let results : Array[InputCandidate] = []
+  let ranked : Array[RankedCandidate] = []
   for path in current_beam {
     let text = path.chars.join("")
-    results.push({ text, score: path.log_prob, segments: segments.copy(), })
+    ranked.push({
+      candidate: { text, score: path.log_prob, segments: segments.copy(), },
+      rank_sum: path.rank_sum,
+    })
   }
   // 合并词组/用户词库候选（高分优先）
   for pc in phrase_candidates {
-    results.push(pc)
+    ranked.push({ candidate: pc, rank_sum: 0, })
   }
-  results.sort_by(fn(a : InputCandidate, b : InputCandidate) -> Int32 {
-    if a.score > b.score {
-      -1
-    } else if a.score < b.score {
-      1
-    } else {
-      0
-    }
+  ranked.sort_by(fn(a : RankedCandidate, b : RankedCandidate) -> Int32 {
+    compare_beam_path(
+      {
+        chars: [],
+        log_prob: a.candidate.score,
+        last_syllable: "",
+        rank_sum: a.rank_sum,
+      },
+      {
+        chars: [],
+        log_prob: b.candidate.score,
+        last_syllable: "",
+        rank_sum: b.rank_sum,
+      },
+    )
   })
-  results
+  let results : Array[InputCandidate] = []
+  for item in ranked {
+    results.push(item.candidate)
+  }
+  dedup_candidates(results)
 }
 
 ///|
@@ -389,7 +460,7 @@ pub fn PinyinInputEngine::input_fuzzy(
         }
       }
     }
-    let unique_chars = chars_set.keys().to_array()
+    let unique_chars = sort_chars_by_commonness(chars_set.keys().to_array())
     if unique_chars.length() == 0 {
       all_candidates.push([seg])
     } else {
@@ -403,7 +474,7 @@ pub fn PinyinInputEngine::input_fuzzy(
   }
   // Beam Search
   let beam : Array[BeamPath] = [
-    { chars: [], log_prob: 0.0, last_syllable: "", },
+    { chars: [], log_prob: 0.0, last_syllable: "", rank_sum: 0, },
   ]
   let mut current_beam = beam
   for i in 0..<segments.length() {
@@ -424,18 +495,11 @@ pub fn PinyinInputEngine::input_fuzzy(
           chars: new_chars,
           log_prob: new_log_prob,
           last_syllable: syllable,
+          rank_sum: path.rank_sum + char_common_rank(c),
         })
       }
     }
-    new_beam.sort_by(fn(a : BeamPath, b : BeamPath) -> Int32 {
-      if a.log_prob > b.log_prob {
-        -1
-      } else if a.log_prob < b.log_prob {
-        1
-      } else {
-        0
-      }
-    })
+    new_beam.sort_by(compare_beam_path)
     let max_k = if new_beam.length() > self.beam_width {
       self.beam_width
     } else {
@@ -448,5 +512,5 @@ pub fn PinyinInputEngine::input_fuzzy(
     let text = path.chars.join("")
     results.push({ text, score: path.log_prob, segments: segments.copy(), })
   }
-  results
+  dedup_candidates(results)
 }

@@ -61,9 +61,9 @@ You can browse and install extra skills here:
 
 拼音引擎：汉字→拼音 + 拼音→汉字 + 繁简转换 + 多音字消歧 + 拼音分词 + 模糊匹配 + 搜索索引 + 变调规则 + 编辑距离 + 规范化 + 流式处理 + N-gram 语言模型 + 拼音输入法。
 
-- 模块名：`walkzzz/pinyin`，版本 0.5.0，MIT 许可证
+- 模块名：`walkzzz/pinyin`，版本 0.7.0，MIT 许可证
 - 仓库：https://github.com/toadium/pinyin.git
-- moon 工具链：0.1.20260713
+- moon 工具链：0.1.20261117
 
 ### 包结构（12 包扁平多根布局）
 
@@ -79,21 +79,25 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   ├── pinyin_initials_finals.mbt # get_initial/get_final/initials_list
 │   ├── pinyin_core_wbtest.mbt  #   白盒测试（5）
 │   ├── pinyin_trie_wbtest.mbt  #   白盒测试（9）
-│   └── pinyin_initials_finals_wbtest.mbt # 白盒测试（7）
+│   ├── pinyin_initials_finals_wbtest.mbt # 白盒测试（7）
+│   └── tone_conversion_coverage_wbtest.mbt # 覆盖率补测（10）
 ├── data/                       # 字典数据包（零依赖）
 │   ├── chinese_dict.mbt        #   繁→简映射（2533 条）
 │   ├── pinyin_dict.mbt         #   单字拼音（20903 条，分 11 段 merge）
 │   ├── mutil_pinyin_dict.mbt   #   词组拼音（843 条）
-│   └── tongyong_pinyin_dict.mbt #  通用拼音（82 条）
+│   ├── tongyong_pinyin_dict.mbt #  通用拼音（82 条）
+│   └── common_chars.mbt        #   常用字排序（GB2312 一级 3755 + 高频字序）
 ├── convert/                    # 核心转换引擎（依赖 core + data）
 │   ├── pinyin_dicts.mbt        #   字典视图常量（与 data 包共享引用）
 │   ├── chinese_helper.mbt      #   ChineseHelper（6 方法）
 │   ├── pinyin_helper.mbt       #   PinyinHelper（8 方法）
 │   ├── pinyin_stream_processor.mbt # PinyinStreamProcessor（4 方法）
 │   ├── convert_wbtest.mbt      #   白盒测试（8）
-│   ├── convert_test.mbt        #   黑盒测试（19）
+│   ├── convert_test.mbt        #   黑盒测试（22）
 │   ├── convert_dict_test.mbt   #   黑盒测试（5）
-│   └── stream_processor_test.mbt # 黑盒测试（7）
+│   ├── stream_processor_test.mbt # 黑盒测试（7）
+│   ├── pinyin_helper_coverage_wbtest.mbt # 覆盖率补测（9）
+│   └── stream_processor_coverage_wbtest.mbt # 覆盖率补测（7）
 ├── reverse/                    # 拼音→汉字反向查找（依赖 core + data）
 ├── segment/                    # 拼音分词 Trie+DP（依赖 core）
 ├── fuzzy/                      # 模糊匹配 BFS（依赖 core + reverse，9 组规则）
@@ -103,13 +107,20 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 ├── normalize/                  # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
 ├── lm/                         # N-gram 语言模型（依赖 core + data + math）
 │   ├── pinyin_lm.mbt           #   PinyinLM + LMStats + Laplace + Katz + Interpolation
-│   └── lm_test.mbt             #   黑盒测试（12）
+│   ├── lm_test.mbt             #   黑盒测试（15）
+│   └── lm_coverage_wbtest.mbt  #   覆盖率补测（12）
 ├── input/                      # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy）
 │   ├── pinyin_input.mbt        #   PinyinInputEngine + InputCandidate + Beam Search + 用户词库 + 模糊输入
-│   └── input_test.mbt          #   黑盒测试（14）
+│   └── input_test.mbt          #   黑盒测试（20）
 ├── examples/                   # 示例包（12 子包全覆盖，37 个示例测试）
+├── demo/                       # 端到端可运行演示（moon run demo）
 ├── docs/                       # 开发文档（roadmap/architecture/api/testing）
-└── scripts/                    # 字典生成脚本（gen_pinyin_dict.py）
+└── scripts/                    # 字典生成 + 工程门禁
+    ├── gen_pinyin_dict.py      #   字典生成
+    ├── gen_common_chars.py     #   常用字排序表生成
+    ├── check_coverage.mjs      #   覆盖率门禁（总 ≥92%，每包 ≥85%）
+    ├── mutation_test.mjs       #   变异测试门禁（13 个变异点）
+    └── check_docs.mjs          #   文档一致性门禁
 ```
 
 ### 依赖拓扑
@@ -134,9 +145,25 @@ input（core+segment+reverse+lm+math+data+fuzzy）
 ### 多后端支持
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 225 测试全通过，共 900 测试
+- 四后端各 302 测试全通过，共 1208 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
-- 无 WASM local count 问题（字典用 Map 字面量，非大 match）
+- 字典用 Map 字面量；`common_chars` 用字符串常量 + `String::find`，避免 wasm 全局初始化 local count 超限
+
+### 工程质量门禁
+
+```bash
+moon fmt    --check
+moon check  --target all --warn-list +73 --deny-warn
+moon build  --target all --warn-list +73 --deny-warn
+moon test   --target all --warn-list +73 --deny-warn
+node scripts/check_docs.mjs
+node scripts/check_coverage.mjs      # 核心 ≥92%，每包 ≥85%
+node scripts/mutation_test.mjs       # 13/13 KILLED
+```
+
+- 覆盖率补测文件统一命名 `*_coverage_wbtest.mbt`。
+- 变异点必须唯一匹配源码（`occurrences == 1`），否则脚本 SKIPPED 并阻断。
+- 任何文档数字以实测为准：测试数 302/后端、覆盖 93.0%、工具链 0.1.20261117。
 
 ### MoonBit 语法要点
 

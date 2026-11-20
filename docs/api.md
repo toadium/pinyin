@@ -65,6 +65,16 @@ pub fn PinyinTrie::prefix_lengths(self : PinyinTrie, word : String) -> Array[Int
 
 Trie 数据结构，用于拼音分词和音节验证。
 
+## data 包
+
+### common_char_rank
+
+```moonbit
+pub fn common_char_rank(ch : String) -> Int32
+```
+
+返回汉字在常用字序列中的字节偏移（越小越常用），未收录返回 100000。序列由 `scripts/gen_common_chars.py` 生成：约 500 字高频字序 + GB2312-80 一级汉字 3755 字；输入法候选排序使用。
+
 ## convert 包
 
 ### PinyinHelper
@@ -335,6 +345,14 @@ pub fn FuzzyPinyinHelper::fuzzy_reverse_lookup(pinyin : String) -> Array[String]
 
 模糊拼音→汉字反向查找。
 
+#### add_fuzzy_rules
+
+```moonbit
+pub fn FuzzyPinyinHelper::add_fuzzy_rules(rules : Array[FuzzyRule]) -> Unit
+```
+
+追加自定义模糊规则（如方言 r→l）。**全局状态副作用**：修改共享 `fuzzy_rules`，后续 `fuzzy_expand`/`fuzzy_match` 立即生效。
+
 ## disambiguate 包
 
 ### PinyinDisambiguator
@@ -575,7 +593,7 @@ bigram 频率表（从 data 包字典自动构建，嵌套 Map 结构）。
 pub fn PinyinInputEngine::new() -> PinyinInputEngine
 ```
 
-创建输入法引擎，默认 beam 宽度 5。
+创建输入法引擎，默认 beam 宽度 10。
 
 #### with_beam_width
 
@@ -612,10 +630,10 @@ pub fn PinyinInputEngine::input(self, pinyin_str : String) -> Array[InputCandida
 #### input_from_segments
 
 ```moonbit
-pub fn PinyinInputEngine::input_from_segments(self, segments : Array[String]) -> Array[InputCandidate]
+pub fn PinyinInputEngine::input_from_segments(self, segments : Array[String]) -> Array[InputCandidate] raise PinyinError
 ```
 
-从已有音节序列直接执行 Beam Search（跳过分词步骤）。
+从已有音节序列直接执行 Beam Search（跳过分词步骤）。空 segments 抛 `PinyinError`。
 
 #### input_all_segments
 
@@ -631,7 +649,23 @@ pub fn PinyinInputEngine::input_all_segments(self, pinyin_str : String) -> Array
 pub fn PinyinInputEngine::input_with_limit(self, pinyin_str : String, limit : Int32) -> Array[InputCandidate] raise PinyinError
 ```
 
-限定候选数量的输入接口，返回最多 `limit` 个候选。
+限定候选数量的输入接口，返回最多 `limit` 个候选。`limit < 1` 抛 `PinyinError`。
+
+#### set_scoring_config
+
+```moonbit
+pub fn PinyinInputEngine::set_scoring_config(self, config : InputScoringConfig) -> Unit
+```
+
+运行时调整评分策略（用户词库加分 / 词组加分 / 每音节候选上限）。
+
+#### scoring_config
+
+```moonbit
+pub fn PinyinInputEngine::scoring_config(self) -> InputScoringConfig
+```
+
+获取当前评分配置。
 
 ### InputCandidate
 
@@ -643,4 +677,16 @@ pub(all) struct InputCandidate {
 }
 ```
 
-输入法候选结构：`text` 为候选汉字文本，`score` 为 LM 对数概率评分（越高越好），`segments` 为对应的拼音音节切分。
+输入法候选结构：`text` 为候选汉字文本，`score` 为 LM 对数概率评分（越高越好），`segments` 为对应的拼音音节切分。同分候选按汉字常用度排序，文本去重。
+
+### InputScoringConfig
+
+```moonbit
+pub(all) struct InputScoringConfig {
+  user_dict_bonus : Double
+  phrase_bonus : Double
+  candidate_limit : Int32
+}
+```
+
+输入法评分配置：用户词库加分（默认 10.0）、内置词组加分（默认 5.0）、每音节候选汉字上限（默认 20）。

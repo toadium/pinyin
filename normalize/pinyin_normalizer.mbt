@@ -54,7 +54,7 @@ pub fn PinyinNormalizer::normalize(pinyin : String) -> String {
   let mut pinyin_part = lower
   if chars.length() > 0 {
     let last = chars[chars.length() - 1]
-    if last >= '1' && last <= '4' {
+    if last >= '1' && last <= '5' {
       tone = last.to_int() - '0'.to_int()
       pinyin_part = lower[:lower.length() - 1].to_owned()
     }
@@ -81,6 +81,9 @@ pub fn PinyinNormalizer::normalize(pinyin : String) -> String {
 /// 例如 "zhōng" → "zhong1"，"nǚ" → "nv3"。
 pub fn PinyinNormalizer::normalize_to_tone_number(pinyin : String) -> String {
   let normalized = PinyinNormalizer::normalize(pinyin)
+  if normalized.length() == 0 {
+    return ""
+  }
   let pinyin_array = @core.convert_with_tone_number(normalized)
   if pinyin_array.length() > 0 {
     pinyin_array[0]

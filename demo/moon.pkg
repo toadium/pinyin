@@ -1,0 +1,10 @@
+import {
+  "walkzzz/pinyin/convert",
+  "walkzzz/pinyin/disambiguate",
+  "walkzzz/pinyin/input",
+  "walkzzz/pinyin/normalize",
+  "walkzzz/pinyin/segment",
+  "walkzzz/pinyin/tone",
+}
+
+pkgtype(kind: "executable")
