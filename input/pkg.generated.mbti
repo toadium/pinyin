@@ -3,6 +3,7 @@ package "walkzzz/pinyin/input"
 
 import {
   "walkzzz/pinyin/core",
+  "walkzzz/pinyin/shuangpin",
 }
 
 // Values
@@ -25,6 +26,7 @@ pub(all) struct InputScoringConfig {
 pub struct PinyinInputEngine {
   mut beam_width : Int32
   user_dict : Map[String, String]
+  user_freq : Map[String, Int32]
   mut scoring_config : InputScoringConfig
 }
 pub fn PinyinInputEngine::add_user_dict(Self, Map[String, String]) -> Unit
@@ -33,7 +35,10 @@ pub fn PinyinInputEngine::input(Self, String) -> Array[InputCandidate] raise @co
 pub fn PinyinInputEngine::input_all_segments(Self, String) -> Array[InputCandidate] raise @core.PinyinError
 pub fn PinyinInputEngine::input_from_segments(Self, Array[String]) -> Array[InputCandidate] raise @core.PinyinError
 pub fn PinyinInputEngine::input_fuzzy(Self, String) -> Array[InputCandidate] raise @core.PinyinError
+pub fn PinyinInputEngine::input_initial(Self, String) -> Array[InputCandidate]
+pub fn PinyinInputEngine::input_shuangpin(Self, @shuangpin.ShuangpinScheme, String) -> Array[InputCandidate] raise @core.PinyinError
 pub fn PinyinInputEngine::input_with_limit(Self, String, Int32) -> Array[InputCandidate] raise @core.PinyinError
+pub fn PinyinInputEngine::learn(Self, String) -> Unit
 pub fn PinyinInputEngine::new() -> Self
 pub fn PinyinInputEngine::scoring_config(Self) -> InputScoringConfig
 pub fn PinyinInputEngine::set_beam_width(Self, Int32) -> Unit

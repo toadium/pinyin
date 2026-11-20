@@ -13,6 +13,7 @@
 pub struct PinyinInputEngine {
   mut beam_width : Int32
   user_dict : Map[String, String]
+  user_freq : Map[String, Int32]
   mut scoring_config : InputScoringConfig
 }
 
@@ -45,6 +46,7 @@ pub fn PinyinInputEngine::new() -> PinyinInputEngine {
   {
     beam_width: 10,
     user_dict: Map([]),
+    user_freq: Map([]),
     scoring_config: {
       user_dict_bonus: 10.0,
       phrase_bonus: 5.0,
@@ -66,6 +68,7 @@ pub fn PinyinInputEngine::with_beam_width(
       beam_width
     },
     user_dict: Map([]),
+    user_freq: Map([]),
     scoring_config: {
       user_dict_bonus: 10.0,
       phrase_bonus: 5.0,
@@ -119,6 +122,111 @@ pub fn PinyinInputEngine::add_user_dict(
   for kv in dict {
     self.user_dict[kv.0] = kv.1
   }
+}
+
+///|
+/// 记录一次用户选择，提升该候选的后续排序权重。
+/// 词频仅保存在当前引擎实例内，宿主可自行持久化选择序列并在启动时重放。
+pub fn PinyinInputEngine::learn(
+  self : PinyinInputEngine,
+  text : String,
+) -> Unit {
+  if text.length() == 0 {
+    return
+  }
+  let count = match self.user_freq.get(text) {
+    Some(value) => value
+    None => 0
+  }
+  self.user_freq[text] = count + 1
+}
+
+///|
+/// 用户学习加分：对数增长，避免单次选择长期压制其他候选。
+fn PinyinInputEngine::learn_bonus(
+  self : PinyinInputEngine,
+  text : String,
+) -> Double {
+  match self.user_freq.get(text) {
+    Some(count) => @math.ln(1.0 + count.to_double()) * 0.5
+    None => 0.0
+  }
+}
+
+///|
+/// 双拼输入：将双拼串（小鹤/自然码）转为全拼后执行标准输入法解码。
+pub fn PinyinInputEngine::input_shuangpin(
+  self : PinyinInputEngine,
+  scheme : @shuangpin.ShuangpinScheme,
+  input : String,
+) -> Array[InputCandidate] raise @core.PinyinError {
+  if input.length() == 0 {
+    @core.raise_invalid_input("Please enter a shuangpin string")
+  }
+  let full = scheme.to_full(input)
+  let segments = full.split(" ").map(fn(x) { x.to_owned() }).to_array()
+  self.input_from_segments(segments)
+}
+
+///|
+/// 简拼输入：输入词组首字母串（如 "zg"、"shurf"），返回匹配的词组候选。
+/// 支持完整首字母与至少 2 个字符的前缀匹配；无法匹配返回空数组。
+pub fn PinyinInputEngine::input_initial(
+  self : PinyinInputEngine,
+  initials : String,
+) -> Array[InputCandidate] {
+  let query = initials.replace_all(old=" ", new="")
+  if query.length() == 0 {
+    return []
+  }
+  let table = build_phrase_table()
+  let result : Array[InputCandidate] = []
+  for kv in table {
+    let key = kv.0
+    let parts = key.split(" ").map(fn(x) { x.to_owned() }).to_array()
+    if parts.length() < 2 {
+      continue
+    }
+    let initial_buf = StringBuilder()
+    for part in parts {
+      if part.length() > 0 {
+        initial_buf.write_char(part[0].unsafe_to_char())
+      }
+    }
+    let initial = initial_buf.to_string()
+    if initial == query || (query.length() >= 2 && initial.has_prefix(query[:])) {
+      let common_bonus = if @data.common_phrases.contains(kv.1) {
+        5.0
+      } else {
+        0.0
+      }
+      result.push({
+        text: kv.1,
+        score: 20.0 +
+        (if initial == query { 10.0 } else { 0.0 }) +
+        common_bonus +
+        parts.length().to_double() * 0.1 +
+        self.learn_bonus(kv.1),
+        segments: parts,
+      })
+    }
+  }
+  result.sort_by(fn(a : InputCandidate, b : InputCandidate) -> Int32 {
+    let a_learned = self.user_freq.contains(a.text)
+    let b_learned = self.user_freq.contains(b.text)
+    if a_learned && !b_learned {
+      -1
+    } else if !a_learned && b_learned {
+      1
+    } else if a.score > b.score {
+      -1
+    } else if a.score < b.score {
+      1
+    } else {
+      0
+    }
+  })
+  dedup_candidates(result)
 }
 
 ///|
@@ -213,7 +321,7 @@ pub fn PinyinInputEngine::input(
   }
   let segments = @segment.PinyinSegmenter::segment_best(pinyin_str)
   if segments.length() == 0 {
-    return []
+    return self.input_initial(pinyin_str)
   }
   self.input_from_segments(segments)
 }
@@ -314,29 +422,48 @@ pub fn PinyinInputEngine::input_from_segments(
   for path in current_beam {
     let text = path.chars.join("")
     ranked.push({
-      candidate: { text, score: path.log_prob, segments: segments.copy(), },
+      candidate: {
+        text,
+        score: path.log_prob + self.learn_bonus(text),
+        segments: segments.copy(),
+      },
       rank_sum: path.rank_sum,
     })
   }
   // 合并词组/用户词库候选（高分优先）
   for pc in phrase_candidates {
-    ranked.push({ candidate: pc, rank_sum: 0, })
+    ranked.push({
+      candidate: {
+        text: pc.text,
+        score: pc.score + self.learn_bonus(pc.text),
+        segments: pc.segments,
+      },
+      rank_sum: 0,
+    })
   }
   ranked.sort_by(fn(a : RankedCandidate, b : RankedCandidate) -> Int32 {
-    compare_beam_path(
-      {
-        chars: [],
-        log_prob: a.candidate.score,
-        last_syllable: "",
-        rank_sum: a.rank_sum,
-      },
-      {
-        chars: [],
-        log_prob: b.candidate.score,
-        last_syllable: "",
-        rank_sum: b.rank_sum,
-      },
-    )
+    let a_learned = self.user_freq.contains(a.candidate.text)
+    let b_learned = self.user_freq.contains(b.candidate.text)
+    if a_learned && !b_learned {
+      -1
+    } else if !a_learned && b_learned {
+      1
+    } else {
+      compare_beam_path(
+        {
+          chars: [],
+          log_prob: a.candidate.score,
+          last_syllable: "",
+          rank_sum: a.rank_sum,
+        },
+        {
+          chars: [],
+          log_prob: b.candidate.score,
+          last_syllable: "",
+          rank_sum: b.rank_sum,
+        },
+      )
+    }
   })
   let results : Array[InputCandidate] = []
   for item in ranked {
@@ -358,7 +485,7 @@ pub fn PinyinInputEngine::input_all_segments(
   }
   let all_segmentations = @segment.PinyinSegmenter::segment(pinyin_str)
   if all_segmentations.length() == 0 {
-    return []
+    return self.input_initial(pinyin_str)
   }
   let all_results : Array[InputCandidate] = []
   for seg in all_segmentations {
@@ -369,7 +496,13 @@ pub fn PinyinInputEngine::input_all_segments(
   }
   // 按得分降序排序
   all_results.sort_by(fn(a : InputCandidate, b : InputCandidate) -> Int32 {
-    if a.score > b.score {
+    let a_learned = self.user_freq.contains(a.text)
+    let b_learned = self.user_freq.contains(b.text)
+    if a_learned && !b_learned {
+      -1
+    } else if !a_learned && b_learned {
+      1
+    } else if a.score > b.score {
       -1
     } else if a.score < b.score {
       1
@@ -409,22 +542,32 @@ pub fn PinyinInputEngine::input_with_limit(
 }
 
 ///|
-/// 从 mutil_pinyin_dict 构建词组查找表。
-/// 键为无调拼音串（空格分隔音节），值为汉字词组。
+/// 将一条“词 → 带调拼音”记录写入词组表（键为无调空格分隔音节）。
+fn insert_phrase(
+  table : Map[String, String],
+  hanzi : String,
+  pinyin_str : String,
+) -> Unit {
+  if pinyin_str.contains(@core.pinyin_separator) {
+    let parts = pinyin_str.split(@core.pinyin_separator)
+    let unmarked : Array[String] = []
+    for p in parts {
+      unmarked.push(@core.strip_tone(p.to_owned()))
+    }
+    table[unmarked.join(" ")] = hanzi
+  }
+}
+
+///|
+/// 从 mutil_pinyin_dict + common_phrases 构建词组查找表。
+/// 常用词表后写入，同音词优先采用常用词。
 fn build_phrase_table() -> Map[String, String] {
   let table : Map[String, String] = Map([])
   for kv in @data.mutil_pinyin_dict {
-    let hanzi = kv.0
-    let pinyin_str = kv.1
-    if pinyin_str.contains(@core.pinyin_separator) {
-      let parts = pinyin_str.split(@core.pinyin_separator)
-      let unmarked : Array[String] = []
-      for p in parts {
-        unmarked.push(@core.strip_tone(p.to_owned()))
-      }
-      let key = unmarked.join(" ")
-      table[key] = hanzi
-    }
+    insert_phrase(table, kv.0, kv.1)
+  }
+  for kv in @data.common_phrases {
+    insert_phrase(table, kv.0, kv.1)
   }
   table
 }

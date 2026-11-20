@@ -2,7 +2,7 @@
 
 ## 测试组织
 
-当前 native / wasm / wasm-gc / js 四个后端各 **302** 个测试，合计 **1208** 个测试全通过。
+当前 native / wasm / wasm-gc / js 四个后端各 **326** 个测试，合计 **1304** 个测试全通过。
 
 | 包 | 文件 | 类型 | 测试数 | 内容 |
 |------|------|------|--------|------|
@@ -24,6 +24,8 @@
 | `fuzzy` | `fuzzy_coverage_wbtest.mbt` | 白盒 | 5 | 空串错误路径、非法音节、自定义规则回滚 |
 | `disambiguate` | `disambiguate_test.mbt` | 黑盒 | 7 | 多音字消歧（Viterbi+bigram） |
 | `disambiguate` | `disambiguate_coverage_wbtest.mbt` | 白盒 | 5 | 空串、单字、多音单字、中英混合 |
+| `disambiguate` | `common_phrases_test.mbt` | 黑盒 | 1 | 22 个常用多音词 |
+| `disambiguate` | `accuracy_test.mbt` | 黑盒 | 1 | 66 条 gold 语料准确率（96.1% vs 68.0%） |
 | `search` | `search_test.mbt` | 黑盒 | 9 | 搜索索引（首字母/连续/模糊） |
 | `search` | `search_coverage_wbtest.mbt` | 白盒 | 8 | 空索引、非汉字、重复文档、无匹配 |
 | `tone` | `tone_test.mbt` | 黑盒 | 14 | 声调变调（三声/一/不/七/八变调） |
@@ -33,20 +35,21 @@
 | `normalize` | `normalizer_coverage_wbtest.mbt` | 白盒 | 7 | 轻声数字 5、空串、大写混数字 |
 | `lm` | `lm_test.mbt` | 黑盒 | 15 | N-gram 语言模型概率、句子、困惑度、统计 |
 | `lm` | `lm_coverage_wbtest.mbt` | 白盒 | 12 | trigram/interpolation、回退、空输入、负 λ |
-| `input` | `input_test.mbt` | 黑盒 | 20 | 输入法引擎（Beam Search、候选、常用字优先） |
-| `examples` | `*.mbt` | 黑盒 | 37 | 12 个子包全覆盖示例 |
-| **总计** | | | **302 / 后端** | **1208（四后端）** |
+| `input` | `input_test.mbt` | 黑盒 | 30 | 输入法（Beam、词组、简拼、双拼、学习、常用字） |
+| `shuangpin` | `shuangpin_test.mbt` | 黑盒 | 10 | 小鹤/自然码双向转换、逆向分支、ü 归一化 |
+| `examples` | `*.mbt` | 黑盒 | 37 | 12 个子包示例 |
+| **总计** | | | **326 / 后端** | **1304（四后端）** |
 
 ## 四后端验证
 
 ```bash
-moon test --target wasm      --warn-list +73 --deny-warn   # 302/302 ✓
-moon test --target wasm-gc   --warn-list +73 --deny-warn   # 302/302 ✓
-moon test --target js        --warn-list +73 --deny-warn   # 302/302 ✓
-moon test --target native    --warn-list +73 --deny-warn   # 302/302 ✓
+moon test --target wasm      --warn-list +73 --deny-warn   # 326/326 ✓
+moon test --target wasm-gc   --warn-list +73 --deny-warn   # 326/326 ✓
+moon test --target js        --warn-list +73 --deny-warn   # 326/326 ✓
+moon test --target native    --warn-list +73 --deny-warn   # 326/326 ✓
 ```
 
-四后端共 1208 测试全通过，严格模式零警告零错误。
+四后端共 1304 测试全通过，严格模式零警告零错误。
 
 ## 覆盖率门禁
 
@@ -55,11 +58,11 @@ node scripts/check_coverage.mjs            # 运行 moon coverage analyze
 node scripts/check_coverage.mjs --min 92   # 指定总门槛
 ```
 
-- 统计范围：11 个核心包，排除 `data/`（纯数据）与 `examples/`（示例）。
+- 统计范围：12 个核心包，排除 `data/`（纯数据）与 `examples/`（示例）。
 - 门槛：总体 ≥ 92%，每个核心包 ≥ 85%。
-- 当前实测：**988/1062 = 93.0%**（core 96.6%、convert 90.3%、reverse 90.2%、
-  fuzzy 92.9%、disambiguate 96.0%、search 95.2%、normalize 95.7%、
-  lm 93.3%、input 90.5%）。
+- 当前实测：**1281/1360 = 94.2%**（core 96.6%、convert 90.3%、reverse 95.1%、
+  fuzzy 96.4%、disambiguate 96.0%、search 95.2%、normalize 95.7%、
+  lm 93.3%、input 92.3%）。
 
 ## 变异测试门禁
 
@@ -68,9 +71,9 @@ node scripts/mutation_test.mjs             # 全部变异点
 node scripts/mutation_test.mjs --filter M01,M10
 ```
 
-- 13 个单点变异，覆盖 core / convert / reverse / segment / fuzzy / tone /
+- 14 个单点变异，覆盖 core / convert / reverse / segment / fuzzy / tone /
   normalize / lm / input / search / disambiguate / data。
-- 每个变异点要求相关包测试失败（KILLED）；当前 **13/13 KILLED**。
+- 每个变异点要求相关包测试失败（KILLED）；当前 **14/14 KILLED**。
 - 脚本自动恢复源文件，变异点必须唯一匹配（否则 SKIPPED 并阻断）。
 
 ## 文档一致性门禁

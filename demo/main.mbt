@@ -48,4 +48,44 @@ fn main {
       println("   " + (i + 1).to_string() + ". " + candidate.text)
     }
   }
+
+  let scheme = @shuangpin.ShuangpinScheme::Xiaohe
+  let shuang_candidates = try engine.input_shuangpin(scheme, "nihc") catch {
+    _ => []
+  } noraise {
+    value => value
+  }
+  println(
+    "8) 小鹤双拼 (nihc): " +
+    (if shuang_candidates.length() > 0 {
+      shuang_candidates[0].text
+    } else {
+      "(no candidate)"
+    }),
+  )
+
+  let initial_candidates = try engine.input("zg") catch {
+    _ => []
+  } noraise {
+    value => value
+  }
+  println(
+    "9) 简拼候选 (zg): " +
+    (if initial_candidates.length() > 0 {
+      initial_candidates[0].text
+    } else {
+      "(no candidate)"
+    }),
+  )
+
+  engine.learn("你号")
+  let learned = try engine.input("nihao") catch {
+    _ => []
+  } noraise {
+    value => value
+  }
+  println(
+    "10) 学习后首选: " +
+    (if learned.length() > 0 { learned[0].text } else { "(no candidate)" }),
+  )
 }

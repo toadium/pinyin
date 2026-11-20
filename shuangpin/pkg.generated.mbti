@@ -1,0 +1,20 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "walkzzz/pinyin/shuangpin"
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) enum ShuangpinScheme {
+  Xiaohe
+  Ziranma
+}
+pub fn ShuangpinScheme::from_full(Self, String) -> String
+pub fn ShuangpinScheme::from_name(String) -> Self?
+pub fn ShuangpinScheme::name(Self) -> String
+pub fn ShuangpinScheme::to_full(Self, String) -> String
+
+// Type aliases
+
+// Traits

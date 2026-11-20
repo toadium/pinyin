@@ -579,13 +579,51 @@ pub let bigram_freq : Map[String, Map[String, Int32]]
 
 bigram 频率表（从 data 包字典自动构建，嵌套 Map 结构）。
 
+## shuangpin 包
+
+### ShuangpinScheme
+
+双拼方案：`Xiaohe`（小鹤）、`Ziranma`（自然码）。
+
+#### from_name
+
+```moonbit
+pub fn ShuangpinScheme::from_name(name : String) -> ShuangpinScheme?
+```
+
+从 `"xiaohe"`/`"小鹤"`、`"ziranma"`/`"自然码"` 解析方案。
+
+#### from_full
+
+```moonbit
+pub fn ShuangpinScheme::from_full(self, syllable : String) -> String
+```
+
+全拼音节 → 双拼音节（声母键 + 韵母键）；零声母原样返回。
+
+#### to_full
+
+```moonbit
+pub fn ShuangpinScheme::to_full(self, input : String) -> String
+```
+
+双拼串（每音节 2 键）→ 空格分隔全拼；奇数长度或未知键位原样返回。
+
+#### name
+
+```moonbit
+pub fn ShuangpinScheme::name(self) -> String
+```
+
+方案展示名。
+
 ## input 包
 
 ### PinyinInputEngine
 
-拼音输入法引擎，基于 Beam Search 解码 + LM 评分。
+拼音输入法引擎，基于 Beam Search 解码 + LM 评分，支持全拼、简拼、双拼、词组候选与用户学习。
 
-算法流程：分词（segment）→ 反查（reverse）→ Beam Search 扩展 + LM 剪枝 → 排序去重输出。时间复杂度 O(S×B×C)，S=音节数、B=beam 宽度、C=单音节最大候选数。
+算法流程：分词（segment）→ 反查（reverse）→ 常用字优先 → Beam Search + LM 剪枝 → 词组合并/去重 → 用户学习重排。时间复杂度 O(S×B×C)，S=音节数、B=beam 宽度、C=单音节最大候选数。
 
 #### new
 
@@ -650,6 +688,30 @@ pub fn PinyinInputEngine::input_with_limit(self, pinyin_str : String, limit : In
 ```
 
 限定候选数量的输入接口，返回最多 `limit` 个候选。`limit < 1` 抛 `PinyinError`。
+
+#### input_shuangpin
+
+```moonbit
+pub fn PinyinInputEngine::input_shuangpin(self, scheme : ShuangpinScheme, input : String) -> Array[InputCandidate] raise PinyinError
+```
+
+双拼输入：先转为全拼，再执行标准解码。空串抛 `PinyinError`。
+
+#### input_initial
+
+```moonbit
+pub fn PinyinInputEngine::input_initial(self, initials : String) -> Array[InputCandidate]
+```
+
+简拼输入：词组首字母串（如 `"zg"`、`"srf"`）→ 词组候选，支持前缀匹配。
+
+#### learn
+
+```moonbit
+pub fn PinyinInputEngine::learn(self, text : String) -> Unit
+```
+
+记录一次用户选择；学习过的候选在后续排序中优先。
 
 #### set_scoring_config
 

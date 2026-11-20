@@ -4,6 +4,7 @@ import {
   "walkzzz/pinyin/input",
   "walkzzz/pinyin/normalize",
   "walkzzz/pinyin/segment",
+  "walkzzz/pinyin/shuangpin",
   "walkzzz/pinyin/tone",
 }
 

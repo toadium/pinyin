@@ -61,11 +61,11 @@ You can browse and install extra skills here:
 
 拼音引擎：汉字→拼音 + 拼音→汉字 + 繁简转换 + 多音字消歧 + 拼音分词 + 模糊匹配 + 搜索索引 + 变调规则 + 编辑距离 + 规范化 + 流式处理 + N-gram 语言模型 + 拼音输入法。
 
-- 模块名：`walkzzz/pinyin`，版本 0.7.0，MIT 许可证
+- 模块名：`walkzzz/pinyin`，版本 0.8.0，MIT 许可证
 - 仓库：https://github.com/toadium/pinyin.git
 - moon 工具链：0.1.20261117
 
-### 包结构（12 包扁平多根布局）
+### 包结构（13 包扁平多根布局）
 
 ```
 pinyin/                         # 根包 — 文档入口（不导入任何子包）
@@ -109,9 +109,12 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   ├── pinyin_lm.mbt           #   PinyinLM + LMStats + Laplace + Katz + Interpolation
 │   ├── lm_test.mbt             #   黑盒测试（15）
 │   └── lm_coverage_wbtest.mbt  #   覆盖率补测（12）
-├── input/                      # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy）
-│   ├── pinyin_input.mbt        #   PinyinInputEngine + InputCandidate + Beam Search + 用户词库 + 模糊输入
-│   └── input_test.mbt          #   黑盒测试（20）
+├── input/                      # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy + shuangpin）
+│   ├── pinyin_input.mbt        #   PinyinInputEngine + InputCandidate + Beam Search + 词库/双拼/简拼/学习
+│   └── input_test.mbt          #   黑盒测试（30）
+├── shuangpin/                  # 双拼输入（小鹤/自然码，双拼↔全拼，零依赖）
+│   ├── pinyin_shuangpin.mbt
+│   └── shuangpin_test.mbt      #   黑盒测试（10）
 ├── examples/                   # 示例包（12 子包全覆盖，37 个示例测试）
 ├── demo/                       # 端到端可运行演示（moon run demo）
 ├── docs/                       # 开发文档（roadmap/architecture/api/testing）
@@ -119,7 +122,7 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
     ├── gen_pinyin_dict.py      #   字典生成
     ├── gen_common_chars.py     #   常用字排序表生成
     ├── check_coverage.mjs      #   覆盖率门禁（总 ≥92%，每包 ≥85%）
-    ├── mutation_test.mjs       #   变异测试门禁（13 个变异点）
+    ├── mutation_test.mjs       #   变异测试门禁（14 个变异点）
     └── check_docs.mjs          #   文档一致性门禁
 ```
 
@@ -145,7 +148,7 @@ input（core+segment+reverse+lm+math+data+fuzzy）
 ### 多后端支持
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 302 测试全通过，共 1208 测试
+- 四后端各 326 测试全通过，共 1304 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 字典用 Map 字面量；`common_chars` 用字符串常量 + `String::find`，避免 wasm 全局初始化 local count 超限
 
@@ -158,12 +161,12 @@ moon build  --target all --warn-list +73 --deny-warn
 moon test   --target all --warn-list +73 --deny-warn
 node scripts/check_docs.mjs
 node scripts/check_coverage.mjs      # 核心 ≥92%，每包 ≥85%
-node scripts/mutation_test.mjs       # 13/13 KILLED
+node scripts/mutation_test.mjs       # 14/14 KILLED
 ```
 
 - 覆盖率补测文件统一命名 `*_coverage_wbtest.mbt`。
 - 变异点必须唯一匹配源码（`occurrences == 1`），否则脚本 SKIPPED 并阻断。
-- 任何文档数字以实测为准：测试数 302/后端、覆盖 93.0%、工具链 0.1.20261117。
+- 任何文档数字以实测为准：测试数 326/后端、覆盖 94.2%、工具链 0.1.20261117。
 
 ### MoonBit 语法要点
 

@@ -118,23 +118,32 @@ N-gram 语言模型，从 data 包字典自动构建 unigram/bigram/trigram 频�
 - **Laplace 平滑**：P(w) = (C(w) + 1) / (N + V)，避免零概率
 - **Katz 回退**：高阶 n-gram 频率不足时回退到低阶，trigram→bigram→unigram 逐级降级
 
-## input 包（依赖 core + segment + reverse + lm + moonbitlang/core/math）
+## input 包（依赖 core + segment + reverse + lm + data + fuzzy + shuangpin）
 
-拼音输入法引擎，基于 Beam Search 解码 + LM 评分，将连续拼音串转换为汉字候选列表。
+拼音输入法引擎，基于 Beam Search 解码 + LM 评分，将连续拼音/简拼/双拼串转换为汉字候选列表。
 
 | 文件 | 职责 |
 |------|------|
-| `pinyin_input.mbt` | PinyinInputEngine 结构体 + InputCandidate 结构体 + Beam Search |
+| `pinyin_input.mbt` | PinyinInputEngine + InputCandidate + Beam Search + 词组/简拼/双拼/学习 |
 
 ### 算法流程
 
-1. **分词**：segment 包对拼音串执行最优切分
-2. **反查**：reverse 包将各音节映射为候选汉字集合
-3. **常用字优先**：按 `data.common_char_rank` 排序候选汉字，截断候选上限时保留常用字
-4. **Beam Search**：逐音节扩展候选路径，LM 评分剪枝，保留 top-B 条路径；同分时按汉字常用度排序
-5. **排序与去重**：按 LM 对数概率降序排列，按候选文本去重输出
+1. **输入归一化**：全拼直接分词；简拼走首字母表；双拼经 `shuangpin` 转全拼
+2. **分词**：segment 包对拼音串执行最优切分
+3. **反查**：reverse 包将各音节映射为候选汉字集合
+4. **常用字优先**：按 `data.common_char_rank` 排序候选汉字，截断候选上限时保留常用字
+5. **Beam Search**：逐音节扩展候选路径，LM 评分剪枝，保留 top-B 条路径；同分时按汉字常用度排序
+6. **词组/学习重排**：词表候选优先，用户学习过的候选置顶，按文本去重
 
 时间复杂度 O(S×B×C)，其中 S=音节数、B=beam 宽度、C=单音节最大候选数。
+
+## shuangpin 包（零依赖）
+
+小鹤/自然码双拼与全拼互转，键位映射参考 Rime `double_pinyin_flypy` / `double_pinyin` schema。
+
+| 文件 | 职责 |
+|------|------|
+| `pinyin_shuangpin.mbt` | ShuangpinScheme 枚举 + 声母/韵母键位表 + 双向转换 |
 
 ## examples 包（12 个子包全覆盖）
 
@@ -143,6 +152,6 @@ N-gram 语言模型，从 data 包字典自动构建 unigram/bigram/trigram 频�
 ## 多后端
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 302 测试全通过，共 1208 测试
+- 四后端各 324 测试全通过，共 1296 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 字典用 Map 字面量；常用字表用字符串常量，避免 wasm 全局初始化 local count 超限

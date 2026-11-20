@@ -6,6 +6,8 @@ pub let chinese_dict : Map[Int32, Int32]
 
 pub fn common_char_rank(String) -> Int32
 
+pub let common_phrases : Map[String, String]
+
 pub let mutil_pinyin_dict : Map[String, String]
 
 pub let pinyin_dict : Map[String, String]

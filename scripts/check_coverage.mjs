@@ -23,6 +23,7 @@ const PACKAGES = [
   "normalize",
   "lm",
   "input",
+  "shuangpin",
 ];
 const EXCLUDED = new Set(["data", "examples", "docs", "scripts"]);
 

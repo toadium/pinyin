@@ -3,10 +3,10 @@
 </div>
 
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v0.7.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v0.8.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/tests-1208-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/packages-12-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/tests-1304-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/packages-13-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/moon-0.1.20261117-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/targets-wasm%2Bwasm--gc%2Bjs%2Bnative-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/license-MIT-brightgreen" style="display: inline-block;" />
@@ -47,6 +47,9 @@ pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音�
 - 🌊 支持拼音流式处理（PinyinStreamProcessor，逐字符输入实时输出）
 - 📊 支持 N-gram 语言模型（Unigram/Bigram/Trigram 频率表、Laplace 平滑、Katz 回退、Interpolation 平滑、困惑度）
 - ⌨️ 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、用户词库、模糊输入、可配置 beam 宽度）
+- 🔠 支持双拼输入（小鹤 / 自然码，双拼 ↔ 全拼互转）
+- 🔤 支持简拼输入与用户选择学习（首字母词组、候选重排）
+- 🎯 多音字上下文消歧：常用多音词准确率 96.1%（首读音基线 68.0%）
 - 🔤 支持声母/韵母提取（get_initial/get_final/initials_list）
 - 💪 支持常用简体/繁体中文字符转换成拼音
 - 🛠️ 支持常见多音字符转换成拼音
@@ -157,6 +160,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── normalize_example.mbt       # 示例测试（2）
 │   ├── lm_example.mbt              # 示例测试（5）
 │   └── input_example.mbt           # 示例测试（4）
+├── shuangpin/                      # 双拼输入（小鹤/自然码，双拼↔全拼）
 ├── demo/                           # 端到端可运行演示（moon run demo）
 ├── docs/                           # 开发文档
 │   ├── roadmap.md
@@ -261,7 +265,7 @@ input（core+segment+reverse+lm+math+data+fuzzy）
 ### 安装
 
 ```bash
-moon add walkzzz/pinyin@0.7.0
+moon add walkzzz/pinyin@0.8.0
 ```
 
 ### 编译构建
@@ -646,7 +650,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20261117 |
 
-四后端（wasm / wasm-gc / js / native）各 302 个测试全通过，共 1208 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 326 个测试全通过，共 1304 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 参考来源
 

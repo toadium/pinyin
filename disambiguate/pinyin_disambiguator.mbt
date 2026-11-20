@@ -5,30 +5,68 @@
 pub struct PinyinDisambiguator {}
 
 ///|
-/// bigram 词频表：前一个无调拼音 → (后一个无调拼音 → 频率)。
-/// 从 mutil_pinyin_table 运行时构建，用于 Viterbi 消歧。
-let pinyin_bigram_freq : Map[String, Map[String, Int32]] = {
-  let result : Map[String, Map[String, Int32]] = Map([])
-  for _word, pinyin_str in @convert.mutil_pinyin_table {
-    let pinyin_array = @core.convert_without_tone(pinyin_str)
-    if pinyin_array.length() >= 2 {
-      for i in 0..<(pinyin_array.length() - 1) {
-        let prev = pinyin_array[i]
-        let next = pinyin_array[i + 1]
-        match result.get(prev) {
-          Some(inner) =>
-            match inner.get(next) {
-              Some(count) => inner[next] = count + 1
-              None => inner[next] = 1
-            }
-          None => {
-            let inner : Map[String, Int32] = Map([])
-            inner[next] = 1
-            result[prev] = inner
+/// 将一条带调拼音串的相邻音节对计入 bigram 频次表。
+fn add_pinyin_bigrams(
+  result : Map[String, Map[String, Int32]],
+  pinyin_str : String,
+) -> Unit {
+  let pinyin_array = pinyin_str
+    .split(@core.pinyin_separator)
+    .map(fn(x) { x.to_owned() })
+    .to_array()
+  if pinyin_array.length() >= 2 {
+    for i in 0..<(pinyin_array.length() - 1) {
+      let prev = pinyin_array[i]
+      let next = pinyin_array[i + 1]
+      match result.get(prev) {
+        Some(inner) =>
+          match inner.get(next) {
+            Some(count) => inner[next] = count + 1
+            None => inner[next] = 1
           }
+        None => {
+          let inner : Map[String, Int32] = Map([])
+          inner[next] = 1
+          result[prev] = inner
         }
       }
     }
+  }
+}
+
+///|
+/// bigram 词频表：前一个带调拼音 → (后一个带调拼音 → 频率)。
+/// 使用带调音节保留声调信息，避免 "处 chǔ/chù" 这类同无调音节的误判。
+let pinyin_bigram_freq : Map[String, Map[String, Int32]] = {
+  let result : Map[String, Map[String, Int32]] = Map([])
+  for _word, pinyin_str in @convert.mutil_pinyin_table {
+    add_pinyin_bigrams(result, pinyin_str)
+  }
+  for _word, pinyin_str in @data.common_phrases {
+    add_pinyin_bigrams(result, pinyin_str)
+  }
+  result
+}
+
+///|
+/// 词级读音表：词组 → 逐字带调读音（含轻声）。
+/// 词表命中时优先于逐字 Viterbi，未命中再回退到上下文统计。
+let phrase_readings : Map[String, Array[String]] = {
+  let result : Map[String, Array[String]] = Map([])
+  let add = fn(word : String, pinyin_str : String) {
+    let readings = pinyin_str
+      .split(@core.pinyin_separator)
+      .map(fn(x) { x.to_owned() })
+      .to_array()
+    if readings.length() == word.to_array().length() {
+      result[word] = readings
+    }
+  }
+  for word, pinyin_str in @convert.mutil_pinyin_table {
+    add(word, pinyin_str)
+  }
+  for word, pinyin_str in @data.common_phrases {
+    add(word, pinyin_str)
   }
   result
 }
@@ -57,6 +95,10 @@ pub fn PinyinDisambiguator::disambiguate(
   let chars = str.to_array()
   if chars.length() == 0 {
     @core.raise_invalid_input("Please enter a word or sentence")
+  }
+  match phrase_readings.get(str) {
+    Some(readings) => return readings.copy()
+    None => ()
   }
   let all_readings : Array[Array[String]] = []
   for c in chars {
@@ -91,13 +133,13 @@ pub fn PinyinDisambiguator::disambiguate(
   }
   for i in 1..<n {
     for j in 0..<all_readings[i].length() {
-      let current_no_tone = @core.strip_tone(all_readings[i][j])
+      let current_reading = all_readings[i][j]
       let mut best_score = -1
       let mut best_prev = 0
       for k in 0..<all_readings[i - 1].length() {
-        let prev_no_tone = @core.strip_tone(all_readings[i - 1][k])
+        let prev_reading = all_readings[i - 1][k]
         let score = dp[i - 1][k] +
-          bigram_count(prev_no_tone, current_no_tone) +
+          bigram_count(prev_reading, current_reading) +
           1
         if score > best_score {
           best_score = score

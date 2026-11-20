@@ -225,3 +225,98 @@ test "input_common_char_priority_zhongguo" {
   assert_true(candidates.length() > 0)
   assert_eq(candidates[0].text, "中国")
 }
+
+///|
+test "input_common_phrase_words" {
+  let engine = @input.PinyinInputEngine::new()
+  let shurufa = engine.input("shurufa")
+  assert_true(shurufa.length() > 0)
+  assert_eq(shurufa[0].text, "输入法")
+  let pinyin = engine.input("pinyin")
+  assert_true(pinyin.length() > 0)
+  assert_eq(pinyin[0].text, "拼音")
+  let shouji = engine.input("shouji")
+  assert_true(shouji.length() > 0)
+  assert_eq(shouji[0].text, "手机")
+}
+
+///|
+test "input_initial_abbreviation" {
+  let engine = @input.PinyinInputEngine::new()
+  let zg = engine.input("zg")
+  assert_true(zg.length() > 0)
+  assert_eq(zg[0].text, "中国")
+  let shurf = engine.input("srf")
+  assert_true(shurf.iter().any(fn(c) { c.text == "输入法" }))
+}
+
+///|
+test "input_learn_reranks" {
+  let engine = @input.PinyinInputEngine::new()
+  let before = engine.input("nihao")
+  assert_true(before.iter().any(fn(c) { c.text == "你号" }))
+  for _ in 0..<5 {
+    engine.learn("你号")
+  }
+  let after = engine.input("nihao")
+  assert_true(after.length() > 0)
+  assert_eq(after[0].text, "你号")
+}
+
+///|
+test "input_shuangpin_xiaohe" {
+  let engine = @input.PinyinInputEngine::new()
+  let nihao = engine.input_shuangpin(Xiaohe, "nihc")
+  assert_true(nihao.length() > 0)
+  assert_eq(nihao[0].text, "你好")
+  let zhongguo = engine.input_shuangpin(Xiaohe, "vsgo")
+  assert_true(zhongguo.length() > 0)
+  assert_eq(zhongguo[0].text, "中国")
+}
+
+///|
+test "input_shuangpin_ziranma" {
+  let engine = @input.PinyinInputEngine::new()
+  let nihao = engine.input_shuangpin(Ziranma, "nihk")
+  assert_true(nihao.length() > 0)
+  assert_eq(nihao[0].text, "你好")
+}
+
+///|
+test "input_initial_empty_and_unknown" {
+  let engine = @input.PinyinInputEngine::new()
+  assert_eq(engine.input_initial("").length(), 0)
+  assert_eq(engine.input_initial("zzzz").length(), 0)
+  assert_eq(engine.input("zzzz").length(), 0)
+}
+
+///|
+test "input_initial_single_letter_no_match" {
+  let engine = @input.PinyinInputEngine::new()
+  assert_eq(engine.input_initial("z").length(), 0)
+}
+
+///|
+test "input_all_segments_initial_fallback" {
+  let engine = @input.PinyinInputEngine::new()
+  let candidates = engine.input_all_segments("zg")
+  assert_true(candidates.iter().any(fn(c) { c.text == "中国" }))
+}
+
+///|
+test "input_shuangpin_empty_raises" {
+  let engine = @input.PinyinInputEngine::new()
+  try engine.input_shuangpin(Xiaohe, "") catch {
+    _ => return
+  } noraise {
+    _ => fail("expected PinyinError for empty shuangpin")
+  }
+}
+
+///|
+test "input_learn_empty_is_noop" {
+  let engine = @input.PinyinInputEngine::new()
+  engine.learn("")
+  let candidates = engine.input("nihao")
+  assert_true(candidates.length() > 0)
+}

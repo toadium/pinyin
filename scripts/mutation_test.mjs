@@ -157,6 +157,16 @@ const MUTATIONS = [
   }`,
     pkg: "convert",
   },
+  {
+    id: "M14",
+    name: "shuangpin zh 声母映射错误",
+    file: "shuangpin/pinyin_shuangpin.mbt",
+    find: `if initial == "zh" {
+    "v"`,
+    replace: `if initial == "zh" {
+    "z"`,
+    pkg: "shuangpin",
+  },
 ];
 
 function runTest(pkg) {

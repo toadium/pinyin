@@ -68,6 +68,7 @@ const packages = [
   "normalize",
   "lm",
   "input",
+  "shuangpin",
 ];
 const dataPackage = existsSync(resolve(root, "data"));
 check(

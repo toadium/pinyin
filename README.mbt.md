@@ -343,7 +343,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20261117 |
 
-四后端（wasm / wasm-gc / js / native）各 302 测试全通过，共 1208 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 326 测试全通过，共 1304 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 开源协议
 
