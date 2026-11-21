@@ -1,0 +1,12 @@
+import {
+  "walkzzz/pinyin",
+  "walkzzz/pinyin/core",
+  "walkzzz/pinyin/convert",
+  "walkzzz/pinyin/disambiguate",
+  "walkzzz/pinyin/input",
+  "walkzzz/pinyin/segment",
+  "walkzzz/pinyin/shuangpin",
+  "walkzzz/pinyin/normalize",
+}
+
+pkgtype(kind: "foreign_library")

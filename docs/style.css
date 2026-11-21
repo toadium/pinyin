@@ -1,0 +1,149 @@
+:root {
+  --bg: #0b0f1a;
+  --panel: #121a2e;
+  --panel-2: #0e1626;
+  --text: #e8edff;
+  --muted: #9aa8cc;
+  --accent: #60a5fa;
+  --accent-2: #fbbf24;
+  --border: rgba(148, 163, 184, 0.22);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1000px 600px at 10% -10%, rgba(96, 165, 250, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 90% 0%, rgba(251, 191, 36, 0.12), transparent 55%),
+    var(--bg);
+  line-height: 1.6;
+}
+
+.hero { max-width: 1000px; margin: 0 auto; padding: 64px 24px 28px; text-align: center; }
+
+.eyebrow {
+  color: var(--accent-2);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.hero h1 {
+  font-size: clamp(38px, 6.5vw, 68px);
+  margin: 0;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, #fff, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tagline { color: var(--muted); margin: 6px 0 18px; font-size: 18px; }
+.sub { max-width: 780px; margin: 0 auto; color: #c7d2fe; }
+
+.badges, .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+
+.badges span {
+  border: 1px solid var(--border);
+  background: rgba(18, 26, 46, 0.75);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.links a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; font-size: 14px; }
+.links a:hover { border-color: var(--accent); }
+
+main { max-width: 1000px; margin: 0 auto; padding: 12px 24px 72px; display: grid; gap: 18px; }
+
+.card {
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.card h2 { margin: 0 0 10px; font-size: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.tag {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #0b1220;
+  background: var(--accent-2);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-family: ui-monospace, monospace;
+}
+
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 10px 0; }
+.grow { flex: 1 1 220px; }
+
+label { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+
+input, select, textarea {
+  background: #070c18;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 9px 11px;
+  font: inherit;
+  font-size: 13px;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  width: 100%;
+  resize: vertical;
+}
+
+button {
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  background: rgba(96, 165, 250, 0.18);
+  color: #dbeafe;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+button:hover { background: rgba(96, 165, 250, 0.3); border-color: var(--accent); }
+
+output, .chips {
+  display: block;
+  margin-top: 10px;
+  background: #070c18;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 14px;
+  color: #dbeafe;
+  word-break: break-word;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  background: rgba(96, 165, 250, 0.12);
+  border-radius: 8px;
+  padding: 4px 9px;
+  font-size: 13px;
+}
+
+.hint { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+.how ol { margin: 8px 0 0; padding-left: 22px; color: #c7d2fe; }
+.how code { color: var(--accent-2); }
+
+footer { border-top: 1px solid var(--border); text-align: center; color: var(--muted); font-size: 12px; padding: 24px; }
+
+@media (max-width: 640px) {
+  .hero { padding-top: 40px; }
+  .row { flex-direction: column; align-items: stretch; }
+}

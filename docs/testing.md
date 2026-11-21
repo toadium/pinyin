@@ -135,3 +135,13 @@ node scripts/mutation_test.mjs                            # 变异（手动 job�
 |---|---|---|
 | wasm `local count too large` | `common_chars` 使用 3755 条 Map 字面量，加入 data 包全局初始化后越过 wasm 上限 | 改为字符串常量 + `String::find` 查找，运行时零大表初始化 |
 | 新增代码零警告 | 严格模式 `--warn-list +73 --deny-warn` | 四后端 check/build/test 全绿 |
+
+## 展示页自检
+
+```bash
+node scripts/check_pages.mjs
+```
+
+- 构建 `playground` 的 js 产物并复制到 `docs/playground.js`。
+- 检查 32 项：静态资源、`index.html`/`app.js` 引用、7 个导出函数、转换/数字调/空串、消歧（银行/重庆）、输入法（nihao/zg/shurufa/空串）、双拼（小鹤/自然码/奇数输入）、分词、规范化（ZHONG1/nv）。
+- 当前结果：**PASS**（`docs/playground.js` 约 2.9 MB，gzip 后约 500 KB）。

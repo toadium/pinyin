@@ -131,6 +131,38 @@ check(
   "docs/api.md 缺少新增接口",
 );
 
+check(
+  "A14 README 含在线演示链接",
+  readme.includes("toadium.github.io/pinyin"),
+  "README 缺少在线演示链接",
+);
+
+const indexHtml = read("docs/index.html");
+const appJs = read("docs/app.js");
+check(
+  "A15 展示页存在并加载 playground.js",
+  existsSync(resolve(root, "docs/index.html")) &&
+    appJs.includes("./playground.js") &&
+    indexHtml.includes("app.js"),
+  "docs/index.html 或 app.js 缺少 playground.js 引用",
+);
+
+const pagesWorkflow = read(".github/workflows/pages.yml");
+check(
+  "A16 Pages workflow 构建 playground",
+  pagesWorkflow.includes("playground"),
+  "pages.yml 未构建 playground",
+);
+
+const rootVersion = read("pinyin.mbt").match(
+  /version\s*:\s*String\s*=\s*"([^"]+)"/,
+)?.[1] ?? "";
+check(
+  "A17 根包 version = moon.mod 版本",
+  rootVersion === version,
+  `pinyin.mbt=${rootVersion}, moon.mod=${version}`,
+);
+
 function checkLinks(file, text) {
   const linkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
   for (const match of text.matchAll(linkPattern)) {

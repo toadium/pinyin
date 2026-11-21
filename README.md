@@ -12,6 +12,10 @@
 <img alt="" src="https://img.shields.io/badge/license-MIT-brightgreen" style="display: inline-block;" />
 </p>
 
+<p align="center">
+<a href="https://toadium.github.io/pinyin/"><strong>在线演示：浏览器内运行拼音转换 / 输入法 / 双拼 / 消歧</strong></a>
+</p>
+
 ## 介绍
 
 pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音→汉字、繁简转换、多音字消歧、拼音分词、模糊匹配、搜索索引、声调变调、编辑距离、规范化、N-gram 语言模型、拼音输入法引擎等全栈拼音能力。
@@ -162,6 +166,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   └── input_example.mbt           # 示例测试（4）
 ├── shuangpin/                      # 双拼输入（小鹤/自然码，双拼↔全拼）
 ├── demo/                           # 端到端可运行演示（moon run demo）
+├── playground/                     # 浏览器演示导出层（js 后端，#export_name）
 ├── docs/                           # 开发文档
 │   ├── roadmap.md
 │   ├── architecture.md
@@ -276,6 +281,19 @@ moon test  --target all --warn-list +73 --deny-warn   # 四后端测试
 moon fmt    --check                                    # 格式检查
 moon info   --target all                              # 生成接口文件
 ```
+
+### 浏览器在线演示
+
+线上演示：<https://toadium.github.io/pinyin/>（需在仓库 Settings → Pages 启用，推荐 `main` / `docs` 模式）。
+页面内所有计算由编译到 JavaScript 的同一份 MoonBit 实现完成，无后端、无网络请求。
+
+本地自检：
+
+```bash
+node scripts/check_pages.mjs   # 构建 playground.js + 32 项页面/导出/语义检查
+```
+
+`docs/` 为静态页面；`docs/playground.js` 由 `moon build --target js --release playground` 生成。
 
 ### 运行端到端演示
 

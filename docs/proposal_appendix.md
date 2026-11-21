@@ -94,5 +94,6 @@ moon test  --target all --warn-list +73 --deny-warn
 node scripts/check_coverage.mjs
 node scripts/mutation_test.mjs
 node scripts/check_docs.mjs
+node scripts/check_pages.mjs
 moon run demo --target native
 ```

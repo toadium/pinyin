@@ -29,4 +29,4 @@
 ///   "walkzzz/pinyin/convert",
 /// }
 /// ```
-pub let version : String = "0.4.0"
+pub let version : String = "0.8.0"

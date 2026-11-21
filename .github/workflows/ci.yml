@@ -71,3 +71,18 @@ jobs:
           node-version: 22
       - name: Coverage gate
         run: node scripts/check_coverage.mjs --min 92
+
+  pages:
+    name: Pages demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pages check
+        run: node scripts/check_pages.mjs
