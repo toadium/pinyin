@@ -605,6 +605,45 @@ a.feature:focus-visible::after {
   gap: 18px;
 }
 
+/* pinyin4cj 功能示例区 */
+.demo-subhead {
+  margin: 36px 0 14px;
+  padding-top: 12px;
+}
+
+.demo-subhead h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.demo-subhead p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.pinyin4cj-grid .card.mini {
+  padding: 16px;
+}
+
+.card.mini h3 {
+  font-size: 15px;
+}
+
+.card.mini .hint {
+  font-size: 12.5px;
+}
+
+.card.mini .row {
+  margin-top: 12px;
+}
+
+.card.mini output {
+  margin-top: 12px;
+  font-size: 12.5px;
+}
+
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radius);

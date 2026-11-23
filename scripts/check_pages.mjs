@@ -126,6 +126,52 @@ check(
   (html.match(/<a class="feature" /g) || []).length === 12,
   `${(html.match(/<a class="feature" /g) || []).length} 个`,
 );
+
+// pinyin4cj 功能示例（10 张卡）
+check("pinyin4cj 子标题", html.includes('class="demo-subhead"') && html.includes("pinyin4cj 功能示例"));
+for (const id of [
+  "demo-c2s",
+  "demo-s2t",
+  "demo-sentence",
+  "demo-format",
+  "demo-char-dict",
+  "demo-phrase-dict",
+  "demo-cn-dict",
+  "demo-multi",
+  "demo-trad-convert",
+  "demo-tongyong",
+]) {
+  check(`pinyin4cj 卡片: ${id}`, html.includes(`id="${id}"`));
+}
+for (const run of [
+  "c2s",
+  "s2t",
+  "sentence",
+  "format",
+  "charDict",
+  "phraseDict",
+  "cnDict",
+  "multi",
+  "tradConvert",
+  "tongyong",
+]) {
+  check(`pinyin4cj 动作: ${run}`, html.includes(`data-run="${run}"`));
+}
+check(
+  "pinyin4cj 10 个输出钩子",
+  [
+    "c2s-out",
+    "s2t-out",
+    "sent-out",
+    "fmt-out",
+    "char-dict-out",
+    "phrase-dict-out",
+    "cn-dict-out",
+    "multi-out",
+    "trad-conv-out",
+    "tongyong-out",
+  ].every((id) => html.includes(`id="${id}"`)),
+);
 check(
   "导航高亮脚本存在",
   appJs.includes("IntersectionObserver") && appJs.includes('classList.toggle("active"'),
@@ -165,6 +211,16 @@ for (const name of [
   "pinyin_shuangpin",
   "pinyin_segment",
   "pinyin_normalize",
+  "pinyin_to_simplified",
+  "pinyin_to_traditional",
+  "pinyin_convert_sentence",
+  "pinyin_convert_format",
+  "pinyin_add_dict_char",
+  "pinyin_add_dict_phrase",
+  "pinyin_add_dict_chinese",
+  "pinyin_multi_readings",
+  "pinyin_convert_traditional",
+  "pinyin_tongyong",
 ]) {
   check(`export: ${name}`, typeof mod[name] === "function");
 }
@@ -192,6 +248,24 @@ check("segment xian non-empty", mod.pinyin_segment("xian").length > 0);
 check("segment invalid folds to empty", mod.pinyin_segment("") === "");
 check("normalize ZHONG1 = zhōng", mod.pinyin_normalize("ZHONG1") === "zhōng");
 check("normalize nv = nü", mod.pinyin_normalize("nv") === "nü");
+
+// pinyin4cj 十项功能（自定义字典会改全局表，放在最后）
+check("繁 → 简", mod.pinyin_to_simplified("臺，喪，麗") === "台，丧，丽");
+check("简 → 繁", mod.pinyin_to_traditional("我是中国人") === "我是中國人");
+check("词句转拼音", mod.pinyin_convert_sentence("我爱编程") === "wǒ ài biān chéng");
+check(
+  "自定义输出格式",
+  mod.pinyin_convert_format("我爱编程", "-", "number") === "wo3-ai4-bian1-cheng2",
+);
+check("多音字集合", mod.pinyin_multi_readings("长") === "长: cháng/zhǎng");
+check("繁简体转拼音", mod.pinyin_convert_traditional("嚴", "mark") === "yán");
+check("通用拼音", mod.pinyin_tongyong("传") === "传: chuan2/jhuan4");
+check("自定义拼音字典", mod.pinyin_add_dict_char("上", "shǎng", "上午") === "shǎng wǔ");
+check(
+  "自定义拼音组合字典",
+  mod.pinyin_add_dict_phrase("阿弥陀佛", "ā,mí,tuó,fó", "阿弥陀佛") === "ā mí tuó fó",
+);
+check("自定义中文字典", mod.pinyin_add_dict_chinese("癥", "症", "癥") === "症");
 
 console.log(`\n=== pages check: ${failures === 0 ? "PASS" : `FAIL (${failures})`} · ${checks} checks ===`);
 if (failures > 0) process.exit(1);

@@ -290,7 +290,7 @@ moon info   --target all                              # 生成接口文件
 本地自检：
 
 ```bash
-node scripts/check_pages.mjs   # 构建 playground.js + 56 项页面结构/导出/语义检查
+node scripts/check_pages.mjs   # 构建 playground.js + 102 项页面结构/导出/语义检查
 ```
 
 `docs/` 为静态页面；`docs/playground.js` 由 `moon build --target js --release playground` 生成。

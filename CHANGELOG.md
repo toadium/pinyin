@@ -13,7 +13,8 @@
   - 大词库「一/不」还原原调（变调交由 tone 包）；6 个字符串分片 + 运行时解析，规避 wasm 初始化局部变量上限
   - 常用多音词准确率 99.5%，首读音基线 68.0%
 - **展示**
-  - GitHub Pages 在线演示：`playground/`（7 个 `#export_name` 导出）+ `docs/` 静态页 + `pages.yml` + `check_pages.mjs`（56 项）
+  - GitHub Pages 在线演示：`playground/`（17 个 `#export_name` 导出）+ `docs/` 静态页 + `pages.yml` + `check_pages.mjs`（102 项）
+  - Live demo 新增 pinyin4cj 十项功能卡：繁简互转、词句转换、自定义格式、三类自定义字典、多音集合、繁简转拼音、通用拼音
   - 页面内完成拼音转换、输入法候选、双拼、消歧、分词与规范化，无后端
 - **质量**
   - 测试 302 → 328 / 后端（四后端共 1312）

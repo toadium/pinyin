@@ -6,6 +6,16 @@ import {
   pinyin_shuangpin,
   pinyin_segment,
   pinyin_normalize,
+  pinyin_to_simplified,
+  pinyin_to_traditional,
+  pinyin_convert_sentence,
+  pinyin_convert_format,
+  pinyin_add_dict_char,
+  pinyin_add_dict_phrase,
+  pinyin_add_dict_chinese,
+  pinyin_multi_readings,
+  pinyin_convert_traditional,
+  pinyin_tongyong,
 } from "./playground.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -214,6 +224,75 @@ function normalize() {
   }
 }
 
+function valueOf(id) {
+  const el = $(id);
+  return el ? el.value : "";
+}
+
+function toSimplified() {
+  setText("#c2s-out", pinyin_to_simplified(valueOf("#c2s-text")) || "（空）");
+}
+
+function toTraditional() {
+  setText("#s2t-out", pinyin_to_traditional(valueOf("#s2t-text")) || "（空）");
+}
+
+function sentencePinyin() {
+  setText("#sent-out", pinyin_convert_sentence(valueOf("#sent-text")) || "（无法转换）");
+}
+
+function customFormat() {
+  const out = pinyin_convert_format(
+    valueOf("#fmt-text"),
+    valueOf("#fmt-sep"),
+    valueOf("#fmt-format"),
+  );
+  setText("#fmt-out", out || "（无法转换）");
+}
+
+function dictChar() {
+  const out = pinyin_add_dict_char(
+    valueOf("#char-dict-char"),
+    valueOf("#char-dict-py"),
+    valueOf("#char-dict-text"),
+  );
+  setText("#char-dict-out", out || "（无结果）");
+}
+
+function dictPhrase() {
+  const out = pinyin_add_dict_phrase(
+    valueOf("#phrase-dict-phrase"),
+    valueOf("#phrase-dict-py"),
+    valueOf("#phrase-dict-text"),
+  );
+  setText("#phrase-dict-out", out || "（无结果）");
+}
+
+function dictChinese() {
+  const out = pinyin_add_dict_chinese(
+    valueOf("#cn-dict-trad"),
+    valueOf("#cn-dict-simp"),
+    valueOf("#cn-dict-text"),
+  );
+  setText("#cn-dict-out", out || "（无结果）");
+}
+
+function multiReadings() {
+  setText("#multi-out", pinyin_multi_readings(valueOf("#multi-text")) || "（空）");
+}
+
+function tradConvert() {
+  const out = pinyin_convert_traditional(
+    valueOf("#trad-conv-text"),
+    valueOf("#trad-conv-format"),
+  );
+  setText("#trad-conv-out", out || "（无法转换）");
+}
+
+function tongyongPinyin() {
+  setText("#tongyong-out", pinyin_tongyong(valueOf("#tongyong-text")) || "（空）");
+}
+
 const ACTIONS = {
   convert,
   input: inputCandidates,
@@ -221,6 +300,16 @@ const ACTIONS = {
   disambiguate,
   segment,
   normalize,
+  c2s: toSimplified,
+  s2t: toTraditional,
+  sentence: sentencePinyin,
+  format: customFormat,
+  charDict: dictChar,
+  phraseDict: dictPhrase,
+  cnDict: dictChinese,
+  multi: multiReadings,
+  tradConvert,
+  tongyong: tongyongPinyin,
 };
 
 $$("button[data-run]").forEach((button) => {
@@ -239,6 +328,25 @@ const ENTER_ACTIONS = [
   ["#dis-text", "disambiguate"],
   ["#seg-py", "segment"],
   ["#norm-py", "normalize"],
+  ["#c2s-text", "c2s"],
+  ["#s2t-text", "s2t"],
+  ["#sent-text", "sentence"],
+  ["#fmt-text", "format"],
+  ["#fmt-sep", "format"],
+  ["#fmt-format", "format"],
+  ["#char-dict-char", "charDict"],
+  ["#char-dict-py", "charDict"],
+  ["#char-dict-text", "charDict"],
+  ["#phrase-dict-phrase", "phraseDict"],
+  ["#phrase-dict-py", "phraseDict"],
+  ["#phrase-dict-text", "phraseDict"],
+  ["#cn-dict-trad", "cnDict"],
+  ["#cn-dict-simp", "cnDict"],
+  ["#cn-dict-text", "cnDict"],
+  ["#multi-text", "multi"],
+  ["#trad-conv-text", "tradConvert"],
+  ["#trad-conv-format", "tradConvert"],
+  ["#tongyong-text", "tongyong"],
 ];
 
 ENTER_ACTIONS.forEach(([selector, action]) => {

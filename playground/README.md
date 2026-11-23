@@ -7,8 +7,9 @@
 ## 用途
 
 GitHub Pages 的在线演示由本包提供：`pkgtype(kind: "foreign_library")` +
-`#export_name` 导出 7 个**非 raise** 函数，错误折叠为空串，JS 侧无需异常映射。
-所有计算在浏览器本地完成，不调用后端。
+`#export_name` 导出 17 个**非 raise** 函数，错误折叠为空串，JS 侧无需异常映射。
+除基础转换/消歧/输入法外，还覆盖 pinyin4cj 的十项功能示例：繁简互转、词句转换、
+自定义输出格式、三类自定义字典、多音字集合、繁简转拼音与通用拼音。
 
 ## 导出函数
 
@@ -21,6 +22,16 @@ GitHub Pages 的在线演示由本包提供：`pkgtype(kind: "foreign_library")`
 | `pinyin_shuangpin` | `(scheme, input) -> String` | 空格分隔全拼；方案为 `xiaohe` / `ziranma` |
 | `pinyin_segment` | `(pinyin) -> String` | 空格分隔的最优切分 |
 | `pinyin_normalize` | `(pinyin) -> String` | 规范化结果 |
+| `pinyin_to_simplified` | `(text) -> String` | 繁 → 简 |
+| `pinyin_to_traditional` | `(text) -> String` | 简 → 繁 |
+| `pinyin_convert_sentence` | `(text) -> String` | 词句 → 带调拼音（空格分隔） |
+| `pinyin_convert_format` | `(text, separator, format) -> String` | 自定义格式输出 |
+| `pinyin_add_dict_char` | `(char, readings, text) -> String` | 注入单字字典后转换 |
+| `pinyin_add_dict_phrase` | `(phrase, readings, text) -> String` | 注入词组字典后转换 |
+| `pinyin_add_dict_chinese` | `(trad, simp, text) -> String` | 注入繁简映射后转换 |
+| `pinyin_multi_readings` | `(text) -> String` | 逐字读音集合（`字: a/b`） |
+| `pinyin_convert_traditional` | `(text, format) -> String` | 繁体 → 拼音（先转简） |
+| `pinyin_tongyong` | `(text) -> String` | 通用拼音（`字: a/b`） |
 
 ## 构建
 

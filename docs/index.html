@@ -264,6 +264,164 @@
           <output id="norm-out">等待规范化…</output>
         </article>
       </div>
+
+      <div class="demo-subhead">
+        <h3>pinyin4cj 功能示例</h3>
+        <p>以下 10 项对齐上游 pinyin4cj 文档示例，全部在浏览器内计算。自定义字典会作用于本页后续转换，刷新页面即复位。</p>
+      </div>
+
+      <div class="demo-grid pinyin4cj-grid">
+        <article class="card mini" id="demo-c2s">
+          <header class="card-head">
+            <h3>繁体 → 简体</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>ChineseHelper</code></a>
+          </header>
+          <p class="hint">逐字映射，未收录字符原样保留。</p>
+          <div class="row">
+            <label class="grow">繁体 <input id="c2s-text" value="臺，喪，麗" /></label>
+            <button type="button" data-run="c2s">转换</button>
+          </div>
+          <output id="c2s-out">点击「转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-s2t">
+          <header class="card-head">
+            <h3>简体 → 繁体</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>ChineseHelper</code></a>
+          </header>
+          <p class="hint">反查繁简映射表，未收录字符原样保留。</p>
+          <div class="row">
+            <label class="grow">简体 <input id="s2t-text" value="我是中国人" /></label>
+            <button type="button" data-run="s2t">转换</button>
+          </div>
+          <output id="s2t-out">点击「转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-sentence">
+          <header class="card-head">
+            <h3>词、句 → 拼音</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>convert_to_pinyin_string</code></a>
+          </header>
+          <p class="hint">多音字按字级展开（本库 convert 契约）；需要上下文定音请用上方「消歧」。</p>
+          <div class="row">
+            <label class="grow">文本 <input id="sent-text" value="我爱编程" /></label>
+            <button type="button" data-run="sentence">转换</button>
+          </div>
+          <output id="sent-out">点击「转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-format">
+          <header class="card-head">
+            <h3>自定义输出格式</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#core-包" target="_blank" rel="noreferrer"><code>PinyinFormat</code></a>
+          </header>
+          <p class="hint">格式与分隔符自由组合：带调 / 数字调 / 无调 / 首字母。</p>
+          <div class="row">
+            <label class="grow">文本 <input id="fmt-text" value="我爱编程" /></label>
+            <label>分隔符 <input id="fmt-sep" value="-" size="2" /></label>
+            <label>格式
+              <select id="fmt-format">
+                <option value="mark">带调</option>
+                <option value="number" selected>数字调</option>
+                <option value="plain">无调</option>
+                <option value="initial">首字母</option>
+              </select>
+            </label>
+            <button type="button" data-run="format">转换</button>
+          </div>
+          <output id="fmt-out">点击「转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-char-dict">
+          <header class="card-head">
+            <h3>自定义拼音字典</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>add_pinyin_dict</code></a>
+          </header>
+          <p class="hint">给单字注入读音后转换；上游示例把「上」改为 shǎng。</p>
+          <div class="row">
+            <label>字 <input id="char-dict-char" value="上" size="2" /></label>
+            <label class="grow">读音（逗号分隔） <input id="char-dict-py" value="shǎng" /></label>
+            <label class="grow">文本 <input id="char-dict-text" value="上午" /></label>
+            <button type="button" data-run="charDict">注入并转换</button>
+          </div>
+          <output id="char-dict-out">点击「注入并转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-phrase-dict">
+          <header class="card-head">
+            <h3>自定义拼音组合字典</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>add_mutil_pinyin_dict</code></a>
+          </header>
+          <p class="hint">按词组注入读音，优先于逐字转换。</p>
+          <div class="row">
+            <label class="grow">词组 <input id="phrase-dict-phrase" value="阿弥陀佛" /></label>
+            <label class="grow">读音 <input id="phrase-dict-py" value="ā,mí,tuó,fó" /></label>
+            <label class="grow">文本 <input id="phrase-dict-text" value="阿弥陀佛" /></label>
+            <button type="button" data-run="phraseDict">注入并转换</button>
+          </div>
+          <output id="phrase-dict-out">点击「注入并转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-cn-dict">
+          <header class="card-head">
+            <h3>自定义中文字典</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>add_chinese_dict</code></a>
+          </header>
+          <p class="hint">追加繁 → 简映射后转换；上游示例把「癥」映射为「症」。</p>
+          <div class="row">
+            <label>繁体 <input id="cn-dict-trad" value="癥" size="2" /></label>
+            <label>简体 <input id="cn-dict-simp" value="症" size="2" /></label>
+            <label class="grow">文本 <input id="cn-dict-text" value="癥" /></label>
+            <button type="button" data-run="cnDict">注入并转换</button>
+          </div>
+          <output id="cn-dict-out">点击「注入并转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-multi">
+          <header class="card-head">
+            <h3>多音字 → 读音集合</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>convert_to_pinyin_array</code></a>
+          </header>
+          <p class="hint">逐字返回全部读音，例如「长」有 cháng / zhǎng。</p>
+          <div class="row">
+            <label class="grow">文本 <input id="multi-text" value="长" /></label>
+            <button type="button" data-run="multi">查询</button>
+          </div>
+          <output id="multi-out">点击「查询」…</output>
+        </article>
+
+        <article class="card mini" id="demo-trad-convert">
+          <header class="card-head">
+            <h3>繁简体 → 拼音</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>convert_traditional</code></a>
+          </header>
+          <p class="hint">先繁转简再转拼音，繁体「嚴」同样得到 yán。</p>
+          <div class="row">
+            <label class="grow">繁体 <input id="trad-conv-text" value="嚴" /></label>
+            <label>格式
+              <select id="trad-conv-format">
+                <option value="mark">带调</option>
+                <option value="number">数字调</option>
+              </select>
+            </label>
+            <button type="button" data-run="tradConvert">转换</button>
+          </div>
+          <output id="trad-conv-out">点击「转换」…</output>
+        </article>
+
+        <article class="card mini" id="demo-tongyong">
+          <header class="card-head">
+            <h3>繁简体 → 通用拼音</h3>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>to_tongyong</code></a>
+          </header>
+          <p class="hint">通用拼音（数字调），简繁同字结果一致。</p>
+          <div class="row">
+            <label class="grow">文本 <input id="tongyong-text" value="传" /></label>
+            <button type="button" data-run="tongyong">查询</button>
+          </div>
+          <output id="tongyong-out">点击「查询」…</output>
+        </article>
+      </div>
     </section>
 
     <section class="section" id="start">
@@ -339,7 +497,7 @@ let candidates = engine.input("nihao")
       <div class="callout">
         <strong>浏览器端复用：</strong>
         <code>playground</code> 是 <code>pkgtype(kind: "foreign_library")</code> 的 MoonBit 包，
-        用 <code>#export_name</code> 导出 7 个函数，<code>moon build --target js --release playground</code>
+        用 <code>#export_name</code> 导出 17 个函数，<code>moon build --target js --release playground</code>
         生成 <code>playground.js</code>；页面直接 <code>import</code> 调用，无需 HTTP 服务。
       </div>
     </section>
@@ -446,7 +604,7 @@ let candidates = engine.input("nihao")
         <h2>这个页面是怎么跑的</h2>
       </div>
       <ol class="steps">
-        <li><span class="step-no">1</span><p><code>playground/</code> 是 MoonBit 包，用 <code>#export_name</code> 导出转换、消歧、输入法、双拼、分词、规范化、版本共 7 个非 raise 函数。</p></li>
+        <li><span class="step-no">1</span><p><code>playground/</code> 是 MoonBit 包，用 <code>#export_name</code> 导出转换、繁简、自定义字典、多音集合、通用拼音、消歧、输入法、双拼、分词、规范化、版本共 17 个非 raise 函数。</p></li>
         <li><span class="step-no">2</span><p><code>moon build --target js --release playground</code> 产出 <code>playground.js</code>，字典与算法一并打包。</p></li>
         <li><span class="step-no">3</span><p>页面通过 ES module 直接 <code>import</code> 该产物，所有计算留在浏览器，不调用后端服务。</p></li>
         <li><span class="step-no">4</span><p>行为由 328×4 测试、94.2% 覆盖率、14 个变异点、文档与页面自检持续守护。</p></li>

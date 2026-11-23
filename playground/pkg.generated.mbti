@@ -2,17 +2,37 @@
 package "walkzzz/pinyin/playground"
 
 // Values
+pub fn pinyin_add_dict_char(String, String, String) -> String
+
+pub fn pinyin_add_dict_chinese(String, String, String) -> String
+
+pub fn pinyin_add_dict_phrase(String, String, String) -> String
+
 pub fn pinyin_convert(String, String, String) -> String
+
+pub fn pinyin_convert_format(String, String, String) -> String
+
+pub fn pinyin_convert_sentence(String) -> String
+
+pub fn pinyin_convert_traditional(String, String) -> String
 
 pub fn pinyin_disambiguate(String) -> String
 
 pub fn pinyin_input(String) -> String
+
+pub fn pinyin_multi_readings(String) -> String
 
 pub fn pinyin_normalize(String) -> String
 
 pub fn pinyin_segment(String) -> String
 
 pub fn pinyin_shuangpin(String, String) -> String
+
+pub fn pinyin_to_simplified(String) -> String
+
+pub fn pinyin_to_traditional(String) -> String
+
+pub fn pinyin_tongyong(String) -> String
 
 pub fn pinyin_version() -> String
 
