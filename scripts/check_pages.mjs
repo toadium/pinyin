@@ -77,18 +77,32 @@ check(
   ),
 );
 
-const apiDoc = readFileSync(join(root, "docs/api.md"), "utf8");
-const apiAnchors = new Set(
-  [...apiDoc.matchAll(/^## (\S+) 包\r?$/gm)].map((match) => `#${match[1]}-包`),
+const modulePackages = [
+  "core",
+  "convert",
+  "reverse",
+  "segment",
+  "fuzzy",
+  "disambiguate",
+  "search",
+  "tone",
+  "normalize",
+  "lm",
+  "input",
+  "shuangpin",
+  "data",
+  "playground",
+];
+const moduleLinks = [...html.matchAll(/blob\/main\/([a-z]+)\/README\.md/g)].map(
+  (match) => match[1],
 );
-const moduleLinks = [...html.matchAll(/docs\/api\.md(#[^"]+)"/g)].map((match) => match[1]);
 check(
-  "模块卡 / API 表 / 演示卡链接到对应文档锚点",
-  moduleLinks.length >= 25 && moduleLinks.every((anchor) => apiAnchors.has(anchor)),
-  `${moduleLinks.length} 个锚点，api.md 定义 ${apiAnchors.size} 个`,
+  "模块卡 / API 表 / 演示卡链接到包级 README",
+  moduleLinks.length >= 25 && moduleLinks.every((pkg) => modulePackages.includes(pkg)),
+  `${moduleLinks.length} 个链接`,
 );
 check(
-  "11 个功能包均有文档入口",
+  "11 个功能包均有 README 入口",
   [
     "convert",
     "reverse",
@@ -101,7 +115,11 @@ check(
     "lm",
     "input",
     "shuangpin",
-  ].every((pkg) => html.includes(`#${pkg}-包`)),
+  ].every((pkg) => html.includes(`/${pkg}/README.md`)),
+);
+check(
+  "14 个包 README 存在",
+  modulePackages.every((pkg) => existsSync(join(root, pkg, "README.md"))),
 );
 check(
   "特性卡为整卡链接（12 个）",

@@ -190,6 +190,17 @@ function checkLinks(file, text) {
 checkLinks("README.md", readme);
 checkLinks("README.mbt.md", readmeMbt);
 
+const allPackages = [...packages, "data", "playground"];
+check(
+  "A19 14 个包 README 齐全",
+  allPackages.every((pkg) => existsSync(resolve(root, pkg, "README.md"))),
+  allPackages.filter((pkg) => !existsSync(resolve(root, pkg, "README.md"))).join(", "),
+);
+for (const pkg of allPackages) {
+  const file = `${pkg}/README.md`;
+  if (existsSync(resolve(root, file))) checkLinks(file, read(file));
+}
+
 console.log(`passed ${passes.length}, failed ${failures.length}`);
 if (failures.length > 0) {
   console.error("docs consistency failed:");

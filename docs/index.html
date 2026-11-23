@@ -97,73 +97,73 @@
         <p class="lede">包间线性依赖、职责单一，core 与 data 零依赖，四个后端（wasm / wasm-gc / js / native）行为一致。</p>
       </div>
       <div class="feature-grid">
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#convert-包" target="_blank" rel="noreferrer" aria-label="查看 convert 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer" aria-label="查看 convert 模块文档">
           <span class="feature-no">01</span>
           <h3>汉字 → 拼音</h3>
           <p>词句级转换，支持带调、数字调、无调、首字母四种格式与自定义分隔符。</p>
           <code>convert</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#reverse-包" target="_blank" rel="noreferrer" aria-label="查看 reverse 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/reverse/README.md" target="_blank" rel="noreferrer" aria-label="查看 reverse 模块文档">
           <span class="feature-no">02</span>
           <h3>拼音 → 汉字</h3>
           <p>反向查找内置 20903 条单字与 843 条词组，三种声调格式互查。</p>
           <code>reverse</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#disambiguate-包" target="_blank" rel="noreferrer" aria-label="查看 disambiguate 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/disambiguate/README.md" target="_blank" rel="noreferrer" aria-label="查看 disambiguate 模块文档">
           <span class="feature-no">03</span>
           <h3>多音字消歧</h3>
           <p>Viterbi + 带调 bigram 上下文决策，47,110 条词组最大匹配，常用多音词准确率 99.5%（基线 68.0%）。</p>
           <code>disambiguate</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#segment-包" target="_blank" rel="noreferrer" aria-label="查看 segment 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/segment/README.md" target="_blank" rel="noreferrer" aria-label="查看 segment 模块文档">
           <span class="feature-no">04</span>
           <h3>拼音分词</h3>
           <p>Trie + 动态规划枚举全切分并取最优路径，处理 <code>xian</code> 这类歧义串。</p>
           <code>segment</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#fuzzy-包" target="_blank" rel="noreferrer" aria-label="查看 fuzzy 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/fuzzy/README.md" target="_blank" rel="noreferrer" aria-label="查看 fuzzy 模块文档">
           <span class="feature-no">05</span>
           <h3>模糊匹配</h3>
           <p>zh↔z、ch↔c、sh↔s、n↔l、in↔ing 等 9 组规则，BFS 扩展候选。</p>
           <code>fuzzy</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#search-包" target="_blank" rel="noreferrer" aria-label="查看 search 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/search/README.md" target="_blank" rel="noreferrer" aria-label="查看 search 模块文档">
           <span class="feature-no">06</span>
           <h3>搜索索引</h3>
           <p>倒排索引支持首字母、连续拼音与模糊拼音检索，面向中文文本搜索。</p>
           <code>search</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#tone-包" target="_blank" rel="noreferrer" aria-label="查看 tone 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/tone/README.md" target="_blank" rel="noreferrer" aria-label="查看 tone 模块文档">
           <span class="feature-no">07</span>
           <h3>声调变调</h3>
           <p>三声、一、不、七、八五类变调规则，含同音字守卫避免误伤原调。</p>
           <code>tone</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#normalize-包" target="_blank" rel="noreferrer" aria-label="查看 normalize 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/normalize/README.md" target="_blank" rel="noreferrer" aria-label="查看 normalize 模块文档">
           <span class="feature-no">08</span>
           <h3>规范化与编辑距离</h3>
           <p>统一大小写、ü/v 与声调格式；音节级 Levenshtein 与模糊距离。</p>
           <code>normalize</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#lm-包" target="_blank" rel="noreferrer" aria-label="查看 lm 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/lm/README.md" target="_blank" rel="noreferrer" aria-label="查看 lm 模块文档">
           <span class="feature-no">09</span>
           <h3>N-gram 语言模型</h3>
           <p>Unigram / Bigram / Trigram 频率表，Laplace、Katz 回退与插值平滑、困惑度。</p>
           <code>lm</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#input-包" target="_blank" rel="noreferrer" aria-label="查看 input 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/input/README.md" target="_blank" rel="noreferrer" aria-label="查看 input 模块文档">
           <span class="feature-no">10</span>
           <h3>输入法引擎</h3>
           <p>Beam Search + LM 评分，全切分候选、词组优先、用户词库与选择学习。</p>
           <code>input</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#shuangpin-包" target="_blank" rel="noreferrer" aria-label="查看 shuangpin 模块文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/shuangpin/README.md" target="_blank" rel="noreferrer" aria-label="查看 shuangpin 模块文档">
           <span class="feature-no">11</span>
           <h3>双拼输入</h3>
           <p>小鹤 / 自然码双拼 ↔ 全拼双向转换，已接入输入法候选流程。</p>
           <code>shuangpin</code>
         </a>
-        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#convert-包" target="_blank" rel="noreferrer" aria-label="查看 convert 流式处理文档">
+        <a class="feature" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer" aria-label="查看 convert 流式处理文档">
           <span class="feature-no">12</span>
           <h3>流式处理</h3>
           <p>逐字符 feed / flush / reset，适合输入框实时标注与增量输出。</p>
@@ -183,7 +183,7 @@
         <article class="card" id="demo-convert">
           <header class="card-head">
             <h3>汉字 → 拼音</h3>
-            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#convert-包" target="_blank" rel="noreferrer"><code>convert</code></a>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>convert</code></a>
           </header>
           <div class="row">
             <label class="grow">文本 <input id="convert-text" value="拼音引擎" /></label>
@@ -205,7 +205,7 @@
         <article class="card" id="demo-input">
           <header class="card-head">
             <h3>拼音 → 输入法候选</h3>
-            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#input-包" target="_blank" rel="noreferrer"><code>input</code></a>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/input/README.md" target="_blank" rel="noreferrer"><code>input</code></a>
           </header>
           <div class="row">
             <label class="grow">拼音（全拼 / 简拼） <input id="input-py" value="nihao" /></label>
@@ -223,7 +223,7 @@
         <article class="card" id="demo-shuangpin">
           <header class="card-head">
             <h3>双拼输入</h3>
-            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#shuangpin-包" target="_blank" rel="noreferrer"><code>shuangpin</code></a>
+            <a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/shuangpin/README.md" target="_blank" rel="noreferrer"><code>shuangpin</code></a>
           </header>
           <div class="row">
             <label>方案
@@ -245,7 +245,7 @@
         <article class="card" id="demo-analyze">
           <header class="card-head">
             <h3>消歧 / 分词 / 规范化</h3>
-            <span class="pkg-links"><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#disambiguate-包" target="_blank" rel="noreferrer"><code>disambiguate</code></a><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#segment-包" target="_blank" rel="noreferrer"><code>segment</code></a><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#normalize-包" target="_blank" rel="noreferrer"><code>normalize</code></a></span>
+            <span class="pkg-links"><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/disambiguate/README.md" target="_blank" rel="noreferrer"><code>disambiguate</code></a><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/segment/README.md" target="_blank" rel="noreferrer"><code>segment</code></a><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/normalize/README.md" target="_blank" rel="noreferrer"><code>normalize</code></a></span>
           </header>
           <div class="row">
             <label class="grow">汉字（消歧） <input id="dis-text" value="银行行长" /></label>
@@ -357,17 +357,17 @@ let candidates = engine.input("nihao")
             <tr><th>能力</th><th>包</th><th>主要入口</th></tr>
           </thead>
           <tbody>
-            <tr><td>汉字 → 拼音</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#convert-包" target="_blank" rel="noreferrer"><code>convert</code></a></td><td><code>PinyinHelper::convert_to_pinyin_string</code></td></tr>
-            <tr><td>拼音 → 汉字</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#reverse-包" target="_blank" rel="noreferrer"><code>reverse</code></a></td><td><code>ReversePinyinHelper::reverse_lookup</code></td></tr>
-            <tr><td>多音字消歧</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#disambiguate-包" target="_blank" rel="noreferrer"><code>disambiguate</code></a></td><td><code>PinyinDisambiguator::disambiguate</code></td></tr>
-            <tr><td>拼音分词</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#segment-包" target="_blank" rel="noreferrer"><code>segment</code></a></td><td><code>PinyinSegmenter::segment_best</code></td></tr>
-            <tr><td>模糊匹配</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#fuzzy-包" target="_blank" rel="noreferrer"><code>fuzzy</code></a></td><td><code>FuzzyPinyinHelper::fuzzy_match</code></td></tr>
-            <tr><td>搜索索引</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#search-包" target="_blank" rel="noreferrer"><code>search</code></a></td><td><code>PinyinSearchIndex::search_pinyin</code></td></tr>
-            <tr><td>声调变调</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#tone-包" target="_blank" rel="noreferrer"><code>tone</code></a></td><td><code>ToneSandhiHelper::apply_tone_sandhi</code></td></tr>
-            <tr><td>规范化 / 编辑距离</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#normalize-包" target="_blank" rel="noreferrer"><code>normalize</code></a></td><td><code>PinyinNormalizer::normalize</code> · <code>PinyinEditDistance::distance</code></td></tr>
-            <tr><td>N-gram 语言模型</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#lm-包" target="_blank" rel="noreferrer"><code>lm</code></a></td><td><code>PinyinLM::bigram_prob</code> · <code>interpolation_prob</code></td></tr>
-            <tr><td>输入法引擎</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#input-包" target="_blank" rel="noreferrer"><code>input</code></a></td><td><code>PinyinInputEngine::input</code> · <code>input_fuzzy</code></td></tr>
-            <tr><td>双拼转换</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/docs/api.md#shuangpin-包" target="_blank" rel="noreferrer"><code>shuangpin</code></a></td><td><code>ShuangpinScheme::from_full</code> · <code>to_full</code></td></tr>
+            <tr><td>汉字 → 拼音</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/convert/README.md" target="_blank" rel="noreferrer"><code>convert</code></a></td><td><code>PinyinHelper::convert_to_pinyin_string</code></td></tr>
+            <tr><td>拼音 → 汉字</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/reverse/README.md" target="_blank" rel="noreferrer"><code>reverse</code></a></td><td><code>ReversePinyinHelper::reverse_lookup</code></td></tr>
+            <tr><td>多音字消歧</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/disambiguate/README.md" target="_blank" rel="noreferrer"><code>disambiguate</code></a></td><td><code>PinyinDisambiguator::disambiguate</code></td></tr>
+            <tr><td>拼音分词</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/segment/README.md" target="_blank" rel="noreferrer"><code>segment</code></a></td><td><code>PinyinSegmenter::segment_best</code></td></tr>
+            <tr><td>模糊匹配</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/fuzzy/README.md" target="_blank" rel="noreferrer"><code>fuzzy</code></a></td><td><code>FuzzyPinyinHelper::fuzzy_match</code></td></tr>
+            <tr><td>搜索索引</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/search/README.md" target="_blank" rel="noreferrer"><code>search</code></a></td><td><code>PinyinSearchIndex::search_pinyin</code></td></tr>
+            <tr><td>声调变调</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/tone/README.md" target="_blank" rel="noreferrer"><code>tone</code></a></td><td><code>ToneSandhiHelper::apply_tone_sandhi</code></td></tr>
+            <tr><td>规范化 / 编辑距离</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/normalize/README.md" target="_blank" rel="noreferrer"><code>normalize</code></a></td><td><code>PinyinNormalizer::normalize</code> · <code>PinyinEditDistance::distance</code></td></tr>
+            <tr><td>N-gram 语言模型</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/lm/README.md" target="_blank" rel="noreferrer"><code>lm</code></a></td><td><code>PinyinLM::bigram_prob</code> · <code>interpolation_prob</code></td></tr>
+            <tr><td>输入法引擎</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/input/README.md" target="_blank" rel="noreferrer"><code>input</code></a></td><td><code>PinyinInputEngine::input</code> · <code>input_fuzzy</code></td></tr>
+            <tr><td>双拼转换</td><td><a class="pkg-link" href="https://github.com/toadium/pinyin/blob/main/shuangpin/README.md" target="_blank" rel="noreferrer"><code>shuangpin</code></a></td><td><code>ShuangpinScheme::from_full</code> · <code>to_full</code></td></tr>
           </tbody>
         </table>
       </div>
