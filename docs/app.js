@@ -230,6 +230,27 @@ $$("button[data-run]").forEach((button) => {
   });
 });
 
+const ENTER_ACTIONS = [
+  ["#convert-text", "convert"],
+  ["#convert-sep", "convert"],
+  ["#convert-format", "convert"],
+  ["#input-py", "input"],
+  ["#sp-input", "shuangpin"],
+  ["#dis-text", "disambiguate"],
+  ["#seg-py", "segment"],
+  ["#norm-py", "normalize"],
+];
+
+ENTER_ACTIONS.forEach(([selector, action]) => {
+  const field = $(selector);
+  if (!field) return;
+  field.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    ACTIONS[action]();
+  });
+});
+
 $$("button[data-preset]").forEach((button) => {
   button.addEventListener("click", () => {
     $("#input-py").value = button.dataset.preset;

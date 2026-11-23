@@ -152,7 +152,7 @@ input（core+segment+reverse+lm+math+data+fuzzy）
 ### 多后端支持
 
 - `supported_targets = "+wasm+wasm-gc+js+native"`
-- 四后端各 326 测试全通过，共 1304 测试
+- 四后端各 327 测试全通过，共 1308 测试
 - 严格模式 `--warn-list +73 --deny-warn` 零警告零错误
 - 字典用 Map 字面量；`common_chars` 用字符串常量 + `String::find`，避免 wasm 全局初始化 local count 超限
 
@@ -171,7 +171,7 @@ node scripts/check_pages.mjs         # 展示页 56 项
 
 - 覆盖率补测文件统一命名 `*_coverage_wbtest.mbt`。
 - 变异点必须唯一匹配源码（`occurrences == 1`），否则脚本 SKIPPED 并阻断。
-- 任何文档数字以实测为准：测试数 326/后端、覆盖 94.2%、工具链 0.1.20261117。
+- 任何文档数字以实测为准：测试数 327/后端、覆盖 94.3%、工具链 0.1.20261117。
 
 ### MoonBit 语法要点
 

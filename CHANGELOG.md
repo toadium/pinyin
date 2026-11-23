@@ -4,16 +4,17 @@
   - `PinyinInputEngine::input_shuangpin` 接入输入法解码
 - **输入法增强**
   - 简拼输入 `input_initial`（首字母串 → 词组候选）
-  - 常用词表 `data/common_phrases`（128 词），词组候选优先
+  - 常用词表 `data/common_phrases`（147 词），词组候选优先
   - 用户选择学习 `learn`，学习过的候选优先重排
 - **消歧增强**
   - 词级优先（常用词表 + 词组表）→ 带调 bigram Viterbi 回退
-  - 常用多音词准确率 96.1%，首读音基线 68.0%
+  - 句内词表最大匹配：`我明天还钱` → `huán qián`，补齐「还」的 26 组动词搭配
+  - 常用多音词准确率 99.0%，首读音基线 68.0%
 - **展示**
-  - GitHub Pages 在线演示：`playground/`（7 个 `#export_name` 导出）+ `docs/` 静态页 + `pages.yml` + `check_pages.mjs`（32 项）
+  - GitHub Pages 在线演示：`playground/`（7 个 `#export_name` 导出）+ `docs/` 静态页 + `pages.yml` + `check_pages.mjs`（56 项）
   - 页面内完成拼音转换、输入法候选、双拼、消歧、分词与规范化，无后端
 - **质量**
-  - 测试 302 → 326 / 后端（四后端共 1304）
+  - 测试 302 → 327 / 后端（四后端共 1308）
   - 新增双拼、简拼、用户学习、消歧 gold 评测
 
 #### V0.7.0

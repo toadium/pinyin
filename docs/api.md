@@ -357,7 +357,7 @@ pub fn FuzzyPinyinHelper::add_fuzzy_rules(rules : Array[FuzzyRule]) -> Unit
 
 ### PinyinDisambiguator
 
-多音字上下文消歧（Viterbi + bigram 词频模型）。
+多音字上下文消歧（词表最大匹配 + Viterbi + bigram 词频模型）。
 
 #### disambiguate
 
@@ -365,7 +365,7 @@ pub fn FuzzyPinyinHelper::add_fuzzy_rules(rules : Array[FuzzyRule]) -> Unit
 pub fn PinyinDisambiguator::disambiguate(text : String) -> Array[String] raise PinyinError
 ```
 
-多音字上下文消歧，返回每个字的数字调拼音。
+多音字上下文消歧，返回每个字的**带调拼音**。句子中出现词表已知词组时先做最大匹配并固定词级读音，其余字符走带调 bigram Viterbi，例如 `"我明天还钱"` → `["wǒ", "míng", "tiān", "huán", "qián"]`。
 
 ## search 包
 

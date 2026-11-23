@@ -41,3 +41,19 @@ test "disambiguate: 三字词" {
   assert_eq(result[1], "guó")
   assert_eq(result[2], "rén")
 }
+
+///|
+test "disambiguate: 句内词表最大匹配" {
+  let forced = forced_phrase_readings("我明天还钱".to_array())
+  assert_eq(forced.length(), 5)
+  assert_eq(forced[0].length(), 0)
+  assert_eq(forced[1].length(), 0)
+  assert_eq(forced[2].length(), 0)
+  assert_eq(forced[3], ["huán"])
+  assert_eq(forced[4], ["qián"])
+  let longest = forced_phrase_readings("还信用卡".to_array())
+  assert_eq(longest.length(), 4)
+  assert_eq(longest[0], ["huán"])
+  assert_eq(longest[3], ["kǎ"])
+  assert_true(phrase_max_chars >= 4)
+}

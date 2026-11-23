@@ -72,6 +72,60 @@ let phrase_readings : Map[String, Array[String]] = {
 }
 
 ///|
+/// 词表最长词条的字符数，用于句子内的最大匹配。
+let phrase_max_chars : Int32 = {
+  let mut longest = 0
+  for word, _ in phrase_readings {
+    let len = word.to_array().length()
+    if len > longest {
+      longest = len
+    }
+  }
+  longest
+}
+
+///|
+/// 句子内词表最大匹配：命中位置的读音固定为词级读音，
+/// 未命中位置返回空数组，留给逐字 Viterbi 处理。
+/// 例如 "我明天还钱" 中 "还钱" 会命中词表，避免 "还" 回退到首读音 hái。
+fn forced_phrase_readings(chars : Array[Char]) -> Array[Array[String]] {
+  let n = chars.length()
+  let forced : Array[Array[String]] = []
+  for _ in 0..<n {
+    forced.push([])
+  }
+  let mut i = 0
+  while i < n {
+    let mut len = phrase_max_chars
+    if n - i < len {
+      len = n - i
+    }
+    let mut matched = false
+    while len >= 2 && !matched {
+      let word = String::from_array(chars[i:i + len])
+      match phrase_readings.get(word) {
+        Some(readings) =>
+          if readings.length() == len {
+            for k in 0..<len {
+              forced[i + k] = [readings[k]]
+            }
+            i += len
+            matched = true
+          }
+        None => ()
+      }
+      if !matched {
+        len -= 1
+      }
+    }
+    if !matched {
+      i += 1
+    }
+  }
+  forced
+}
+
+///|
 /// 获取 bigram 频率，未见 bigram 返回 0。
 fn bigram_count(prev : String, next : String) -> Int32 {
   match pinyin_bigram_freq.get(prev) {
@@ -100,9 +154,13 @@ pub fn PinyinDisambiguator::disambiguate(
     Some(readings) => return readings.copy()
     None => ()
   }
+  let forced = forced_phrase_readings(chars)
   let all_readings : Array[Array[String]] = []
-  for c in chars {
-    if @convert.ChineseHelper::is_chinese(c) || c == @core.chinese_ling {
+  for i in 0..<chars.length() {
+    let c = chars[i]
+    if forced[i].length() > 0 {
+      all_readings.push(forced[i])
+    } else if @convert.ChineseHelper::is_chinese(c) || c == @core.chinese_ling {
       match @convert.pinyin_table.get(c.to_string()) {
         Some(v) => {
           let readings = v

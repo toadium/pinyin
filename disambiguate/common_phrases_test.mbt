@@ -66,4 +66,20 @@ test "disambiguate: 常用多音词" {
   assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("薄荷"), [
     "bò", "he",
   ])
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("还钱"), [
+    "huán", "qián",
+  ])
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("还书"), [
+    "huán", "shū",
+  ])
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("还债"), [
+    "huán", "zhài",
+  ])
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("还是"), [
+    "hái", "shì",
+  ])
+  assert_eq(
+    @disambiguate.PinyinDisambiguator::disambiguate("我明天还钱"),
+    ["wǒ", "míng", "tiān", "huán", "qián"],
+  )
 }

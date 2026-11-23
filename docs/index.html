@@ -7,7 +7,7 @@
   <meta name="description" content="MoonBit 拼音引擎：汉字→拼音、拼音输入法候选、多音字消歧、双拼、分词与规范化。页面内所有计算由编译到 JavaScript 的同一份 MoonBit 实现完成，无后端、无网络请求。" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="pinyin — MoonBit 拼音引擎" />
-  <meta property="og:description" content="汉字 ↔ 拼音全栈引擎：转换、反向查找、多音字消歧、分词、模糊匹配、N-gram 语言模型、输入法与双拼。四后端一致，326×4 测试全绿。" />
+  <meta property="og:description" content="汉字 ↔ 拼音全栈引擎：转换、反向查找、多音字消歧、分词、模糊匹配、N-gram 语言模型、输入法与双拼。四后端一致，327×4 测试全绿。" />
   <meta property="og:url" content="https://toadium.github.io/pinyin/" />
   <meta name="twitter:card" content="summary" />
   <meta name="theme-color" content="#2563eb" />
@@ -63,8 +63,8 @@
           <a class="btn ghost" href="#start">快速开始</a>
         </div>
         <ul class="badges" aria-label="项目指标">
-          <li>326 × 4 测试</li>
-          <li>覆盖率 94.2%</li>
+          <li>327 × 4 测试</li>
+          <li>覆盖率 94.3%</li>
           <li>变异 14 / 14</li>
           <li>MIT</li>
         </ul>
@@ -112,7 +112,7 @@
         <article class="feature">
           <span class="feature-no">03</span>
           <h3>多音字消歧</h3>
-          <p>Viterbi + 带调 bigram 上下文决策，常用多音词准确率 96.1%（基线 68.0%）。</p>
+          <p>Viterbi + 带调 bigram 上下文决策，词表最大匹配，常用多音词准确率 99.0%（基线 68.0%）。</p>
           <code>disambiguate</code>
         </article>
         <article class="feature">
@@ -382,8 +382,8 @@ let candidates = engine.input("nihao")
 
       <div class="stat-grid">
         <div class="stat"><strong>326</strong><span>每后端测试</span></div>
-        <div class="stat"><strong>1304</strong><span>四后端合计</span></div>
-        <div class="stat"><strong>94.2%</strong><span>核心覆盖率</span></div>
+        <div class="stat"><strong>1308</strong><span>四后端合计</span></div>
+        <div class="stat"><strong>94.3%</strong><span>核心覆盖率</span></div>
         <div class="stat"><strong>14 / 14</strong><span>变异点 KILLED</span></div>
         <div class="stat"><strong>0</strong><span>编译警告</span></div>
         <div class="stat"><strong>4</strong><span>后端一致</span></div>
@@ -391,11 +391,11 @@ let candidates = engine.input("nihao")
 
       <div class="quality-notes">
         <p>
-          <strong>多音字准确率</strong>：66 条 gold 语料上词级优先 + 带调 bigram 达 96.1%，
+          <strong>多音字准确率</strong>：66 条 gold 语料上词级优先 + 句内最大匹配 + 带调 bigram 达 99.0%，
           首读音基线为 68.0%。
         </p>
         <p>
-          <strong>覆盖口径</strong>：核心包 94.2%（1281 / 1360 行），门禁要求总覆盖率 ≥ 92%、单包 ≥ 85%。
+          <strong>覆盖口径</strong>：核心包 94.3%（1308 / 1387 行），门禁要求总覆盖率 ≥ 92%、单包 ≥ 85%。
         </p>
         <p>
           <strong>已知边界</strong>：不提供中文分词、语音合成/识别与方言拼音；N-gram 模型基于内置字典，
@@ -426,7 +426,7 @@ let candidates = engine.input("nihao")
         </a>
         <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/docs/testing.md">
           <h3>测试策略</h3>
-          <p>326 个测试的分包清单与门禁口径。</p>
+          <p>327 个测试的分包清单与门禁口径。</p>
         </a>
         <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/hackathon2026_pinyin_proposal.md">
           <h3>项目申报书</h3>
@@ -448,7 +448,7 @@ let candidates = engine.input("nihao")
         <li><span class="step-no">1</span><p><code>playground/</code> 是 MoonBit 包，用 <code>#export_name</code> 导出转换、消歧、输入法、双拼、分词、规范化、版本共 7 个非 raise 函数。</p></li>
         <li><span class="step-no">2</span><p><code>moon build --target js --release playground</code> 产出 <code>playground.js</code>，字典与算法一并打包。</p></li>
         <li><span class="step-no">3</span><p>页面通过 ES module 直接 <code>import</code> 该产物，所有计算留在浏览器，不调用后端服务。</p></li>
-        <li><span class="step-no">4</span><p>行为由 326×4 测试、94.2% 覆盖率、14 个变异点、文档与页面自检持续守护。</p></li>
+        <li><span class="step-no">4</span><p>行为由 327×4 测试、94.3% 覆盖率、14 个变异点、文档与页面自检持续守护。</p></li>
       </ol>
     </section>
   </main>

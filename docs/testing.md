@@ -2,7 +2,7 @@
 
 ## 测试组织
 
-当前 native / wasm / wasm-gc / js 四个后端各 **326** 个测试，合计 **1304** 个测试全通过。
+当前 native / wasm / wasm-gc / js 四个后端各 **327** 个测试，合计 **1308** 个测试全通过。
 
 | 包 | 文件 | 类型 | 测试数 | 内容 |
 |------|------|------|--------|------|
@@ -23,9 +23,9 @@
 | `fuzzy` | `fuzzy_test.mbt` | 黑盒 | 20 | 模糊匹配（扩展/等价/反向查找，9 组规则） |
 | `fuzzy` | `fuzzy_coverage_wbtest.mbt` | 白盒 | 5 | 空串错误路径、非法音节、自定义规则回滚 |
 | `disambiguate` | `disambiguate_test.mbt` | 黑盒 | 7 | 多音字消歧（Viterbi+bigram） |
-| `disambiguate` | `disambiguate_coverage_wbtest.mbt` | 白盒 | 5 | 空串、单字、多音单字、中英混合 |
-| `disambiguate` | `common_phrases_test.mbt` | 黑盒 | 1 | 22 个常用多音词 |
-| `disambiguate` | `accuracy_test.mbt` | 黑盒 | 1 | 66 条 gold 语料准确率（96.1% vs 68.0%） |
+| `disambiguate` | `disambiguate_coverage_wbtest.mbt` | 白盒 | 6 | 空串、单字、多音单字、中英混合、句内词表最大匹配 |
+| `disambiguate` | `common_phrases_test.mbt` | 黑盒 | 1 | 常用多音词（含「还」动词搭配与句内匹配） |
+| `disambiguate` | `accuracy_test.mbt` | 黑盒 | 1 | 66 条 gold 语料准确率（99.0% vs 68.0%） |
 | `search` | `search_test.mbt` | 黑盒 | 9 | 搜索索引（首字母/连续/模糊） |
 | `search` | `search_coverage_wbtest.mbt` | 白盒 | 8 | 空索引、非汉字、重复文档、无匹配 |
 | `tone` | `tone_test.mbt` | 黑盒 | 14 | 声调变调（三声/一/不/七/八变调） |
@@ -38,18 +38,18 @@
 | `input` | `input_test.mbt` | 黑盒 | 30 | 输入法（Beam、词组、简拼、双拼、学习、常用字） |
 | `shuangpin` | `shuangpin_test.mbt` | 黑盒 | 10 | 小鹤/自然码双向转换、逆向分支、ü 归一化 |
 | `examples` | `*.mbt` | 黑盒 | 37 | 12 个子包示例 |
-| **总计** | | | **326 / 后端** | **1304（四后端）** |
+| **总计** | | | **327 / 后端** | **1308（四后端）** |
 
 ## 四后端验证
 
 ```bash
-moon test --target wasm      --warn-list +73 --deny-warn   # 326/326 ✓
-moon test --target wasm-gc   --warn-list +73 --deny-warn   # 326/326 ✓
-moon test --target js        --warn-list +73 --deny-warn   # 326/326 ✓
-moon test --target native    --warn-list +73 --deny-warn   # 326/326 ✓
+moon test --target wasm      --warn-list +73 --deny-warn   # 327/327 ✓
+moon test --target wasm-gc   --warn-list +73 --deny-warn   # 327/327 ✓
+moon test --target js        --warn-list +73 --deny-warn   # 327/327 ✓
+moon test --target native    --warn-list +73 --deny-warn   # 327/327 ✓
 ```
 
-四后端共 1304 测试全通过，严格模式零警告零错误。
+四后端共 1308 测试全通过，严格模式零警告零错误。
 
 ## 覆盖率门禁
 
@@ -60,9 +60,9 @@ node scripts/check_coverage.mjs --min 92   # 指定总门槛
 
 - 统计范围：12 个核心包，排除 `data/`（纯数据）与 `examples/`（示例）。
 - 门槛：总体 ≥ 92%，每个核心包 ≥ 85%。
-- 当前实测：**1281/1360 = 94.2%**（core 96.6%、convert 90.3%、reverse 95.1%、
-  fuzzy 96.4%、disambiguate 96.0%、search 95.2%、normalize 95.7%、
-  lm 93.3%、input 92.3%）。
+- 当前实测：**1308/1387 = 94.3%**（core 96.6%、convert 90.3%、reverse 95.1%、
+  fuzzy 96.4%、disambiguate 97.6%、search 95.2%、normalize 95.7%、
+  lm 93.3%、input 92.3%、shuangpin 96.9%）。
 
 ## 变异测试门禁
 
@@ -145,5 +145,5 @@ node scripts/check_pages.mjs
 - 构建 `playground` 的 js 产物并复制到 `docs/playground.js`。
 - 检查 56 项：静态资源、`index.html`/`app.js` 引用、7 个导出函数、转换/数字调/空串、消歧（银行/重庆）、输入法（nihao/zg/shurufa/空串）、双拼（小鹤/自然码/奇数输入）、分词、规范化（ZHONG1/nv）。
 - 展示页结构（Chart.js / Leaflet 式库首页）：分区锚点、Hero 实时演示钩子（消歧 + 数字调 + 首字母 + 耗时）、6 个演示动作与预置按钮、复制按钮目标、主题切换与持久化、无外链 CDN、文档入口、导航高亮。
-- 页面数字口径直接比对 `docs/testing.md`（每后端 326 / 四后端 1304 / 覆盖率 94.2%），版本徽章比对 `moon.mod`。
+- 页面数字口径直接比对 `docs/testing.md`（每后端 327 / 四后端 1308 / 覆盖率 94.3%），版本徽章比对 `moon.mod`。
 - 当前结果：**PASS**（`docs/playground.js` 约 2.9 MB，gzip 后约 500 KB）。
