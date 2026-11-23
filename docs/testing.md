@@ -143,5 +143,7 @@ node scripts/check_pages.mjs
 ```
 
 - 构建 `playground` 的 js 产物并复制到 `docs/playground.js`。
-- 检查 32 项：静态资源、`index.html`/`app.js` 引用、7 个导出函数、转换/数字调/空串、消歧（银行/重庆）、输入法（nihao/zg/shurufa/空串）、双拼（小鹤/自然码/奇数输入）、分词、规范化（ZHONG1/nv）。
+- 检查 56 项：静态资源、`index.html`/`app.js` 引用、7 个导出函数、转换/数字调/空串、消歧（银行/重庆）、输入法（nihao/zg/shurufa/空串）、双拼（小鹤/自然码/奇数输入）、分词、规范化（ZHONG1/nv）。
+- 展示页结构（Chart.js / Leaflet 式库首页）：分区锚点、Hero 实时演示钩子（消歧 + 数字调 + 首字母 + 耗时）、6 个演示动作与预置按钮、复制按钮目标、主题切换与持久化、无外链 CDN、文档入口、导航高亮。
+- 页面数字口径直接比对 `docs/testing.md`（每后端 326 / 四后端 1304 / 覆盖率 94.2%），版本徽章比对 `moon.mod`。
 - 当前结果：**PASS**（`docs/playground.js` 约 2.9 MB，gzip 后约 500 KB）。

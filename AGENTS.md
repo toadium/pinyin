@@ -127,7 +127,7 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
     ├── check_coverage.mjs      #   覆盖率门禁（总 ≥92%，每包 ≥85%）
     ├── mutation_test.mjs       #   变异测试门禁（14 个变异点）
     ├── check_docs.mjs          #   文档一致性门禁
-    └── check_pages.mjs         #   展示页自检（构建 playground.js + 32 项）
+    └── check_pages.mjs         #   展示页自检（构建 playground.js + 56 项）
 ```
 
 ### 依赖拓扑
@@ -166,7 +166,7 @@ moon test   --target all --warn-list +73 --deny-warn
 node scripts/check_docs.mjs
 node scripts/check_coverage.mjs      # 核心 ≥92%，每包 ≥85%
 node scripts/mutation_test.mjs       # 14/14 KILLED
-node scripts/check_pages.mjs         # 展示页 32 项
+node scripts/check_pages.mjs         # 展示页 56 项
 ```
 
 - 覆盖率补测文件统一命名 `*_coverage_wbtest.mbt`。

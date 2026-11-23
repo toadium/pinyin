@@ -11,7 +11,9 @@ const jsBuild = join(root, "_build/js/release/build/playground/playground.js");
 const jsDocs = join(root, "docs/playground.js");
 
 let failures = 0;
+let checks = 0;
 function check(name, ok, detail) {
+  checks += 1;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? `  (${detail})` : ""}`);
   if (!ok) failures += 1;
 }
@@ -21,9 +23,74 @@ for (const file of ["docs/index.html", "docs/app.js", "docs/style.css"]) {
 }
 
 const html = readFileSync(join(root, "docs/index.html"), "utf8");
+const appJs = readFileSync(join(root, "docs/app.js"), "utf8");
 check("index.html mentions pinyin + 输入法", html.includes("pinyin") && html.includes("输入法"));
 check("index.html loads app.js / style.css", html.includes("app.js") && html.includes("style.css"));
-check("index.html loads playground.js via app.js", readFileSync(join(root, "docs/app.js"), "utf8").includes("./playground.js"));
+check("index.html loads playground.js via app.js", appJs.includes("./playground.js"));
+
+// --- 展示页结构（Chart.js / Leaflet 式库首页） ---
+const sections = ["features", "demo", "start", "api", "quality", "docs"];
+check(
+  "index.html 分区锚点齐全",
+  sections.every((id) => html.includes(`id="${id}"`) && html.includes(`href="#${id}"`)),
+  sections.join(", "),
+);
+for (const id of ["hero-text", "hero-mark", "hero-number", "hero-initial", "hero-time"]) {
+  check(`hero 实时演示钩子: ${id}`, html.includes(`id="${id}"`));
+}
+check(
+  "app.js Hero 用消歧结果实时渲染",
+  appJs.includes("pinyin_disambiguate") &&
+    appJs.includes("#hero-mark") &&
+    appJs.includes("toToneNumber") &&
+    appJs.includes("#hero-time"),
+);
+for (const action of ["convert", "input", "shuangpin", "disambiguate", "segment", "normalize"]) {
+  check(`演示动作钩子: data-run=${action}`, html.includes(`data-run="${action}"`));
+}
+check(
+  "演示预置按钮保留",
+  ["zhongguo", "zg", "shurufa"].every((p) => html.includes(`data-preset="${p}"`)) &&
+    ["xiaohe", "ziranma"].every((p) => html.includes(`data-preset-sp="${p}"`)),
+);
+
+const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map((m) => m[1]));
+const copyTargets = [...html.matchAll(/data-copy-target="([^"]+)"/g)].map((m) => m[1]);
+check(
+  "复制按钮指向存在的元素",
+  copyTargets.length >= 5 && copyTargets.every((target) => htmlIds.has(target)),
+  copyTargets.join(", "),
+);
+check(
+  "主题切换 + 本地持久化",
+  html.includes('id="theme-toggle"') && appJs.includes("pinyin-theme") && appJs.includes("localStorage"),
+);
+check(
+  "无外链 CDN 静态资源",
+  !/https?:\/\/[^"']+\.(css|js)(\?|")/.test(html),
+  "页面应只引用本地 style.css / app.js",
+);
+check(
+  "文档入口链接齐全",
+  ["docs/api.md", "docs/architecture.md", "docs/roadmap.md", "docs/testing.md"].every((file) =>
+    html.includes(file),
+  ),
+);
+check(
+  "导航高亮脚本存在",
+  appJs.includes("IntersectionObserver") && appJs.includes('classList.toggle("active"'),
+);
+
+const modVersion = readFileSync(join(root, "moon.mod"), "utf8").match(/version\s*=\s*"([^"]+)"/)?.[1] ?? "";
+check("页面版本徽章 = moon.mod", html.includes(`id="version">${modVersion}`), `moon.mod=${modVersion}`);
+
+const testing = readFileSync(join(root, "docs/testing.md"), "utf8");
+const perBackend = testing.match(/\*\*(\d+) \/ 后端\*\*/)?.[1] ?? "";
+const totalTests = testing.match(/\*\*(\d+)（四后端）\*\*/)?.[1] ?? "";
+const coverage = testing.match(/\*\*\d+\/\d+ = ([\d.]+%)\*\*/)?.[1] ?? "";
+check("页面每后端测试数 = docs/testing", perBackend.length > 0 && html.includes(`${perBackend} × 4`));
+check("页面四后端合计 = docs/testing", totalTests.length > 0 && html.includes(totalTests));
+check("页面覆盖率 = docs/testing", coverage.length > 0 && html.includes(coverage));
 
 const build = spawnSync("moon", ["build", "--target", "js", "--release", "playground"], {
   cwd: root,
@@ -76,5 +143,5 @@ check("segment invalid folds to empty", mod.pinyin_segment("") === "");
 check("normalize ZHONG1 = zhōng", mod.pinyin_normalize("ZHONG1") === "zhōng");
 check("normalize nv = nü", mod.pinyin_normalize("nv") === "nü");
 
-console.log(`\n=== pages check: ${failures === 0 ? "PASS" : `FAIL (${failures})`} ===`);
+console.log(`\n=== pages check: ${failures === 0 ? "PASS" : `FAIL (${failures})`} · ${checks} checks ===`);
 if (failures > 0) process.exit(1);

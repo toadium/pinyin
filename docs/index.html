@@ -1,117 +1,468 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pinyin · MoonBit 拼音引擎（浏览器内演示）</title>
-  <meta name="description" content="MoonBit 拼音引擎：汉字→拼音、拼音输入法候选、双拼、多音字消歧、分词与规范化。页面内所有计算由编译到 JavaScript 的同一份 MoonBit 实现完成。" />
+  <title>pinyin — MoonBit 拼音引擎 · 转换 / 输入法 / 消歧 / 双拼</title>
+  <meta name="description" content="MoonBit 拼音引擎：汉字→拼音、拼音输入法候选、多音字消歧、双拼、分词与规范化。页面内所有计算由编译到 JavaScript 的同一份 MoonBit 实现完成，无后端、无网络请求。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="pinyin — MoonBit 拼音引擎" />
+  <meta property="og:description" content="汉字 ↔ 拼音全栈引擎：转换、反向查找、多音字消歧、分词、模糊匹配、N-gram 语言模型、输入法与双拼。四后端一致，326×4 测试全绿。" />
+  <meta property="og:url" content="https://toadium.github.io/pinyin/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='43' font-size='36' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E拼%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("pinyin-theme"); } catch (e) { saved = null; }
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = saved || (prefersDark ? "dark" : "light");
+    })();
+  </script>
 </head>
 <body>
-  <header class="hero">
-    <p class="eyebrow">MoonBit · 拼音引擎 · 输入法 / 消歧 / 双拼</p>
-    <h1>pinyin</h1>
-    <p class="tagline">汉字 → 拼音，拼音 → 输入法候选</p>
-    <p class="sub">
-      不是字典查表封装：输入法解码、多音字上下文消歧、连续拼音 Trie+DP 分词、
-      变调与规范化都在浏览器本地完成。
-    </p>
-    <div class="badges">
-      <span id="version">0.8.0</span>
-      <span>326 / 326 测试 × 4 后端</span>
-      <span>覆盖率 94.2%</span>
-      <span>变异 14 / 14 KILLED</span>
-      <span>0 运行时依赖</span>
-    </div>
-    <div class="links">
-      <a href="https://github.com/toadium/pinyin">GitHub</a>
-      <a href="https://mooncakes.io/docs/walkzzz/pinyin">mooncakes</a>
-      <a href="https://github.com/toadium/pinyin/blob/main/docs/proposal_appendix.md">技术附件</a>
-      <a href="https://github.com/toadium/pinyin/blob/main/docs/testing.md">测试报告</a>
+  <a class="skip-link" href="#main">跳到主内容</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">拼</span>
+        <span class="brand-name">pinyin</span>
+        <span class="brand-ver" id="version">0.8.0</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#features">特性</a>
+        <a href="#demo">在线演示</a>
+        <a href="#start">快速开始</a>
+        <a href="#api">API</a>
+        <a href="#quality">工程质量</a>
+        <a href="#docs">文档</a>
+      </nav>
+      <div class="topbar-actions">
+        <button id="theme-toggle" class="icon-btn" type="button" title="切换深浅主题" aria-label="切换深浅主题">◐</button>
+        <a class="gh-btn" href="https://github.com/toadium/pinyin" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>汉字 → 拼音 <span class="tag">pinyin_convert</span></h2>
-      <div class="row">
-        <label class="grow">文本 <input id="convert-text" value="我是中国人" /></label>
-        <label>分隔符 <input id="convert-sep" value=" " size="3" /></label>
-        <label>格式
-          <select id="convert-format">
-            <option value="mark">带调</option>
-            <option value="number">数字调</option>
-            <option value="plain">无调</option>
-            <option value="initial">首字母</option>
-          </select>
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-text">
+        <p class="eyebrow">MoonBit · Pinyin Engine</p>
+        <h1>汉字 ↔ 拼音<br /><span class="grad">全栈引擎</span></h1>
+        <p class="tagline">从转换、分词到输入法候选，一整套拼音能力，零运行时依赖。</p>
+        <p class="sub">
+          13 个包覆盖转换、反向查找、多音字消歧、分词、模糊匹配、搜索索引、变调、
+          规范化、N-gram 语言模型、输入法、双拼与流式处理。右侧演示全部由编译到
+          JavaScript 的同一份 MoonBit 实现完成，在浏览器本地实时计算。
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#demo">立即试用</a>
+          <a class="btn ghost" href="#start">快速开始</a>
+        </div>
+        <ul class="badges" aria-label="项目指标">
+          <li>326 × 4 测试</li>
+          <li>覆盖率 94.2%</li>
+          <li>变异 14 / 14</li>
+          <li>MIT</li>
+        </ul>
+      </div>
+
+      <div class="hero-card" aria-label="实时转换演示">
+        <div class="hero-card-head">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="hero-card-title">playground.js · 浏览器内计算</span>
+        </div>
+        <label class="hero-input">
+          <span>输入汉字</span>
+          <input id="hero-text" value="我是中国人" autocomplete="off" spellcheck="false" />
         </label>
-        <button data-run="convert">转换</button>
+        <div class="hero-result">
+          <p class="hero-line"><span class="k">带调</span><output id="hero-mark">wǒ shì zhōng guó rén</output></p>
+          <p class="hero-line"><span class="k">数字调</span><output id="hero-number">wo3 shi4 zhong1 guo2 ren2</output></p>
+          <p class="hero-line"><span class="k">首字母</span><output id="hero-initial">w s z g r</output></p>
+        </div>
+        <p class="hero-meta"><span id="hero-time">0.00 ms</span> · 计算全在本地 · 无后端</p>
       </div>
-      <output id="convert-out">等待转换…</output>
-      <p class="hint">多音字默认展开全部读音；需要上下文读音时用下方「消歧」。</p>
     </section>
 
-    <section class="card">
-      <h2>拼音 → 输入法候选 <span class="tag">pinyin_input</span></h2>
-      <div class="row">
-        <label class="grow">拼音（全拼 / 简拼） <input id="input-py" value="nihao" /></label>
-        <button data-run="input">生成候选</button>
-        <button data-preset="zhongguo">预置：zhongguo</button>
-        <button data-preset="zg">预置：zg</button>
-        <button data-preset="shurufa">预置：shurufa</button>
+    <section class="section" id="features">
+      <div class="section-head">
+        <p class="kicker">Capabilities</p>
+        <h2>一个模块，十三条能力线</h2>
+        <p class="lede">包间线性依赖、职责单一，core 与 data 零依赖，四个后端（wasm / wasm-gc / js / native）行为一致。</p>
       </div>
-      <div id="input-out" class="chips">等待输入…</div>
+      <div class="feature-grid">
+        <article class="feature">
+          <span class="feature-no">01</span>
+          <h3>汉字 → 拼音</h3>
+          <p>词句级转换，支持带调、数字调、无调、首字母四种格式与自定义分隔符。</p>
+          <code>convert</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">02</span>
+          <h3>拼音 → 汉字</h3>
+          <p>反向查找内置 20903 条单字与 843 条词组，三种声调格式互查。</p>
+          <code>reverse</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">03</span>
+          <h3>多音字消歧</h3>
+          <p>Viterbi + 带调 bigram 上下文决策，常用多音词准确率 96.1%（基线 68.0%）。</p>
+          <code>disambiguate</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">04</span>
+          <h3>拼音分词</h3>
+          <p>Trie + 动态规划枚举全切分并取最优路径，处理 <code>xian</code> 这类歧义串。</p>
+          <code>segment</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">05</span>
+          <h3>模糊匹配</h3>
+          <p>zh↔z、ch↔c、sh↔s、n↔l、in↔ing 等 9 组规则，BFS 扩展候选。</p>
+          <code>fuzzy</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">06</span>
+          <h3>搜索索引</h3>
+          <p>倒排索引支持首字母、连续拼音与模糊拼音检索，面向中文文本搜索。</p>
+          <code>search</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">07</span>
+          <h3>声调变调</h3>
+          <p>三声、一、不、七、八五类变调规则，含同音字守卫避免误伤原调。</p>
+          <code>tone</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">08</span>
+          <h3>规范化与编辑距离</h3>
+          <p>统一大小写、ü/v 与声调格式；音节级 Levenshtein 与模糊距离。</p>
+          <code>normalize</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">09</span>
+          <h3>N-gram 语言模型</h3>
+          <p>Unigram / Bigram / Trigram 频率表，Laplace、Katz 回退与插值平滑、困惑度。</p>
+          <code>lm</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">10</span>
+          <h3>输入法引擎</h3>
+          <p>Beam Search + LM 评分，全切分候选、词组优先、用户词库与选择学习。</p>
+          <code>input</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">11</span>
+          <h3>双拼输入</h3>
+          <p>小鹤 / 自然码双拼 ↔ 全拼双向转换，已接入输入法候选流程。</p>
+          <code>shuangpin</code>
+        </article>
+        <article class="feature">
+          <span class="feature-no">12</span>
+          <h3>流式处理</h3>
+          <p>逐字符 feed / flush / reset，适合输入框实时标注与增量输出。</p>
+          <code>convert</code>
+        </article>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>双拼输入 <span class="tag">pinyin_shuangpin</span></h2>
-      <div class="row">
-        <label>方案
-          <select id="sp-scheme">
-            <option value="xiaohe">小鹤双拼</option>
-            <option value="ziranma">自然码双拼</option>
-          </select>
-        </label>
-        <label class="grow">双拼串 <input id="sp-input" value="nihc" /></label>
-        <button data-run="shuangpin">转全拼</button>
-        <button data-preset-sp="xiaohe">预置：nihc（小鹤）</button>
-        <button data-preset-sp="ziranma">预置：nihk（自然码）</button>
+    <section class="section" id="demo">
+      <div class="section-head">
+        <p class="kicker">Live demo</p>
+        <h2>在浏览器里直接跑</h2>
+        <p class="lede">下面的输入全部在本地计算，不调用后端，也不请求第三方接口；改任意输入即可验证真实行为。</p>
       </div>
-      <output id="sp-out">等待转换…</output>
+
+      <div class="demo-grid">
+        <article class="card" id="demo-convert">
+          <header class="card-head">
+            <h3>汉字 → 拼音</h3>
+            <code>convert</code>
+          </header>
+          <div class="row">
+            <label class="grow">文本 <input id="convert-text" value="拼音引擎" /></label>
+            <label>分隔符 <input id="convert-sep" value=" " size="3" /></label>
+            <label>格式
+              <select id="convert-format">
+                <option value="mark">带调</option>
+                <option value="number">数字调</option>
+                <option value="plain">无调</option>
+                <option value="initial">首字母</option>
+              </select>
+            </label>
+            <button type="button" data-run="convert">转换</button>
+          </div>
+          <output id="convert-out">等待转换…</output>
+          <p class="hint">多音字默认展开全部读音；需要上下文读音时用下方「消歧」。</p>
+        </article>
+
+        <article class="card" id="demo-input">
+          <header class="card-head">
+            <h3>拼音 → 输入法候选</h3>
+            <code>input</code>
+          </header>
+          <div class="row">
+            <label class="grow">拼音（全拼 / 简拼） <input id="input-py" value="nihao" /></label>
+            <button type="button" data-run="input">生成候选</button>
+          </div>
+          <div class="row presets">
+            <button type="button" class="chip-btn" data-preset="zhongguo">zhongguo</button>
+            <button type="button" class="chip-btn" data-preset="zg">zg</button>
+            <button type="button" class="chip-btn" data-preset="shurufa">shurufa</button>
+            <button type="button" class="chip-btn" data-preset="nihao">nihao</button>
+          </div>
+          <div id="input-out" class="chips">等待输入…</div>
+        </article>
+
+        <article class="card" id="demo-shuangpin">
+          <header class="card-head">
+            <h3>双拼输入</h3>
+            <code>shuangpin</code>
+          </header>
+          <div class="row">
+            <label>方案
+              <select id="sp-scheme">
+                <option value="xiaohe">小鹤双拼</option>
+                <option value="ziranma">自然码双拼</option>
+              </select>
+            </label>
+            <label class="grow">双拼串 <input id="sp-input" value="nihc" /></label>
+            <button type="button" data-run="shuangpin">转全拼</button>
+          </div>
+          <div class="row presets">
+            <button type="button" class="chip-btn" data-preset-sp="xiaohe">预置 nihc（小鹤）</button>
+            <button type="button" class="chip-btn" data-preset-sp="ziranma">预置 nihk（自然码）</button>
+          </div>
+          <output id="sp-out">等待转换…</output>
+        </article>
+
+        <article class="card" id="demo-analyze">
+          <header class="card-head">
+            <h3>消歧 / 分词 / 规范化</h3>
+            <code>disambiguate · segment · normalize</code>
+          </header>
+          <div class="row">
+            <label class="grow">汉字（消歧） <input id="dis-text" value="银行行长" /></label>
+            <button type="button" data-run="disambiguate">消歧</button>
+          </div>
+          <output id="dis-out">等待消歧…</output>
+          <div class="row">
+            <label class="grow">连续拼音（分词） <input id="seg-py" value="xian" /></label>
+            <button type="button" data-run="segment">分词</button>
+          </div>
+          <output id="seg-out">等待分词…</output>
+          <div class="row">
+            <label class="grow">拼音（规范化） <input id="norm-py" value="ZHONG1" /></label>
+            <button type="button" data-run="normalize">规范化</button>
+          </div>
+          <output id="norm-out">等待规范化…</output>
+        </article>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>消歧 / 分词 / 规范化 <span class="tag">pinyin_disambiguate · pinyin_segment · pinyin_normalize</span></h2>
-      <div class="row">
-        <label class="grow">汉字（消歧） <input id="dis-text" value="银行行长" /></label>
-        <button data-run="disambiguate">消歧</button>
+    <section class="section" id="start">
+      <div class="section-head">
+        <p class="kicker">Get started</p>
+        <h2>三分钟接入</h2>
+        <p class="lede">标准 MoonBit 模块，无运行时依赖；浏览器端把 playground 包编译成一份 JS 即可复用同一实现。</p>
       </div>
-      <output id="dis-out">等待消歧…</output>
-      <div class="row">
-        <label class="grow">连续拼音（分词） <input id="seg-py" value="xian" /></label>
-        <button data-run="segment">分词</button>
+
+      <div class="start-grid">
+        <div class="start-col">
+          <div class="code" id="code-install">
+            <div class="code-head">
+              <span>安装</span>
+              <button type="button" class="copy" data-copy-target="cmd-install">复制</button>
+            </div>
+            <pre id="cmd-install"><code>moon add walkzzz/pinyin@0.8.0</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head">
+              <span>本地端到端演示</span>
+              <button type="button" class="copy" data-copy-target="cmd-demo">复制</button>
+            </div>
+            <pre id="cmd-demo"><code>moon run demo --target native</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head">
+              <span>工程门禁</span>
+              <button type="button" class="copy" data-copy-target="cmd-gates">复制</button>
+            </div>
+            <pre id="cmd-gates"><code>moon check --target all --warn-list +73 --deny-warn
+moon test  --target all --warn-list +73 --deny-warn
+node scripts/check_coverage.mjs
+node scripts/mutation_test.mjs
+node scripts/check_pages.mjs</code></pre>
+          </div>
+        </div>
+
+        <div class="start-col">
+          <div class="code">
+            <div class="code-head">
+              <span>汉字 → 拼音</span>
+              <button type="button" class="copy" data-copy-target="code-convert">复制</button>
+            </div>
+            <pre id="code-convert"><code>let py = @convert.PinyinHelper::convert_to_pinyin_string(
+  "我是中国人",
+  " ",
+)
+// wǒ shì zhōng guó rén</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head">
+              <span>输入法候选</span>
+              <button type="button" class="copy" data-copy-target="code-input">复制</button>
+            </div>
+            <pre id="code-input"><code>let engine = @input.PinyinInputEngine::new()
+let candidates = engine.input("nihao")
+// candidates[0].text == "你好"</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head">
+              <span>多音字消歧</span>
+              <button type="button" class="copy" data-copy-target="code-disambiguate">复制</button>
+            </div>
+            <pre id="code-disambiguate"><code>let tones = @disambiguate.PinyinDisambiguator::disambiguate(
+  "银行行长",
+)
+// ["yin2", "hang2", "hang2", "zhang3"]</code></pre>
+          </div>
+        </div>
       </div>
-      <output id="seg-out">等待分词…</output>
-      <div class="row">
-        <label class="grow">拼音（规范化） <input id="norm-py" value="ZHONG1" /></label>
-        <button data-run="normalize">规范化</button>
+
+      <div class="callout">
+        <strong>浏览器端复用：</strong>
+        <code>playground</code> 是 <code>pkgtype(kind: "foreign_library")</code> 的 MoonBit 包，
+        用 <code>#export_name</code> 导出 7 个函数，<code>moon build --target js --release playground</code>
+        生成 <code>playground.js</code>；页面直接 <code>import</code> 调用，无需 HTTP 服务。
       </div>
-      <output id="norm-out">等待规范化…</output>
     </section>
 
-    <section class="card how">
-      <h2>这是怎么在浏览器里跑的？</h2>
-      <ol>
-        <li><code>playground/</code> 是 <code>pkgtype(kind: "foreign_library")</code> 的 MoonBit 包，用 <code>#export_name</code> 导出 7 个非 raise 函数。</li>
-        <li><code>moon build --target js --release playground</code> 生成 <code>playground.js</code>；页面直接 <code>import</code> 调用。</li>
-        <li>字典、输入法、消歧、双拼全部打包进同一份产物，页面无网络请求、无后端。</li>
-        <li>行为由 326×4 测试、覆盖率 94.2%、14 个变异点与 CI 门禁守护。</li>
+    <section class="section" id="api">
+      <div class="section-head">
+        <p class="kicker">API map</p>
+        <h2>能力与入口</h2>
+        <p class="lede">子包通过 <code>@包名.</code> 限定访问；完整签名见 <a href="https://github.com/toadium/pinyin/blob/main/docs/api.md">API 文档</a>。</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>能力</th><th>包</th><th>主要入口</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>汉字 → 拼音</td><td><code>convert</code></td><td><code>PinyinHelper::convert_to_pinyin_string</code></td></tr>
+            <tr><td>拼音 → 汉字</td><td><code>reverse</code></td><td><code>ReversePinyinHelper::reverse_lookup</code></td></tr>
+            <tr><td>多音字消歧</td><td><code>disambiguate</code></td><td><code>PinyinDisambiguator::disambiguate</code></td></tr>
+            <tr><td>拼音分词</td><td><code>segment</code></td><td><code>PinyinSegmenter::segment_best</code></td></tr>
+            <tr><td>模糊匹配</td><td><code>fuzzy</code></td><td><code>FuzzyPinyinHelper::fuzzy_match</code></td></tr>
+            <tr><td>搜索索引</td><td><code>search</code></td><td><code>PinyinSearchIndex::search_pinyin</code></td></tr>
+            <tr><td>声调变调</td><td><code>tone</code></td><td><code>ToneSandhiHelper::apply_tone_sandhi</code></td></tr>
+            <tr><td>规范化 / 编辑距离</td><td><code>normalize</code></td><td><code>PinyinNormalizer::normalize</code> · <code>PinyinEditDistance::distance</code></td></tr>
+            <tr><td>N-gram 语言模型</td><td><code>lm</code></td><td><code>PinyinLM::bigram_prob</code> · <code>interpolation_prob</code></td></tr>
+            <tr><td>输入法引擎</td><td><code>input</code></td><td><code>PinyinInputEngine::input</code> · <code>input_fuzzy</code></td></tr>
+            <tr><td>双拼转换</td><td><code>shuangpin</code></td><td><code>ShuangpinScheme::from_full</code> · <code>to_full</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="quality">
+      <div class="section-head">
+        <p class="kicker">Quality gates</p>
+        <h2>指标由门禁守护，不靠口号</h2>
+        <p class="lede">严格告警模式下四后端零警告；覆盖率、变异与页面自检均有脚本与 CI 作业兜底。</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat"><strong>326</strong><span>每后端测试</span></div>
+        <div class="stat"><strong>1304</strong><span>四后端合计</span></div>
+        <div class="stat"><strong>94.2%</strong><span>核心覆盖率</span></div>
+        <div class="stat"><strong>14 / 14</strong><span>变异点 KILLED</span></div>
+        <div class="stat"><strong>0</strong><span>编译警告</span></div>
+        <div class="stat"><strong>4</strong><span>后端一致</span></div>
+      </div>
+
+      <div class="quality-notes">
+        <p>
+          <strong>多音字准确率</strong>：66 条 gold 语料上词级优先 + 带调 bigram 达 96.1%，
+          首读音基线为 68.0%。
+        </p>
+        <p>
+          <strong>覆盖口径</strong>：核心包 94.2%（1281 / 1360 行），门禁要求总覆盖率 ≥ 92%、单包 ≥ 85%。
+        </p>
+        <p>
+          <strong>已知边界</strong>：不提供中文分词、语音合成/识别与方言拼音；N-gram 模型基于内置字典，
+          不支持外部语料训练。
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="docs">
+      <div class="section-head">
+        <p class="kicker">Documentation</p>
+        <h2>继续深入</h2>
+        <p class="lede">设计取舍、接口签名、迭代计划与测试口径都写在仓库里。</p>
+      </div>
+
+      <div class="doc-grid">
+        <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/docs/api.md">
+          <h3>API 文档</h3>
+          <p>各包公开类型、函数签名与行为说明。</p>
+        </a>
+        <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/docs/architecture.md">
+          <h3>架构设计</h3>
+          <p>包依赖拓扑、算法复杂度与数据流。</p>
+        </a>
+        <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/docs/roadmap.md">
+          <h3>路线图</h3>
+          <p>版本演进、已完成能力与后续计划。</p>
+        </a>
+        <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/docs/testing.md">
+          <h3>测试策略</h3>
+          <p>326 个测试的分包清单与门禁口径。</p>
+        </a>
+        <a class="doc-card" href="https://github.com/toadium/pinyin/blob/main/hackathon2026_pinyin_proposal.md">
+          <h3>项目申报书</h3>
+          <p>2026 MoonBit 黑客松：定位、差异化与里程碑。</p>
+        </a>
+        <a class="doc-card" href="https://mooncakes.io/docs/walkzzz/pinyin">
+          <h3>mooncakes</h3>
+          <p>包页面与发布版本入口。</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section how" id="how">
+      <div class="section-head">
+        <p class="kicker">Under the hood</p>
+        <h2>这个页面是怎么跑的</h2>
+      </div>
+      <ol class="steps">
+        <li><span class="step-no">1</span><p><code>playground/</code> 是 MoonBit 包，用 <code>#export_name</code> 导出转换、消歧、输入法、双拼、分词、规范化、版本共 7 个非 raise 函数。</p></li>
+        <li><span class="step-no">2</span><p><code>moon build --target js --release playground</code> 产出 <code>playground.js</code>，字典与算法一并打包。</p></li>
+        <li><span class="step-no">3</span><p>页面通过 ES module 直接 <code>import</code> 该产物，所有计算留在浏览器，不调用后端服务。</p></li>
+        <li><span class="step-no">4</span><p>行为由 326×4 测试、94.2% 覆盖率、14 个变异点、文档与页面自检持续守护。</p></li>
       </ol>
     </section>
   </main>
 
-  <footer>
-    <p>pinyin · MIT · MoonBit 拼音引擎</p>
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-brand"><span class="brand-mark small">拼</span> pinyin · MIT · MoonBit 拼音引擎</p>
+      <nav class="footer-links" aria-label="页脚导航">
+        <a href="https://github.com/toadium/pinyin" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://mooncakes.io/docs/walkzzz/pinyin" target="_blank" rel="noreferrer">mooncakes</a>
+        <a href="https://github.com/toadium/pinyin/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer">变更日志</a>
+        <a href="https://github.com/toadium/pinyin/blob/main/CONTRIBUTING.md" target="_blank" rel="noreferrer">参与贡献</a>
+      </nav>
+    </div>
   </footer>
 
   <script type="module" src="app.js"></script>

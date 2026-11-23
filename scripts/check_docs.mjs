@@ -103,6 +103,11 @@ check(
   roadmap.includes(`版本 ${version}`),
   `roadmap 未写版本 ${version}`,
 );
+check(
+  "A18 roadmap 测试数与 docs/testing 一致",
+  roadmap.includes(`**${perBackend} / 后端**`) || roadmap.includes(`${perBackend} / 后端`),
+  `roadmap 未写 ${perBackend} / 后端`,
+);
 
 check(
   "A9 申报书测试数与 README 一致",
