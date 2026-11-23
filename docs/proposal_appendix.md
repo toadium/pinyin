@@ -59,7 +59,7 @@ pinyin-toolkit 的真实强项（它做得比我们好，不回避）：
 ### 2.2 输入法
 
 - 简拼：`input_initial("zg")` → 中国，`srf` → 输入法
-- 词表：`data/common_phrases` 147 词 + pypinyin 大词库 47,110 词组，词组候选优先
+- 词表：`data/common_phrases` 151 词 + pypinyin 大词库 47,110 词组，词组候选优先
 - 用户学习：`learn(text)` 后该候选优先重排
 - 候选去重、常用字优先、词表同音覆盖
 

@@ -39,12 +39,16 @@ pinyin-toolkit 强在 UniHan 数据、可审计 token/搜索键、批量转换�
 - 文档：14 份包级 README；页面模块卡/API 表/演示标签直达对应包文档
 - 质量：**328 测试/后端 × 4 = 1312**、覆盖率 **94.2%**（1335/1417）、变异 **14/14**、
   `check_pages` **102 项**、`check_docs` **76 项**，CI 四后端严格门禁
+- 多音字覆盖：**3,050** 字 / **6,669** 读音全部收录；常用字 **617** 个多音字词组覆盖 **100%**
+  （`check_polyphones.mjs` 门禁；全量词组覆盖 31.15%，生僻字回退字级 + bigram）
 
-**三个使用场景**
+**五个使用场景**
 
 1. 拼音输入法：全拼/简拼/双拼、词组与用户学习
 2. 中文搜索与索引：首字母/全拼/模糊检索
 3. 拼音教学与 NLP 前处理：多音字标注、变调、规范化
+4. 中文文本转换与清洗：繁简互转、词句转拼音、自定义输出格式、繁简转拼音、通用拼音
+5. 可配置词表与多音字教学：三类自定义字典（单字/词组/繁简）、多音字读音集合
 
 **技术方案**
 
@@ -67,6 +71,7 @@ moon test  --target all --warn-list +73 --deny-warn   # 328 × 4 = 1312
 node scripts/check_coverage.mjs                        # 94.2%（1335/1417）
 node scripts/mutation_test.mjs                         # 14/14 KILLED
 node scripts/check_docs.mjs                            # 76 项
+node scripts/check_polyphones.mjs                      # 多音字覆盖门禁
 node scripts/check_pages.mjs                           # 102 项
 ```
 

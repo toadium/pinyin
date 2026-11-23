@@ -88,7 +88,7 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   ├── pinyin_dict.mbt         #   单字拼音（20903 条，分 11 段 merge）
 │   ├── mutil_pinyin_dict.mbt   #   词组拼音（843 条）
 │   ├── tongyong_pinyin_dict.mbt #  通用拼音（82 条）
-│   ├── common_phrases.mbt      #   常用词（147 条）
+│   ├── common_phrases.mbt      #   常用词（151 条）
 │   ├── large_phrase_raw_01..06.mbt # pypinyin 大词库字符串分片（47,110 条）
 │   ├── large_phrases.mbt       #   大词库运行时解析与查询
 │   └── common_chars.mbt        #   常用字排序（GB2312 一级 3755 + 高频字序）
@@ -169,6 +169,7 @@ moon check  --target all --warn-list +73 --deny-warn
 moon build  --target all --warn-list +73 --deny-warn
 moon test   --target all --warn-list +73 --deny-warn
 node scripts/check_docs.mjs
+node scripts/check_polyphones.mjs    # 多音字覆盖：字典 100%，常用字词组 100%
 node scripts/check_coverage.mjs      # 核心 ≥92%，每包 ≥85%
 node scripts/mutation_test.mjs       # 14/14 KILLED
 node scripts/check_pages.mjs         # 展示页 102 项

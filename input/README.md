@@ -52,7 +52,7 @@ let shuangpin = engine.input_shuangpin(@shuangpin.ShuangpinScheme::Xiaohe, "nihc
 ## 行为说明
 
 - 解码流程：分词 → 反查 → 常用字优先 → Beam Search + LM 剪枝 → 词组合并去重。
-- 词组候选优先来自 `mutil_pinyin_dict`（843）与 `common_phrases`（147）。
+- 词组候选优先来自 `mutil_pinyin_dict`（843）与 `common_phrases`（151）。
 - 候选按评分排序，同分时按汉字常用度（`common_char_rank`）排序。
 - 非法拼音抛 `PinyinError`；空串在 `input` 中抛错，`input_initial` 返回空数组。
 

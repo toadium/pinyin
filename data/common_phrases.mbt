@@ -149,4 +149,8 @@ pub let common_phrases : Map[String, String] = {
   "返还": "fǎn,huán",
   "发还": "fā,huán",
   "讨还": "tǎo,huán",
+  "啊哈": "ā,hā",
+  "墨翟": "mò,dí",
+  "铣床": "xǐ,chuáng",
+  "鱼鳃": "yú,sāi",
 }

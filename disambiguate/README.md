@@ -35,7 +35,7 @@ let sentence = @disambiguate.PinyinDisambiguator::disambiguate("我明天还钱"
 
 ## 行为说明
 
-- 词级读音优先级：`common_phrases`（147）> pypinyin 大词库（47,110）> `mutil_pinyin_table`（843）。
+- 词级读音优先级：`common_phrases`（151）> pypinyin 大词库（47,110）> `mutil_pinyin_table`（843）。
 - 句子内已知词组按最长匹配固定读音，未命中字符走带调 bigram Viterbi。
 - 大词库「一/不」已还原原调，变调请配合 `tone` 包的 `apply_tone_sandhi`。
 - 单字输入返回该字首读音；非法空串抛错。

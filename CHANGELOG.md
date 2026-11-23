@@ -4,7 +4,7 @@
   - `PinyinInputEngine::input_shuangpin` 接入输入法解码
 - **输入法增强**
   - 简拼输入 `input_initial`（首字母串 → 词组候选）
-  - 常用词表 `data/common_phrases`（147 词），词组候选优先
+  - 常用词表 `data/common_phrases`（151 词），词组候选优先
   - 用户选择学习 `learn`，学习过的候选优先重排
 - **消歧增强**
   - 词级优先（常用词表 + 词组表）→ 带调 bigram Viterbi 回退

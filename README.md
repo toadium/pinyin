@@ -113,7 +113,7 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── pinyin_dict.mbt             # 单字拼音（20903 条，分 11 段 merge）
 │   ├── mutil_pinyin_dict.mbt       # 词组拼音（843 条）
 │   ├── tongyong_pinyin_dict.mbt    # 通用拼音（82 条）
-│   ├── common_phrases.mbt          # 项目校准常用词（147 条）
+│   ├── common_phrases.mbt          # 项目校准常用词（151 条）
 │   ├── large_phrase_raw_01..06.mbt # pypinyin 大词库字符串分片（47,110 条）
 │   ├── large_phrases.mbt           # 大词库运行时解析与查询
 │   └── common_chars.mbt            # 常用字排序（GB2312 一级 3755 + 高频字序）
@@ -299,6 +299,7 @@ moon info   --target all                              # 生成接口文件
 
 ```bash
 node scripts/check_pages.mjs   # 构建 playground.js + 102 项页面结构/导出/语义检查
+node scripts/check_polyphones.mjs   # 多音字覆盖：3,050 字 / 6,669 读音；常用字词组 100%
 ```
 
 `docs/` 为静态页面；`docs/playground.js` 由 `moon build --target js --release playground` 生成。

@@ -544,6 +544,7 @@ let candidates = engine.input("nihao")
         <div class="stat"><strong>94.2%</strong><span>核心覆盖率</span></div>
         <div class="stat"><strong>14 / 14</strong><span>变异点 KILLED</span></div>
         <div class="stat"><strong>47,110</strong><span>词组大词库</span></div>
+        <div class="stat"><strong>3,050</strong><span>多音字（常用 100%）</span></div>
         <div class="stat"><strong>0</strong><span>编译警告</span></div>
         <div class="stat"><strong>4</strong><span>后端一致</span></div>
       </div>
@@ -555,6 +556,10 @@ let candidates = engine.input("nihao")
         </p>
         <p>
           <strong>覆盖口径</strong>：核心包 94.2%（1335 / 1417 行），门禁要求总覆盖率 ≥ 92%、单包 ≥ 85%。
+        </p>
+        <p>
+          <strong>多音字覆盖</strong>：3,050 字 / 6,669 读音全部收录；常用 617 个多音字词组覆盖 100%，
+          <code>check_polyphones.mjs</code> 门禁。
         </p>
         <p>
           <strong>已知边界</strong>：不提供中文分词、语音合成/识别与方言拼音；N-gram 模型基于内置字典，
