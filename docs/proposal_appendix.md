@@ -76,11 +76,14 @@ pinyin-toolkit 的真实强项（它做得比我们好，不回避）：
 
 - 四后端 wasm / wasm-gc / js / native：328 测试/后端，共 1312
 - 严格模式 `--warn-list +73 --deny-warn`：四后端 check/build/test 零警告
-- 覆盖率门禁：核心包 ≥92%、每包 ≥85%
-- 变异门禁：14 个单点变异，要求相关包测试失败（KILLED）
+- 覆盖率实测：**94.2%（1335/1417）**，disambiguate 96.1%；门槛总 ≥92%、每包 ≥85%
+- 变异门禁：**14/14 KILLED**
 - CI：quality（fmt/check/build/mbti/docs）+ test×4 + coverage；mutation 手动/每周
+- 展示页门禁：`check_pages` **102 项**（含 17 个导出与 pinyin4cj 十项语义断言）
+- 文档门禁：`check_docs` **76 项**（版本、测试数、包数、工具链、相对链接）
 - 可运行演示：`moon run demo --target native`
-- 文档一致性：版本、测试数、包数、工具链、相对链接自动校验
+- 在线演示：https://toadium.github.io/pinyin/ ，17 个 `#export_name` 导出在浏览器本地计算；
+  发布后另做 104 项真实浏览器验收（96 桌面 + 8 移动）
 
 ## 4. 数据与许可证
 
