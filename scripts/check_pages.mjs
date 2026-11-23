@@ -118,6 +118,25 @@ check(
   ].every((pkg) => html.includes(`/${pkg}/README.md`)),
 );
 check(
+  "API 表覆盖十项文本转换能力",
+  [
+    "convert_to_simplified_chinese",
+    "convert_to_traditional_chinese",
+    "convert_to_pinyin_string(text, sep, format)",
+    "add_pinyin_dict_resource",
+    "add_mutil_pinyin_dict_resource",
+    "add_chinese_dict_resource",
+    "convert_to_pinyin_array",
+    "convert_to_pinyin_string_traditional",
+    "to_tongyong_pinyin_string_array",
+  ].every((entry) => html.includes(entry)),
+);
+check(
+  "API 表行数 ≥ 20",
+  (html.match(/<tr><td>/g) || []).length >= 20,
+  `${(html.match(/<tr><td>/g) || []).length} 行`,
+);
+check(
   "14 个包 README 存在",
   modulePackages.every((pkg) => existsSync(join(root, pkg, "README.md"))),
 );
