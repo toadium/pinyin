@@ -65,7 +65,9 @@ You can browse and install extra skills here:
 - 仓库：https://github.com/toadium/pinyin.git
 - moon 工具链：0.1.20261117
 
-### 包结构（13 包扁平多根布局）
+### 包结构（12 功能包 + data + playground，共 14 包）
+
+> 树内测试数为快速索引；完整清单与实测口径以 `docs/testing.md` 为准。
 
 ```
 pinyin/                         # 根包 — 文档入口（不导入任何子包）
@@ -86,6 +88,9 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   ├── pinyin_dict.mbt         #   单字拼音（20903 条，分 11 段 merge）
 │   ├── mutil_pinyin_dict.mbt   #   词组拼音（843 条）
 │   ├── tongyong_pinyin_dict.mbt #  通用拼音（82 条）
+│   ├── common_phrases.mbt      #   常用词（147 条）
+│   ├── large_phrase_raw_01..06.mbt # pypinyin 大词库字符串分片（47,110 条）
+│   ├── large_phrases.mbt       #   大词库运行时解析与查询
 │   └── common_chars.mbt        #   常用字排序（GB2312 一级 3755 + 高频字序）
 ├── convert/                    # 核心转换引擎（依赖 core + data）
 │   ├── pinyin_dicts.mbt        #   字典视图常量（与 data 包共享引用）
@@ -94,7 +99,7 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   ├── pinyin_stream_processor.mbt # PinyinStreamProcessor（4 方法）
 │   ├── convert_wbtest.mbt      #   白盒测试（8）
 │   ├── convert_test.mbt        #   黑盒测试（22）
-│   ├── convert_dict_test.mbt   #   黑盒测试（5）
+│   ├── convert_dict_test.mbt   #   黑盒测试（6）
 │   ├── stream_processor_test.mbt # 黑盒测试（7）
 │   ├── pinyin_helper_coverage_wbtest.mbt # 覆盖率补测（9）
 │   └── stream_processor_coverage_wbtest.mbt # 覆盖率补测（7）
@@ -114,7 +119,7 @@ pinyin/                         # 根包 — 文档入口（不导入任何子�
 │   └── input_test.mbt          #   黑盒测试（30）
 ├── shuangpin/                  # 双拼输入（小鹤/自然码，双拼↔全拼，零依赖）
 │   ├── pinyin_shuangpin.mbt
-│   └── shuangpin_test.mbt      #   黑盒测试（10）
+│   └── shuangpin_test.mbt      #   黑盒测试（12）
 ├── examples/                   # 示例包（12 子包全覆盖，37 个示例测试）
 ├── demo/                       # 端到端可运行演示（moon run demo）
 ├── playground/                 # 浏览器演示导出层（js 后端，#export_name 17 函数）

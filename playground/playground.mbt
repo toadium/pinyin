@@ -114,7 +114,9 @@ pub fn pinyin_to_traditional(text : String) -> String {
 /// 词句 → 拼音（带调、空格分隔）。
 #export_name("pinyin_convert_sentence")
 pub fn pinyin_convert_sentence(text : String) -> String {
-  @convert.PinyinHelper::convert_to_pinyin_string(text, " ") catch { _ => "" }
+  @convert.PinyinHelper::convert_to_pinyin_string(text, " ") catch {
+    _ => ""
+  }
 }
 
 ///|
@@ -145,7 +147,9 @@ pub fn pinyin_add_dict_char(
   let dict : Map[String, String] = Map([])
   dict[ch] = readings
   @convert.PinyinHelper::add_pinyin_dict_resource(dict)
-  @convert.PinyinHelper::convert_to_pinyin_string(text, " ") catch { _ => "" }
+  @convert.PinyinHelper::convert_to_pinyin_string(text, " ") catch {
+    _ => ""
+  }
 }
 
 ///|
@@ -159,7 +163,9 @@ pub fn pinyin_add_dict_phrase(
   let dict : Map[String, String] = Map([])
   dict[phrase] = readings
   @convert.PinyinHelper::add_mutil_pinyin_dict_resource(dict)
-  @convert.PinyinHelper::convert_to_pinyin_string(text, " ") catch { _ => "" }
+  @convert.PinyinHelper::convert_to_pinyin_string(text, " ") catch {
+    _ => ""
+  }
 }
 
 ///|

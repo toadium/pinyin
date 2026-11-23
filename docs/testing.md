@@ -36,7 +36,7 @@
 | `lm` | `lm_test.mbt` | 黑盒 | 15 | N-gram 语言模型概率、句子、困惑度、统计 |
 | `lm` | `lm_coverage_wbtest.mbt` | 白盒 | 12 | trigram/interpolation、回退、空输入、负 λ |
 | `input` | `input_test.mbt` | 黑盒 | 30 | 输入法（Beam、词组、简拼、双拼、学习、常用字） |
-| `shuangpin` | `shuangpin_test.mbt` | 黑盒 | 10 | 小鹤/自然码双向转换、逆向分支、ü 归一化 |
+| `shuangpin` | `shuangpin_test.mbt` | 黑盒 | 12 | 小鹤/自然码双向转换、逆向分支、ü 归一化、全键位与方案名称 |
 | `examples` | `*.mbt` | 黑盒 | 37 | 12 个子包示例 |
 | **总计** | | | **328 / 后端** | **1312（四后端）** |
 

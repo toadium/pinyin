@@ -28,7 +28,9 @@ pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音�
 
 ## 软件架构
 
-### 包结构（12 包扁平多根布局）
+### 包结构（12 功能包 + data + playground，共 14 包）
+
+> 树内测试数为快速索引；完整清单与实测口径以 `docs/testing.md` 为准。
 
 ```
 pinyin/                             # 根包 — 文档入口（不导入任何子包）
@@ -46,15 +48,19 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── chinese_dict.mbt            # 繁→简映射（2533 条）
 │   ├── pinyin_dict.mbt             # 单字拼音（20903 条，分 11 段 merge）
 │   ├── mutil_pinyin_dict.mbt       # 词组拼音（843 条）
-│   └── tongyong_pinyin_dict.mbt    # 通用拼音（82 条）
+│   ├── tongyong_pinyin_dict.mbt    # 通用拼音（82 条）
+│   ├── common_phrases.mbt          # 常用词（147 条）
+│   ├── large_phrase_raw_01..06.mbt # pypinyin 大词库字符串分片（47,110 条）
+│   ├── large_phrases.mbt           # 大词库运行时解析与查询
+│   └── common_chars.mbt            # 常用字排序（GB2312 一级 3755 + 高频字序）
 ├── convert/                        # 核心转换引擎（依赖 core + data）
 │   ├── pinyin_dicts.mbt            # 字典视图常量
 │   ├── chinese_helper.mbt          # ChineseHelper 命名空间
 │   ├── pinyin_helper.mbt           # PinyinHelper 命名空间
 │   ├── pinyin_stream_processor.mbt # PinyinStreamProcessor 流式处理器
 │   ├── convert_wbtest.mbt          # 白盒测试（8）
-│   ├── convert_test.mbt            # 黑盒测试（19）
-│   ├── convert_dict_test.mbt       # 黑盒测试（5）
+│   ├── convert_test.mbt            # 黑盒测试（22）
+│   ├── convert_dict_test.mbt       # 黑盒测试（6）
 │   └── stream_processor_test.mbt   # 黑盒测试（7）
 ├── reverse/                        # 拼音→汉字反向查找（依赖 core + data）
 │   ├── pinyin_reverse.mbt
@@ -64,27 +70,27 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   └── segment_test.mbt            # 黑盒测试（12）
 ├── fuzzy/                          # 模糊匹配（依赖 core + reverse）
 │   ├── pinyin_fuzzy.mbt
-│   └── fuzzy_test.mbt              # 黑盒测试（19）
+│   └── fuzzy_test.mbt              # 黑盒测试（20）
 ├── disambiguate/                   # 多音字消歧（依赖 core + convert）
 │   ├── pinyin_disambiguator.mbt
 │   └── disambiguate_test.mbt       # 黑盒测试（7）
 ├── search/                         # 搜索索引（依赖 core + convert + segment + fuzzy）
 │   ├── pinyin_search.mbt
-│   └── search_test.mbt             # 黑盒测试（7）
+│   └── search_test.mbt             # 黑盒测试（9）
 ├── tone/                           # 声调变调（依赖 core）
 │   ├── pinyin_tone_sandhi.mbt
-│   └── tone_test.mbt               # 黑盒测试（12）
+│   └── tone_test.mbt               # 黑盒测试（14）
 ├── normalize/                      # 规范化 + 编辑距离（依赖 core + segment + fuzzy）
 │   ├── pinyin_normalizer.mbt
 │   ├── pinyin_edit_distance.mbt
-│   ├── normalizer_test.mbt         # 黑盒测试（10）
-│   └── edit_distance_test.mbt      # 黑盒测试（7）
+│   ├── normalizer_test.mbt         # 黑盒测试（12）
+│   └── edit_distance_test.mbt      # 黑盒测试（8）
 ├── lm/                             # N-gram 语言模型（依赖 core + data + math）
 │   ├── pinyin_lm.mbt               # PinyinLM + LMStats + Laplace 平滑 + Katz 回退 + Interpolation
-│   └── lm_test.mbt                 # 黑盒测试（12）
+│   └── lm_test.mbt                 # 黑盒测试（15）
 ├── input/                          # 拼音输入法引擎（依赖 core + segment + reverse + lm + math + data + fuzzy）
 │   ├── pinyin_input.mbt            # PinyinInputEngine + InputCandidate + Beam Search + 用户词库 + 模糊输入
-│   └── input_test.mbt              # 黑盒测试（14）
+│   └── input_test.mbt              # 黑盒测试（30）
 ├── examples/                       # 示例包（12 子包全覆盖，37 个示例测试）
 │   ├── chinese_helper_example.mbt  # 示例测试（2）
 │   ├── pinyin_helper_example.mbt   # 示例测试（5）
@@ -100,6 +106,13 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 │   ├── normalize_example.mbt       # 示例测试（2）
 │   ├── lm_example.mbt              # 示例测试（5）
 │   └── input_example.mbt           # 示例测试（4）
+├── shuangpin/                      # 双拼输入（小鹤/自然码，双拼↔全拼）
+│   ├── pinyin_shuangpin.mbt
+│   └── shuangpin_test.mbt          # 黑盒测试（12）
+├── demo/                           # 端到端可运行演示（moon run demo）
+├── playground/                     # 浏览器演示导出层（js 后端，#export_name 17 函数）
+│   ├── playground.mbt
+│   └── pkg.generated.mbti
 ├── docs/                           # 开发文档
 │   ├── roadmap.md
 │   ├── architecture.md
@@ -128,6 +141,8 @@ pinyin/                             # 根包 — 文档入口（不导入任何�
 - `lm/` N-gram 语言模型，依赖 core + data + math，含 PinyinLM / LMStats / Laplace 平滑 / Katz 回退
 - `input/` 拼音输入法引擎，依赖 core + segment + reverse + lm + math + data + fuzzy，含 PinyinInputEngine / InputCandidate / Beam Search / 用户词库 / 模糊输入
 - `examples/` 示例包，12 子包全覆盖，37 个示例测试
+- `shuangpin/` 双拼输入（小鹤/自然码 ↔ 全拼，零依赖）
+- `playground/` 浏览器演示导出层，17 个 `#export_name`（js 后端）
 - `docs/` 开发文档（roadmap / architecture / api / testing）
 - 根包为文档入口（如 owl-mbt），不导入任何子包
 

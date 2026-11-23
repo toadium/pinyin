@@ -70,11 +70,14 @@ const packages = [
   "input",
   "shuangpin",
 ];
-const dataPackage = existsSync(resolve(root, "data"));
+const dataPackage = existsSync(resolve(root, "data/moon.pkg"));
+const playgroundPackage = existsSync(resolve(root, "playground/moon.pkg"));
+const libraryPackages =
+  packages.length + (dataPackage ? 1 : 0) + (playgroundPackage ? 1 : 0);
 check(
-  "A4 README 包数 = 功能包数",
-  badgePackages === packages.length + (dataPackage ? 1 : 0),
-  `README=${badgePackages}, 实际=${packages.length + (dataPackage ? 1 : 0)}`,
+  "A4 README 包数 = 功能包 + data + playground",
+  badgePackages === libraryPackages,
+  `README=${badgePackages}, 实际=${libraryPackages}`,
 );
 
 check(
