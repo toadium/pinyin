@@ -147,3 +147,12 @@ node scripts/check_pages.mjs
 - 展示页结构（Chart.js / Leaflet 式库首页）：分区锚点、Hero 实时演示钩子（消歧 + 数字调 + 首字母 + 耗时）、6 个演示动作与预置按钮、复制按钮目标、主题切换与持久化、无外链 CDN、文档入口、导航高亮。
 - 页面数字口径直接比对 `docs/testing.md`（每后端 327 / 四后端 1308 / 覆盖率 94.3%），版本徽章比对 `moon.mod`。
 - 当前结果：**PASS**（`docs/playground.js` 约 2.9 MB，gzip 后约 500 KB）。
+
+## 展示页浏览器验收（发布后人工）
+
+无 Playwright MCP 环境时，用 Chrome DevTools Protocol 做等价的真实浏览器验收。
+
+- 覆盖 88 项：初始状态、主题切换与刷新持久化、Hero 多音/emoji/长文本、4 张演示卡、预设按钮、回车提交、复制反馈、全部导航锚点、桌面与移动端布局及移动端点击。
+- 关注 console/页面异常、4xx 资源、横向溢出与交互结果正确性。
+- 2026-11-23 结果：线上 `https://toadium.github.io/pinyin/` 88/88 通过，包含 `还钱 → huán qián`、`我明天还钱 → wǒ míng tiān huán qián` 与回车提交。
+- 回归要求：任何 `docs/` 交互或 `playground` 导出改动后，除 `check_pages.mjs` 外必须再做一次浏览器验收（字符串断言不能证明脚本真的能跑）。
