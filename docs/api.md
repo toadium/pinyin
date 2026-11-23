@@ -367,6 +367,8 @@ pub fn PinyinDisambiguator::disambiguate(text : String) -> Array[String] raise P
 
 多音字上下文消歧，返回每个字的**带调拼音**。句子中出现词表已知词组时先做最大匹配并固定词级读音，其余字符走带调 bigram Viterbi，例如 `"我明天还钱"` → `["wǒ", "míng", "tiān", "huán", "qián"]`。
 
+词级读音优先级：`common_phrases`（147）> pypinyin 大词库（47,110）> `mutil_pinyin_table`（843）。
+
 ## search 包
 
 ### PinyinSearchIndex

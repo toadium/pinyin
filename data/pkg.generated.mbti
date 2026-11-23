@@ -8,6 +8,24 @@ pub fn common_char_rank(String) -> Int32
 
 pub let common_phrases : Map[String, String]
 
+pub let large_phrase_count : Int32
+
+pub fn large_phrase_lookup(String) -> String?
+
+pub let large_phrase_max_chars : Int32
+
+pub let large_phrase_raw_01 : String
+
+pub let large_phrase_raw_02 : String
+
+pub let large_phrase_raw_03 : String
+
+pub let large_phrase_raw_04 : String
+
+pub let large_phrase_raw_05 : String
+
+pub let large_phrase_raw_06 : String
+
 pub let mutil_pinyin_dict : Map[String, String]
 
 pub let pinyin_dict : Map[String, String]

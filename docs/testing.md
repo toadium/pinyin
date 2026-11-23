@@ -2,7 +2,7 @@
 
 ## 测试组织
 
-当前 native / wasm / wasm-gc / js 四个后端各 **327** 个测试，合计 **1308** 个测试全通过。
+当前 native / wasm / wasm-gc / js 四个后端各 **328** 个测试，合计 **1312** 个测试全通过。
 
 | 包 | 文件 | 类型 | 测试数 | 内容 |
 |------|------|------|--------|------|
@@ -12,7 +12,7 @@
 | `core` | `tone_conversion_coverage_wbtest.mbt` | 白盒 | 10 | 声调转换、标调位置、非法输入 |
 | `convert` | `convert_wbtest.mbt` | 白盒 | 8 | 转换引擎内部逻辑 |
 | `convert` | `convert_test.mbt` | 黑盒 | 22 | 正向用例、格式转换、自定义字典、共享引用 |
-| `convert` | `convert_dict_test.mbt` | 黑盒 | 5 | 字典完整性验证（条目数、采样、边界） |
+| `convert` | `convert_dict_test.mbt` | 黑盒 | 6 | 字典完整性验证（条目数、采样、边界、pypinyin 大词库分片查找） |
 | `convert` | `stream_processor_test.mbt` | 黑盒 | 7 | 流式处理器（feed/flush/reset/增量输出） |
 | `convert` | `pinyin_helper_coverage_wbtest.mbt` | 白盒 | 9 | 通用拼音、多音字、自定义词组、边界 |
 | `convert` | `stream_processor_coverage_wbtest.mbt` | 白盒 | 7 | 自定义分隔符、首字母、词组增量、标点 |
@@ -25,7 +25,7 @@
 | `disambiguate` | `disambiguate_test.mbt` | 黑盒 | 7 | 多音字消歧（Viterbi+bigram） |
 | `disambiguate` | `disambiguate_coverage_wbtest.mbt` | 白盒 | 6 | 空串、单字、多音单字、中英混合、句内词表最大匹配 |
 | `disambiguate` | `common_phrases_test.mbt` | 黑盒 | 1 | 常用多音词（含「还」动词搭配与句内匹配） |
-| `disambiguate` | `accuracy_test.mbt` | 黑盒 | 1 | 66 条 gold 语料准确率（99.0% vs 68.0%） |
+| `disambiguate` | `accuracy_test.mbt` | 黑盒 | 1 | 66 条 gold 语料准确率（99.5% vs 68.0%） |
 | `search` | `search_test.mbt` | 黑盒 | 9 | 搜索索引（首字母/连续/模糊） |
 | `search` | `search_coverage_wbtest.mbt` | 白盒 | 8 | 空索引、非汉字、重复文档、无匹配 |
 | `tone` | `tone_test.mbt` | 黑盒 | 14 | 声调变调（三声/一/不/七/八变调） |
@@ -38,18 +38,41 @@
 | `input` | `input_test.mbt` | 黑盒 | 30 | 输入法（Beam、词组、简拼、双拼、学习、常用字） |
 | `shuangpin` | `shuangpin_test.mbt` | 黑盒 | 10 | 小鹤/自然码双向转换、逆向分支、ü 归一化 |
 | `examples` | `*.mbt` | 黑盒 | 37 | 12 个子包示例 |
-| **总计** | | | **327 / 后端** | **1308（四后端）** |
+| **总计** | | | **328 / 后端** | **1312（四后端）** |
+
+## 数据字典
+
+| 表 | 条目 | 说明 |
+|---|---|---|
+| `chinese_dict` | 2533 | 繁 → 简码点 |
+| `pinyin_dict` | 20903 | 单字拼音（多音字逗号分隔） |
+| `mutil_pinyin_dict` | 843 | 源库词组拼音 |
+| `tongyong_pinyin_dict` | 82 | 通用拼音 |
+| `common_phrases` | 147 | 项目校准常用词（消歧优先级最高） |
+| `large_phrase_dict` | 47110 | pypinyin 大词库（字符串分片 + 运行时解析） |
+
+大词库说明：
+
+- 来源：`mozillazg/python-pinyin` 的 `pypinyin/phrases_dict.json`（源自 pinyin-data phrase-pinyin-data），
+  SHA256 `a45ff140a6b631ca9c82127b280a2f414e0aba6bb2824a0e9d1e77fff359c665`；
+- 生成：`python scripts/gen_large_phrases.py --src <phrases_dict.json>`，仅保留全汉字、2..9 字、
+  读音数等于字数的词组；
+- 口径：「一/不」还原原调（yí/yì → yī，bú → bù），变调交由 `tone` 包；每字取首读音；
+- 存储：6 个字符串分片（`data/large_phrase_raw_*.mbt`）+ `data/large_phrases.mbt` 运行时解析。
+  47k 条 Map 字面量会触发 wasm `local count too large`，字符串方案已实测四后端通过；
+- 优先级：`common_phrases` > `large_phrase_dict` > `mutil_pinyin_dict`（消歧路径）；
+  `convert` 保持字级全展开语义，不引入大词库。
 
 ## 四后端验证
 
 ```bash
-moon test --target wasm      --warn-list +73 --deny-warn   # 327/327 ✓
-moon test --target wasm-gc   --warn-list +73 --deny-warn   # 327/327 ✓
-moon test --target js        --warn-list +73 --deny-warn   # 327/327 ✓
-moon test --target native    --warn-list +73 --deny-warn   # 327/327 ✓
+moon test --target wasm      --warn-list +73 --deny-warn   # 328/328 ✓
+moon test --target wasm-gc   --warn-list +73 --deny-warn   # 328/328 ✓
+moon test --target js        --warn-list +73 --deny-warn   # 328/328 ✓
+moon test --target native    --warn-list +73 --deny-warn   # 328/328 ✓
 ```
 
-四后端共 1308 测试全通过，严格模式零警告零错误。
+四后端共 1312 测试全通过，严格模式零警告零错误。
 
 ## 覆盖率门禁
 
@@ -60,8 +83,8 @@ node scripts/check_coverage.mjs --min 92   # 指定总门槛
 
 - 统计范围：12 个核心包，排除 `data/`（纯数据）与 `examples/`（示例）。
 - 门槛：总体 ≥ 92%，每个核心包 ≥ 85%。
-- 当前实测：**1308/1387 = 94.3%**（core 96.6%、convert 90.3%、reverse 95.1%、
-  fuzzy 96.4%、disambiguate 97.6%、search 95.2%、normalize 95.7%、
+- 当前实测：**1335/1417 = 94.2%**（core 96.6%、convert 90.3%、reverse 95.1%、
+  fuzzy 96.4%、disambiguate 96.1%、search 95.2%、normalize 95.7%、
   lm 93.3%、input 92.3%、shuangpin 96.9%）。
 
 ## 变异测试门禁
@@ -145,7 +168,7 @@ node scripts/check_pages.mjs
 - 构建 `playground` 的 js 产物并复制到 `docs/playground.js`。
 - 检查 56 项：静态资源、`index.html`/`app.js` 引用、7 个导出函数、转换/数字调/空串、消歧（银行/重庆）、输入法（nihao/zg/shurufa/空串）、双拼（小鹤/自然码/奇数输入）、分词、规范化（ZHONG1/nv）。
 - 展示页结构（Chart.js / Leaflet 式库首页）：分区锚点、Hero 实时演示钩子（消歧 + 数字调 + 首字母 + 耗时）、6 个演示动作与预置按钮、复制按钮目标、主题切换与持久化、无外链 CDN、文档入口、导航高亮。
-- 页面数字口径直接比对 `docs/testing.md`（每后端 327 / 四后端 1308 / 覆盖率 94.3%），版本徽章比对 `moon.mod`。
+- 页面数字口径直接比对 `docs/testing.md`（每后端 328 / 四后端 1312 / 覆盖率 94.2%），版本徽章比对 `moon.mod`。
 - 当前结果：**PASS**（`docs/playground.js` 约 2.9 MB，gzip 后约 500 KB）。
 
 ## 展示页浏览器验收（发布后人工）

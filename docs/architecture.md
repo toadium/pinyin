@@ -51,6 +51,7 @@ input（core+segment+reverse+lm+math）
 | `chinese_dict` | Map[Int, Int] | 2533 | 繁→简码点映射 |
 | `pinyin_dict` | Map[String, String] | 20903 | 单字拼音（分 11 段 merge） |
 | `mutil_pinyin_dict` | Map[String, String] | 843 | 词组拼音 |
+| `large_phrase_dict` | 函数（6 个字符串分片 + 运行时解析） | 47110 | pypinyin 大词库（词组拼音，消歧/输入法使用） |
 | `tongyong_pinyin_dict` | Map[String, String] | 82 | 通用拼音 |
 | `common_char_rank` | 函数（内部字符串常量） | 3755 | 常用字序号（高频字序 + GB2312 一级字兜底） |
 

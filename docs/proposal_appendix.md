@@ -23,7 +23,7 @@ pinyin4cj 提供 PinyinHelper + ChineseHelper 共 14 个方法（查表 + 繁简
 
 | 引擎 | 算法 | 复杂度 | 可复核证据 |
 |---|---|---|---|
-| PinyinDisambiguator | 词级覆盖 + Viterbi + 带调 bigram | O(nk²) | 66 条 gold：99.0% vs 基线 68.0% |
+| PinyinDisambiguator | 词级覆盖 + Viterbi + 带调 bigram | O(nk²) | 66 条 gold：99.5% vs 基线 68.0% |
 | PinyinInputEngine | Beam Search + N-gram + 词组/学习重排 | O(S×B×C) | `nihao`→你好、`nihao`(双拼)→你好、`zg`→中国 |
 | PinyinSegmenter | Trie + DP 全切分/最优 | O(n²L) | `xian` 多切分、`nihao` 最优 |
 | ShuangpinScheme | 声母/韵母双向映射 | O(n) | 小鹤/自然码 10 组往返测试 |
@@ -59,7 +59,7 @@ pinyin-toolkit 的真实强项（它做得比我们好，不回避）：
 ### 2.2 输入法
 
 - 简拼：`input_initial("zg")` → 中国，`srf` → 输入法
-- 常用词表：`data/common_phrases` 147 词，词组候选优先
+- 词表：`data/common_phrases` 147 词 + pypinyin 大词库 47,110 词组，词组候选优先
 - 用户学习：`learn(text)` 后该候选优先重排
 - 候选去重、常用字优先、词表同音覆盖
 
@@ -68,11 +68,13 @@ pinyin-toolkit 的真实强项（它做得比我们好，不回避）：
 - 词级优先：常用词表 / 词组表命中直接采用逐字读音（含轻声）
 - 句内最大匹配：句子中出现已知词组时固定词级读音（`我明天还钱` → huán qián）
 - 未命中回退：带调 bigram Viterbi（保留声调，区分 chǔ/chù）
-- gold 语料：37 个多音词 + 29 个短句，共 66 条；准确率 99.0%，首读音基线 68.0%
+- gold 语料：37 个多音词 + 29 个短句，共 66 条；准确率 99.5%，首读音基线 68.0%
+- 大词库：pypinyin `phrases_dict.json` 47,110 条，优先级 common > 大词库 > 旧词表；
+  「一/不」还原原调，字符串分片规避 wasm 初始化局部变量上限
 
 ## 3. 工程与质量
 
-- 四后端 wasm / wasm-gc / js / native：327 测试/后端，共 1308
+- 四后端 wasm / wasm-gc / js / native：328 测试/后端，共 1312
 - 严格模式 `--warn-list +73 --deny-warn`：四后端 check/build/test 零警告
 - 覆盖率门禁：核心包 ≥92%、每包 ≥85%
 - 变异门禁：14 个单点变异，要求相关包测试失败（KILLED）

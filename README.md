@@ -5,7 +5,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v0.8.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/tests-1308-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/tests-1312-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/packages-13-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/moon-0.1.20261117-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/targets-wasm%2Bwasm--gc%2Bjs%2Bnative-brightgreen" style="display: inline-block;" />
@@ -53,7 +53,7 @@ pinyin 是一个自研的 MoonBit 拼音引擎，提供汉字→拼音、拼音�
 - ⌨️ 支持拼音输入法引擎（Beam Search + LM 评分、全切分候选、用户词库、模糊输入、可配置 beam 宽度）
 - 🔠 支持双拼输入（小鹤 / 自然码，双拼 ↔ 全拼互转）
 - 🔤 支持简拼输入与用户选择学习（首字母词组、候选重排）
-- 🎯 多音字上下文消歧：常用多音词准确率 99.0%（首读音基线 68.0%）
+- 🎯 多音字上下文消歧：常用多音词准确率 99.5%（首读音基线 68.0%），内置 47,110 条 pypinyin 大词库
 - 🔤 支持声母/韵母提取（get_initial/get_final/initials_list）
 - 💪 支持常用简体/繁体中文字符转换成拼音
 - 🛠️ 支持常见多音字符转换成拼音
@@ -650,6 +650,7 @@ let fuzzy_candidates = engine.input_fuzzy("zongguo")
 | `chinese_map` | 2533 | `Map[Int, Int]` |
 | `pinyin_table` | 20903 | `Map[String, String]` |
 | `mutil_pinyin_table` | 843 | `Map[String, String]` |
+| `large_phrase_lookup` | 47110 | 函数（6 个字符串分片，运行时解析） |
 | `tongyong_pinyin_table` | 82 | `Map[String, String]` |
 
 ## 字典生成
@@ -668,7 +669,7 @@ python scripts/gen_pinyin_dict.py
 | ---- | ------------ | ------ |
 | 1    | **moon**     | 0.1.20261117 |
 
-四后端（wasm / wasm-gc / js / native）各 327 个测试全通过，共 1308 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
+四后端（wasm / wasm-gc / js / native）各 328 个测试全通过，共 1312 测试。严格模式 `--warn-list +73 --deny-warn` 零警告零错误。
 
 ## 参考来源
 

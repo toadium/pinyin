@@ -76,6 +76,38 @@ check(
     html.includes(file),
   ),
 );
+
+const apiDoc = readFileSync(join(root, "docs/api.md"), "utf8");
+const apiAnchors = new Set(
+  [...apiDoc.matchAll(/^## (\S+) 包\r?$/gm)].map((match) => `#${match[1]}-包`),
+);
+const moduleLinks = [...html.matchAll(/docs\/api\.md(#[^"]+)"/g)].map((match) => match[1]);
+check(
+  "模块卡 / API 表 / 演示卡链接到对应文档锚点",
+  moduleLinks.length >= 25 && moduleLinks.every((anchor) => apiAnchors.has(anchor)),
+  `${moduleLinks.length} 个锚点，api.md 定义 ${apiAnchors.size} 个`,
+);
+check(
+  "11 个功能包均有文档入口",
+  [
+    "convert",
+    "reverse",
+    "disambiguate",
+    "segment",
+    "fuzzy",
+    "search",
+    "tone",
+    "normalize",
+    "lm",
+    "input",
+    "shuangpin",
+  ].every((pkg) => html.includes(`#${pkg}-包`)),
+);
+check(
+  "特性卡为整卡链接（12 个）",
+  (html.match(/<a class="feature" /g) || []).length === 12,
+  `${(html.match(/<a class="feature" /g) || []).length} 个`,
+);
 check(
   "导航高亮脚本存在",
   appJs.includes("IntersectionObserver") && appJs.includes('classList.toggle("active"'),

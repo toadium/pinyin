@@ -72,9 +72,53 @@ let phrase_readings : Map[String, Array[String]] = {
 }
 
 ///|
+/// 项目常用词表的逐字读音，优先级高于大词库与旧词组表。
+let common_phrase_readings : Map[String, Array[String]] = {
+  let result : Map[String, Array[String]] = Map([])
+  for word, pinyin_str in @data.common_phrases {
+    let readings = pinyin_str
+      .split(@core.pinyin_separator)
+      .map(fn(x) { x.to_owned() })
+      .to_array()
+    if readings.length() == word.to_array().length() {
+      result[word] = readings
+    }
+  }
+  result
+}
+
+///|
+/// 词级读音查找，优先级：common_phrases > pypinyin 大词库 > mutil 旧词组表。
+/// 返回 None 表示该词不在任何词表中。
+fn phrase_readings_lookup(word : String) -> Array[String]? {
+  match common_phrase_readings.get(word) {
+    Some(readings) => Some(readings)
+    None =>
+      match @data.large_phrase_lookup(word) {
+        Some(pinyin_str) => {
+          let readings = pinyin_str
+            .split(@core.pinyin_separator)
+            .map(fn(x) { x.to_owned() })
+            .to_array()
+          if readings.length() == word.to_array().length() {
+            Some(readings)
+          } else {
+            None
+          }
+        }
+        None =>
+          match phrase_readings.get(word) {
+            Some(readings) => Some(readings)
+            None => None
+          }
+      }
+  }
+}
+
+///|
 /// 词表最长词条的字符数，用于句子内的最大匹配。
 let phrase_max_chars : Int32 = {
-  let mut longest = 0
+  let mut longest = @data.large_phrase_max_chars
   for word, _ in phrase_readings {
     let len = word.to_array().length()
     if len > longest {
@@ -103,7 +147,7 @@ fn forced_phrase_readings(chars : Array[Char]) -> Array[Array[String]] {
     let mut matched = false
     while len >= 2 && !matched {
       let word = String::from_array(chars[i:i + len])
-      match phrase_readings.get(word) {
+      match phrase_readings_lookup(word) {
         Some(readings) =>
           if readings.length() == len {
             for k in 0..<len {
@@ -150,7 +194,7 @@ pub fn PinyinDisambiguator::disambiguate(
   if chars.length() == 0 {
     @core.raise_invalid_input("Please enter a word or sentence")
   }
-  match phrase_readings.get(str) {
+  match phrase_readings_lookup(str) {
     Some(readings) => return readings.copy()
     None => ()
   }

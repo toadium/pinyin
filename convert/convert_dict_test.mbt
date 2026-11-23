@@ -16,6 +16,18 @@ test "dicts_have_expected_entry_counts" {
 }
 
 ///|
+/// 字典完整性：pypinyin 大词库分片查找（含未命中回退）与最长词长。
+test "large_phrase_dict_lookup" {
+  match @data.large_phrase_lookup("虚与委蛇") {
+    Some(v) => inspect(v, content="xū,yǔ,wēi,yí")
+    None => fail("expected 虚与委蛇 in large_phrase_dict")
+  }
+  assert_eq(@data.large_phrase_lookup("不存在的词组"), None)
+  assert_eq(@data.large_phrase_count, 47110)
+  assert_eq(@data.large_phrase_max_chars, 9)
+}
+
+///|
 /// 字典完整性：chinese_dict 的所有 value 均为有效 Unicode 码点（BMP 区间 <= 0xFFFF）。
 /// 抽样验证首条目 0x4E1F→0x4E22 与末条目 0x9F9C→0x9F9F。
 test "chinese_dict_values_are_valid_codepoints" {

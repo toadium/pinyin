@@ -82,4 +82,26 @@ test "disambiguate: 常用多音词" {
     @disambiguate.PinyinDisambiguator::disambiguate("我明天还钱"),
     ["wǒ", "míng", "tiān", "huán", "qián"],
   )
+  // pypinyin 大词库：整串命中与句内最大匹配
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("虚与委蛇"), [
+    "xū", "yǔ", "wēi", "yí",
+  ])
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("螳臂当车"), [
+    "táng", "bì", "dāng", "chē",
+  ])
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("暴殄天物"), [
+    "bào", "tiǎn", "tiān", "wù",
+  ])
+  assert_eq(
+    @disambiguate.PinyinDisambiguator::disambiguate("他虚与委蛇"),
+    ["tā", "xū", "yǔ", "wēi", "yí"],
+  )
+  // 「一/不」保持原调，变调交由 tone 包
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("一不小心"), [
+    "yī", "bù", "xiǎo", "xīn",
+  ])
+  // 项目常用词表优先级高于大词库（大词库对「还款」误读 hái）
+  assert_eq(@disambiguate.PinyinDisambiguator::disambiguate("还款"), [
+    "huán", "kuǎn",
+  ])
 }

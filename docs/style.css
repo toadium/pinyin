@@ -542,6 +542,61 @@ output {
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
+/* 模块卡整卡跳转 + 文档链接 */
+a.feature {
+  display: block;
+  padding-bottom: 34px;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.feature:hover,
+a.feature:focus-visible {
+  text-decoration: none;
+}
+
+a.feature::after {
+  content: "模块文档 ↗";
+  position: absolute;
+  right: 18px;
+  bottom: 15px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+a.feature:hover::after,
+a.feature:focus-visible::after {
+  opacity: 1;
+  transform: none;
+}
+
+.pkg-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.pkg-link code {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pkg-link:hover code,
+.pkg-link:focus-visible code {
+  background: color-mix(in srgb, var(--accent) 24%, var(--panel));
+  color: var(--accent);
+}
+
+.pkg-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
 /* ---------- 演示区 ---------- */
 
 .demo-grid {
