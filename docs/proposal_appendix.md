@@ -79,7 +79,7 @@ pinyin-toolkit 的真实强项（它做得比我们好，不回避）：
 - 覆盖率实测：**94.2%（1335/1417）**，disambiguate 96.1%；门槛总 ≥92%、每包 ≥85%
 - 变异门禁：**14/14 KILLED**
 - CI：quality（fmt/check/build/mbti/docs）+ test×4 + coverage；mutation 手动/每周
-- 展示页门禁：`check_pages` **102 项**（含 17 个导出与 pinyin4cj 十项语义断言）
+- 展示页门禁：`check_pages` **104 项**（含 17 个导出、pinyin4cj 十项语义断言与 API 表 20 行覆盖）
 - 文档门禁：`check_docs` **76 项**（版本、测试数、包数、工具链、相对链接）
 - 可运行演示：`moon run demo --target native`
 - 在线演示：https://toadium.github.io/pinyin/ ，17 个 `#export_name` 导出在浏览器本地计算；

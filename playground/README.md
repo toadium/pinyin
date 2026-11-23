@@ -75,7 +75,7 @@ pinyin_input("nihao").split("|")[0];
 ## 约束
 
 - 导出函数必须保持非 raise；新增导出需同步 `docs/app.js` 与 `scripts/check_pages.mjs`。
-- 产物包含完整字典（约 4.3 MB，gzip 后约 1 MB），页面加载即完成初始化。
+- 产物包含完整字典（4.73 MB，gzip 0.86 MB），页面加载即完成初始化。
 - 修改导出或交互后需跑浏览器验收，字符串断言不能替代真实运行。
 
 ## 相关

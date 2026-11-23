@@ -38,7 +38,7 @@ pinyin-toolkit 强在 UniHan 数据、可审计 token/搜索键、批量转换�
   通用拼音）与转换/输入法/双拼/消歧/分词/规范化
 - 文档：14 份包级 README；页面模块卡/API 表/演示标签直达对应包文档
 - 质量：**328 测试/后端 × 4 = 1312**、覆盖率 **94.2%**（1335/1417）、变异 **14/14**、
-  `check_pages` **102 项**、`check_docs` **76 项**，CI 四后端严格门禁
+  `check_pages` **104 项**、`check_docs` **76 项**，CI 四后端严格门禁
 - 多音字覆盖：**3,050** 字 / **6,669** 读音全部收录；常用字 **617** 个多音字词组覆盖 **100%**
   （`check_polyphones.mjs` 门禁；全量词组覆盖 31.15%，生僻字回退字级 + bigram）
 
@@ -54,8 +54,8 @@ pinyin-toolkit 强在 UniHan 数据、可审计 token/搜索键、批量转换�
 
 Viterbi+bigram O(nk²)；Beam O(SBC)；Trie+DP O(n²L)；双拼 O(n)。大词库以 **6 个字符串
 分片 + 运行时解析**存储，规避 wasm 全局初始化 `local count too large` 与 MoonBit
-单文本段行数上限；`playground.js` 约 4.3 MB（gzip 后约 1 MB），Node 侧加载+初始化
-393 ms，单次消歧约 0.04 ms。四后端行为一致，零运行时 IO。
+单文本段行数上限；`playground.js` 4.73 MB（gzip 0.86 MB），Node 侧加载+初始化
+711 ms，单次消歧约 0.08 ms（2026-11-23 实测）。四后端行为一致，零运行时 IO。
 
 **在线演示与可复现证据**
 
@@ -72,7 +72,7 @@ node scripts/check_coverage.mjs                        # 94.2%（1335/1417）
 node scripts/mutation_test.mjs                         # 14/14 KILLED
 node scripts/check_docs.mjs                            # 76 项
 node scripts/check_polyphones.mjs                      # 多音字覆盖门禁
-node scripts/check_pages.mjs                           # 102 项
+node scripts/check_pages.mjs                           # 104 项
 ```
 
 **移植边界**
@@ -89,6 +89,6 @@ AI 辅助测试、文档、展示页与部分实现；算法选型、边界与�
 
 **预期交付**
 
-MoonBit 包、`demo`、14 份包 README、1312 测试、102 项页面门禁、在线交互演示。
+MoonBit 包、`demo`、14 份包 README、1312 测试、104 项页面门禁、在线交互演示。
 
 > 技术细节与组委会关切逐条回复见 `docs/proposal_appendix.md` 与 `回复组委会关切.md`。
