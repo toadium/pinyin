@@ -682,12 +682,12 @@ python scripts/gen_pinyin_dict.py
 
 ## 参考来源
 
-本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/pinyin4cj/pinyin4cj)（MIT 许可证），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、声母韵母提取、N-gram 语言模型、拼音输入法引擎等十大核心引擎。
+本项目核心转换 API（PinyinHelper / ChineseHelper）的字典数据与接口设计参考自 Cangjie 库 [pinyin4cj](https://gitcode.com/Cangjie-TPC/pinyin4cj)（MIT 许可证；Gitcode 仓库页 license 徽章为 MIT，GitHub 三个公开镜像仓库 license 经 API 核验均为 MIT），并在此基础上自研了反向查找、分词、模糊匹配、消歧、搜索索引、声调变调、编辑距离、规范化、声母韵母提取、N-gram 语言模型、拼音输入法引擎等十大核心引擎。
 
 | 项 | 内容 |
 |---|---|
 | 参考项目 | pinyin4cj |
-| 参考链接 | https://gitcode.com/pinyin4cj/pinyin4cj |
+| 参考链接 | https://gitcode.com/Cangjie-TPC/pinyin4cj |
 | 参考项目语言 | Cangjie（仓颉） |
 | 参考项目许可证 | MIT |
 | 参考范围 | pinyin_helper + chinese_helper 的字典数据与接口设计 |
