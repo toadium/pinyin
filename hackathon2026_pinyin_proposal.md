@@ -7,9 +7,9 @@
 - 仓库：https://github.com/toadium/pinyin
 - 在线演示：https://toadium.github.io/pinyin/（浏览器内计算，无后端）
 - Gitlink：提交前填写（与 GitHub 同步）
-- 版本：开发版 v0.8.0；mooncakes 最新发布 v0.6.0（v0.8.0 待发布）
-- 许可证：MIT；字典数据参考 pinyin4cj（MIT），大词库来自 pypinyin（MIT）
-- 当前提交：`1ce5094`（2026-11-23）
+- 版本：v0.8.0；mooncakes 已发布 v0.8.0（2026-11-24，registry build_status: success）
+- 许可证：MIT；字典数据参考 pinyin4cj（MIT，三个公开镜像均经 GitHub API 核验为 MIT），大词库来自 pypinyin（MIT）
+- 当前提交：`74eef5b`（2026-11-23）
 
 **项目简介**
 
